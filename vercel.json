@@ -1,0 +1,11 @@
+{
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "framework": null,
+  "functions": {
+    "dist/server/**/*.mjs": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
+
