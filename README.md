@@ -10,7 +10,7 @@ A modern meal planning web application built with [Vike](https://vike.dev) and [
 - **Build Tool**: Vite
 - **Package Manager**: pnpm
 
-## Getting Started
+## Get Started
 
 ```sh
 # Install dependencies
