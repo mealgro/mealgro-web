@@ -2,7 +2,9 @@
   <section class="riders-hero">
     <div class="riders-hero__container">
       <div class="riders-hero__topbar">
-        <img :src="logoImage" alt="MealGro logo" class="riders-hero__logo" />
+        <a href="/">
+          <img :src="logoImage" alt="MealGro logo" class="riders-hero__logo" />
+        </a>
         <button
           class="riders-hero__menu"
           type="button"
@@ -261,6 +263,11 @@ onUnmounted(() => {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 32px;
+  }
+
+  .riders-hero__topbar a {
+    display: inline-block;
+    text-decoration: none;
   }
 
   .riders-hero__logo {

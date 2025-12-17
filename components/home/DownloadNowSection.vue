@@ -177,6 +177,8 @@ onUnmounted(() => {
     overflow-x: hidden;
     padding-left: 0;
     padding-right: 0;
+    padding-top: 0;
+    margin-top: 0;
   }
 
   .download-section .container {
@@ -197,7 +199,7 @@ onUnmounted(() => {
     max-width: 100%;
     position: relative;
     min-height: 600px;
-    padding: 20px;
+    padding: 10px 20px 20px 20px;
   }
 
   .mobile-bg-box {

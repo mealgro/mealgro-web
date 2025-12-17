@@ -2,7 +2,6 @@
   <div class="min-h-screen">
     <!-- Import and use components from /components/home/ -->
     <HeroSection />
-    <LocationSection />
     <DownloadNowSection />
     <FindWhatYouCraveSection />
     <GetStartedSection />
@@ -19,7 +18,7 @@
 <script setup lang="ts">
 // Import components from /components/home/
 import HeroSection from "../../components/home/HeroSection.vue";
-import LocationSection from "../../components/home/LocationSection.vue";
+// import LocationSection from "../../components/home/LocationSection.vue";
 import DownloadNowSection from "../../components/home/DownloadNowSection.vue";
 import FindWhatYouCraveSection from "../../components/home/FindWhatYouCraveSection.vue";
 import GetStartedSection from "../../components/home/GetStartedSection.vue";

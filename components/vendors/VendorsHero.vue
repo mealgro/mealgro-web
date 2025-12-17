@@ -2,7 +2,9 @@
   <section class="vendors-hero">
     <div class="vendors-hero__container">
       <div class="vendors-hero__topbar">
-        <img :src="logoImage" alt="MealGro logo" class="vendors-hero__logo" />
+        <a href="/">
+          <img :src="logoImage" alt="MealGro logo" class="vendors-hero__logo" />
+        </a>
         <button
           class="vendors-hero__menu"
           type="button"
@@ -333,6 +335,11 @@ onUnmounted(() => {
     margin-bottom: 40px;
     position: relative;
     z-index: 10;
+  }
+
+  .vendors-hero__topbar a {
+    display: inline-block;
+    text-decoration: none;
   }
 
   .vendors-hero__logo {
