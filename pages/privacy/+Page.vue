@@ -1,5 +1,5 @@
 <template>
-  <div class="contact-page-wrapper">
+  <div class="help-page-wrapper">
     <!-- Mobile/Tablet Header -->
     <div class="mobile-header">
       <div class="mobile-logo-container">
@@ -67,35 +67,25 @@
       </nav>
     </transition>
 
-    <div class="min-h-screen contact-page">
-      <div class="contact-container">
-        <div class="contact-content">
-          <h1 class="contact-title">Contact Us</h1>
-          <p class="contact-intro">
-            We'd love to hear from you! Whether you have a question, feedback, or need support, our team is here to help.
-          </p>
-          <div class="contact-grid">
-            <div class="contact-card">
-              <h2 class="contact-card-title">Customer Support</h2>
-              <p class="contact-card-text">
-                For order inquiries, delivery issues, or general questions about our service.
-              </p>
-              <div class="contact-info">
-                <p><strong>Email:</strong> <a href="mailto:support@mealgro.com" class="contact-email">support@mealgro.com</a></p>
-              </div>
-            </div>
-            <div class="contact-card">
-              <h2 class="contact-card-title">General Inquiries</h2>
-              <p class="contact-card-text">
-                For business inquiries, partnerships, or any other questions.
-              </p>
-              <div class="contact-info">
-                <p><strong>Email:</strong> <a href="mailto:info@mealgro.com" class="contact-email">info@mealgro.com</a></p>
-              </div>
+    <div class="min-h-screen help-page">
+      <div class="help-container">
+        <div class="help-content">
+          <h1 class="help-title">{{ pageTitle || 'Privacy Policy' }}</h1>
+          
+          <div v-if="loading" class="help-section">
+            <div class="help-text-content">
+              <p>Loading privacy policy...</p>
             </div>
           </div>
-          <div class="contact-note">
-            <p>You can also reach us through our social media channels for quick updates and announcements.</p>
+
+          <div v-else-if="error" class="help-section">
+            <div class="help-text-content">
+              <p>Error loading privacy policy. Please try again later.</p>
+            </div>
+          </div>
+
+          <div v-else class="help-section">
+            <div class="help-text-content markdown-content" v-html="renderedContent"></div>
           </div>
         </div>
       </div>
@@ -107,11 +97,17 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import axios from 'axios';
+import { marked } from 'marked';
 import Footer from '../../components/shared/Footer.vue';
 import { navLinks } from '../../components/shared/navLinks';
 import logoImage from '../../assets/logo.svg';
 
 const isMobileMenuOpen = ref(false);
+const loading = ref(true);
+const error = ref(false);
+const pageTitle = ref('');
+const renderedContent = ref('');
 
 const mobileNavLinks = computed(() => {
   return navLinks.filter(link => link.href !== '/');
@@ -131,8 +127,39 @@ const handleEscape = (event: KeyboardEvent) => {
   }
 };
 
+const fetchPrivacyPolicy = async () => {
+  try {
+    loading.value = true;
+    error.value = false;
+    
+    const response = await axios.get('https://api.mealgro.com/v1/privacy-policy');
+    
+    if (response.data.status === 'success' && response.data.data) {
+      pageTitle.value = response.data.data.title || 'Privacy Policy';
+      const markdownContent = response.data.data.content || '';
+      
+      // Configure marked options
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+      });
+      
+      // Parse markdown to HTML
+      renderedContent.value = marked.parse(markdownContent);
+    } else {
+      error.value = true;
+    }
+  } catch (err) {
+    console.error('Error fetching privacy policy:', err);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
+
 onMounted(() => {
   window.addEventListener('keydown', handleEscape);
+  fetchPrivacyPolicy();
 });
 
 onUnmounted(() => {
@@ -141,11 +168,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.contact-page-wrapper {
+.help-page-wrapper {
   background: #000000;
 }
 
-.contact-page {
+.help-page {
   background: #D62300;
   color: #FFFFFF;
   padding: clamp(120px, 15vw, 180px) 0 clamp(80px, 10vw, 120px);
@@ -157,130 +184,169 @@ onUnmounted(() => {
   height: clamp(60px, 8vw, 100px);
 }
 
-.contact-container {
-  max-width: 1200px;
+.help-container {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 clamp(12px, 2vw, 28px);
+  padding: 0 clamp(8px, 1.5vw, 20px);
 }
 
-.contact-content {
+.help-content {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 40px;
-  padding: clamp(24px, 3vw, 40px);
+  padding: clamp(16px, 2.5vw, 32px);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
 
-.contact-title {
+.help-title {
   font-family: 'MADE Tommy Soft', sans-serif;
   font-weight: 800;
   font-size: clamp(48px, 6vw, 72px);
   line-height: 1.2;
   letter-spacing: -0.25px;
   color: #FFFFFF;
-  margin: 0 0 clamp(24px, 4vw, 32px);
+  margin: 0 0 clamp(48px, 6vw, 64px);
   text-align: center;
 }
 
-.contact-intro {
+.help-section {
+  margin-bottom: clamp(48px, 6vw, 64px);
+}
+
+.help-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.help-text-content {
   font-family: 'MADE Tommy Soft', sans-serif;
   font-weight: 400;
-  font-size: clamp(20px, 3vw, 24px);
-  line-height: 1.6;
+  font-size: clamp(16px, 2vw, 18px);
+  line-height: 1.7;
   letter-spacing: -0.25px;
   color: #FFFFFF;
-  text-align: center;
-  margin: 0 0 clamp(48px, 6vw, 64px);
+}
+
+.help-text-content p {
+  margin: 0 0 clamp(20px, 3vw, 24px);
   opacity: 0.95;
 }
 
-.contact-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: clamp(24px, 4vw, 32px);
-  margin-bottom: clamp(32px, 5vw, 48px);
-}
-
-.contact-card {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 24px;
-  padding: clamp(24px, 4vw, 32px);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.contact-card-title {
+.help-subsection-title {
   font-family: 'MADE Tommy Soft', sans-serif;
-  font-weight: 700;
-  font-size: clamp(24px, 3vw, 28px);
-  line-height: 1.3;
+  font-weight: 600;
+  font-size: clamp(20px, 2.5vw, 24px);
+  line-height: 1.4;
   letter-spacing: -0.25px;
   color: #FFE100;
-  margin: 0 0 clamp(16px, 2.5vw, 20px);
+  margin: clamp(24px, 4vw, 32px) 0 clamp(12px, 2vw, 16px);
 }
 
-.contact-card-text {
+/* Markdown content styling */
+.markdown-content {
   font-family: 'MADE Tommy Soft', sans-serif;
   font-weight: 400;
   font-size: clamp(16px, 2vw, 18px);
-  line-height: 1.6;
+  line-height: 1.7;
   letter-spacing: -0.25px;
   color: #FFFFFF;
+}
+
+.markdown-content p {
   margin: 0 0 clamp(20px, 3vw, 24px);
-  opacity: 0.9;
-}
-
-.contact-info {
-  font-family: 'MADE Tommy Soft', sans-serif;
-  font-weight: 400;
-  font-size: clamp(16px, 2vw, 18px);
-  line-height: 1.8;
-  letter-spacing: -0.25px;
-  color: #FFFFFF;
-}
-
-.contact-info p {
-  margin: 0 0 clamp(8px, 1.5vw, 12px);
   opacity: 0.95;
 }
 
-.contact-info strong {
+.markdown-content h2 {
+  font-family: 'MADE Tommy Soft', sans-serif;
+  font-weight: 700;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.3;
+  letter-spacing: -0.25px;
+  color: #FFFFFF;
+  margin: clamp(32px, 5vw, 48px) 0 clamp(20px, 3vw, 24px);
+  padding-bottom: clamp(16px, 2.5vw, 20px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.markdown-content h3 {
+  font-family: 'MADE Tommy Soft', sans-serif;
+  font-weight: 600;
+  font-size: clamp(20px, 2.5vw, 24px);
+  line-height: 1.4;
+  letter-spacing: -0.25px;
+  color: #FFE100;
+  margin: clamp(24px, 4vw, 32px) 0 clamp(12px, 2vw, 16px);
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin: 0 0 clamp(20px, 3vw, 24px);
+  padding-left: clamp(24px, 4vw, 32px);
+  opacity: 0.95;
+}
+
+.markdown-content li {
+  margin-bottom: clamp(12px, 2vw, 16px);
+  line-height: 1.7;
+}
+
+.markdown-content a {
+  color: #FFE100;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.markdown-content a:hover {
+  opacity: 0.8;
+}
+
+.markdown-content strong {
   color: #FFE100;
   font-weight: 600;
 }
 
-.contact-email {
-  color: #FFE100;
-  text-decoration: none;
-  transition: opacity 0.2s;
+.markdown-content code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
 }
 
-.contact-email:hover {
-  opacity: 0.8;
-  text-decoration: underline;
+.markdown-content pre {
+  background: rgba(255, 255, 255, 0.1);
+  padding: clamp(16px, 2.5vw, 20px);
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0 0 clamp(20px, 3vw, 24px);
 }
 
-.contact-note {
+.markdown-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.help-contact {
+  margin-top: clamp(48px, 6vw, 64px);
+  padding-top: clamp(32px, 5vw, 48px);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
   text-align: center;
-  padding-top: clamp(24px, 4vw, 32px);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.contact-note p {
+.help-contact p {
   font-family: 'MADE Tommy Soft', sans-serif;
   font-weight: 400;
-  font-size: clamp(16px, 2vw, 18px);
+  font-size: clamp(18px, 2.5vw, 20px);
   line-height: 1.6;
   letter-spacing: -0.25px;
   color: #FFFFFF;
   margin: 0;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
-@media (max-width: 768px) {
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
+.help-contact strong {
+  color: #FFE100;
+  font-weight: 600;
 }
 
 /* Mobile Header */
@@ -397,7 +463,7 @@ onUnmounted(() => {
     transform: translateY(-10px);
   }
 
-  .contact-page {
+  .help-page {
     padding-top: clamp(100px, 15vw, 180px);
   }
 }

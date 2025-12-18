@@ -38,7 +38,7 @@
                 <li class="font-bold text-[24px] leading-[68px] tracking-[-0.25px] text-white">About us</li>
                 <li><a href="/about" class="text-[24px] leading-[68px] tracking-[-0.25px] text-white font-normal hover:opacity-70 transition-opacity block">Who we are</a></li>
                 <li><a href="/about" class="text-[24px] leading-[68px] tracking-[-0.25px] text-white font-normal hover:opacity-70 transition-opacity block">Our core values</a></li>
-                <li><a href="/help" class="text-[24px] leading-[68px] tracking-[-0.25px] text-white font-normal hover:opacity-70 transition-opacity block">Privacy policies</a></li>
+                <li><a href="/privacy" class="text-[24px] leading-[68px] tracking-[-0.25px] text-white font-normal hover:opacity-70 transition-opacity block">Privacy policies</a></li>
               </ul>
             </div>
           </div>
@@ -106,26 +106,29 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         <!-- Social Media Icons (mobile first) -->
         <div class="flex items-center gap-4 md:order-2">
-          <a href="#" @click.prevent="scrollToTop" class="hover:opacity-70 transition-opacity">
+          <a href="https://www.facebook.com/share/14VPaxDJVbY/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="hover:opacity-70 transition-opacity">
             <img :src="facebookIcon" alt="Facebook" class="w-7 h-7 object-contain" />
           </a>
-          <a href="#" @click.prevent="scrollToTop" class="hover:opacity-70 transition-opacity">
+          <a href="https://www.instagram.com/trymealgro?igsh=Y2R4YXRjYnBhbjV5&utm_source=qr" target="_blank" rel="noopener noreferrer" class="hover:opacity-70 transition-opacity">
             <img :src="instagramIcon" alt="Instagram" class="w-7 h-8 object-contain" />
           </a>
-          <a href="#" @click.prevent="scrollToTop" class="hover:opacity-70 transition-opacity">
+          <a href="https://www.linkedin.com/company/mealgro/" target="_blank" rel="noopener noreferrer" class="hover:opacity-70 transition-opacity">
             <img :src="linkedInIcon" alt="LinkedIn" class="w-6 h-6 object-contain" />
+          </a>
+          <a href="https://x.com/mealgro?s=21&t=DqLhe4jYMReTjpiqvefrMQ" target="_blank" rel="noopener noreferrer" class="hover:opacity-70 transition-opacity">
+            <img :src="twitterIcon" alt="Twitter" class="w-7 h-7 object-contain" style="filter: brightness(0) invert(1);" />
           </a>
         </div>
 
         <!-- Copyright and Legal Links -->
         <div class="flex flex-col md:flex-row items-center gap-2 md:gap-4 md:order-1 text-center md:text-left">
           <p class="text-sm text-white">
-            All rights reserved, 2025, Meal Gro.
+            All rights reserved, 2025, MealGro.
           </p>
           <div class="hidden md:flex items-center gap-4 text-sm">
-            <a href="/help" class="text-white hover:opacity-70 transition-opacity">Privacy Policy</a>
+            <a href="/privacy" class="text-white hover:opacity-70 transition-opacity">Privacy Policy</a>
             <span class="text-white">•</span>
-            <a href="/help" class="text-white hover:opacity-70 transition-opacity">Terms of Service</a>
+            <a href="/terms" class="text-white hover:opacity-70 transition-opacity">Terms of Service</a>
           </div>
         </div>
       </div>
@@ -140,6 +143,7 @@ import playStoreIcon from '../../assets/download/playstore.svg';
 import facebookIcon from '../../assets/footer/Vector (1).svg';
 import instagramIcon from '../../assets/footer/Vector (2).svg';
 import linkedInIcon from '../../assets/footer/Vector (3).svg';
+import twitterIcon from '../../assets/footer/twitter-alt-square.svg';
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -160,7 +164,7 @@ const mobileEnquiries = [
 const mobileAbout = [
   { label: 'Who we are', href: '/about' },
   { label: 'Our core values', href: '/about' },
-  { label: 'Privacy policies', href: '/help' },
+  { label: 'Privacy policies', href: '/privacy' },
 ];
 </script>
 

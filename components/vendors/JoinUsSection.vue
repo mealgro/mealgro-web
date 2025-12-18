@@ -28,6 +28,7 @@
       </div>
       <div class="joinus-form-wrapper">
         <h2 class="form-title">Become a MealGro Vendor today</h2>
+        <p class="form-caption">Join the waitlist for the future of food delivery</p>
         <div class="joinus-form-card">
           <form class="form-grid" @submit.prevent>
             <label class="form-field">
@@ -39,7 +40,7 @@
               <input type="text" class="form-input" />
             </label>
             <label class="form-field">
-              <span>Phone number</span>
+              <span>Phone number (WhatsApp)</span>
               <input type="tel" class="form-input" />
             </label>
             <label class="form-field">
@@ -225,7 +226,7 @@ onUnmounted(() => {
 }
 
 .form-title {
-  margin: 0 0 clamp(24px, 4vw, 32px);
+  margin: 0 0 clamp(12px, 2vw, 16px);
   font-family: 'MADE Tommy Soft', sans-serif;
   font-style: normal;
   font-weight: 500;
@@ -236,6 +237,19 @@ onUnmounted(() => {
   color: #000000;
   width: 455px;
   height: 110px;
+}
+
+.form-caption {
+  margin: 0 0 clamp(24px, 4vw, 32px);
+  font-family: 'MADE Tommy Soft', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(18px, 2.5vw, 24px);
+  line-height: 1.4;
+  letter-spacing: -0.25px;
+  text-align: left;
+  color: #8D8A8A;
+  width: 455px;
 }
 
 .joinus-form-card {
@@ -345,6 +359,10 @@ onUnmounted(() => {
     width: clamp(320px, 40vw, 455px);
   }
 
+  .form-caption {
+    width: clamp(320px, 40vw, 455px);
+  }
+
   .joinus-form-card {
     width: clamp(370px, 42vw, 463px);
     height: clamp(385px, 45vw, 482px);
@@ -411,6 +429,11 @@ onUnmounted(() => {
     height: auto;
     font-size: clamp(36px, 5vw, 50px);
     line-height: clamp(40px, 5.5vw, 54px);
+    text-align: center;
+  }
+
+  .form-caption {
+    width: auto;
     text-align: center;
   }
 

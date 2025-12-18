@@ -156,14 +156,14 @@ onUnmounted(() => {
 .about-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 clamp(24px, 5vw, 72px);
+  padding: 0 clamp(12px, 2vw, 28px);
 }
 
 .about-content {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 40px;
-  padding: clamp(40px, 6vw, 80px);
+  padding: clamp(24px, 3vw, 40px);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
 

@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { usePageContext } from 'vike-vue/usePageContext';
 import Navigation from "../components/shared/Navigation.vue";
 import logoImage from "../assets/logo.svg";
@@ -29,6 +29,47 @@ const isRedLogoPage = computed(() => {
   const path = pageContext.urlPathname;
   return path === '/' || path === '/riders';
 });
+
+// Prevent zoom via keyboard shortcuts (Ctrl/Cmd + Plus/Minus/0)
+const preventZoomKeyboard = (e: KeyboardEvent) => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+    e.preventDefault();
+    return false;
+  }
+};
+
+// Prevent zoom via mouse wheel with Ctrl/Cmd
+const preventZoomWheel = (e: WheelEvent) => {
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    return false;
+  }
+};
+
+// Prevent pinch zoom gestures
+const preventZoomTouch = (e: TouchEvent) => {
+  if (e.touches.length > 1) {
+    e.preventDefault();
+    return false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('keydown', preventZoomKeyboard);
+  document.addEventListener('wheel', preventZoomWheel, { passive: false });
+  document.addEventListener('touchstart', preventZoomTouch, { passive: false });
+  document.addEventListener('touchmove', preventZoomTouch, { passive: false });
+  document.addEventListener('gesturestart', (e) => e.preventDefault());
+  document.addEventListener('gesturechange', (e) => e.preventDefault());
+  document.addEventListener('gestureend', (e) => e.preventDefault());
+});
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', preventZoomKeyboard);
+  document.removeEventListener('wheel', preventZoomWheel);
+  document.removeEventListener('touchstart', preventZoomTouch);
+  document.removeEventListener('touchmove', preventZoomTouch);
+});
 </script>
 
 <style>
@@ -36,6 +77,8 @@ html {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
+  touch-action: pan-x pan-y;
+  -ms-touch-action: pan-x pan-y;
 }
 
 body {
@@ -48,9 +91,23 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  touch-action: pan-x pan-y;
+  -ms-touch-action: pan-x pan-y;
 }
+
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent zoom on double tap - use manipulation to disable pinch zoom */
+* {
+  touch-action: manipulation;
+}
+
+/* Allow text selection and normal touch behavior for interactive elements */
+input, textarea, [contenteditable], a, button {
+  touch-action: auto;
 }
 </style>
 
