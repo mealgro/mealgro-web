@@ -5,9 +5,12 @@ import vikeVue from "vike-vue/config";
 // https://vike.dev/config
 
 export default {
-  // https://vike.dev/head-tags
-  title: "Mealgro - Your food at your doorstep in minutes",
-  description: "Your food at your doorstep in minutes",
+	// https://vike.dev/head-tags
+	title: "Mealgro - Your food at your doorstep in minutes",
+	description: "Your food at your doorstep in minutes",
 
-  extends: [vikeVue],
+	extends: [vikeVue],
+	prerender: {
+		enable: true,
+	},
 } as Config;
