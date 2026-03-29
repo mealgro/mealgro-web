@@ -99,7 +99,10 @@
 								required
 							/>
 						</label>
-						<button type="submit" class="form-submit">
+						<button
+							type="submit"
+							class="form-submit bg-[#FF2509] hover:bg-[#FF2509]/90 focus-within:bg-[#FF2509]/80"
+						>
 							Submit
 						</button>
 					</form>
@@ -382,15 +385,14 @@ onUnmounted(() => {
 	line-height: 1.2;
 	text-align: center;
 	letter-spacing: -0.25px;
-	color: #b2acac;
-	background: #d9d9d9;
-	cursor: not-allowed;
+	color: white;
 	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	box-sizing: border-box;
 	align-self: center;
+	cursor: pointer;
 }
 
 @media (max-width: 1200px) {

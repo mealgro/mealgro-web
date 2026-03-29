@@ -38,7 +38,12 @@
 					/>
 					<label class="form-field">
 						<span>Full name</span>
-						<input type="text" name="full_name" placeholder="" required />
+						<input
+							type="text"
+							name="full_name"
+							placeholder=""
+							required
+						/>
 					</label>
 					<label class="form-field">
 						<span>Phone number</span>
@@ -51,9 +56,19 @@
 					</label>
 					<label class="form-field">
 						<span>Email</span>
-						<input type="email" name="email" placeholder="" required />
+						<input
+							type="email"
+							name="email"
+							placeholder=""
+							required
+						/>
 					</label>
-					<button type="submit" class="form-submit">Submit</button>
+					<button
+						type="submit"
+						class="form-submit bg-[#FF2509] hover:bg-[#FF2509]/90 focus-within:bg-[#FF2509]/80"
+					>
+						Submit
+					</button>
 				</form>
 			</div>
 		</div>
@@ -231,9 +246,8 @@ onUnmounted(() => {
 	font-family: "MADE Tommy Soft", sans-serif;
 	font-size: 20px;
 	font-weight: 600;
-	color: rgba(18, 18, 18, 0.4);
-	background: #ebebeb;
-	cursor: not-allowed;
+	color: white;
+	cursor: pointer;
 }
 
 @media (max-width: 1024px) {
