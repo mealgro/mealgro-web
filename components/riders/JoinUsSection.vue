@@ -38,7 +38,7 @@
 					/>
 					<label class="form-field">
 						<span>Full name</span>
-						<input type="text" name="full_name" placeholder="" />
+						<input type="text" name="full_name" placeholder="" required />
 					</label>
 					<label class="form-field">
 						<span>Phone number</span>
@@ -46,15 +46,14 @@
 							type="tel"
 							name="phone"
 							placeholder="+23490XXXXXXXX"
+							required
 						/>
 					</label>
 					<label class="form-field">
 						<span>Email</span>
-						<input type="email" name="email" placeholder="" />
+						<input type="email" name="email" placeholder="" required />
 					</label>
-					<button type="submit" class="form-submit" disabled>
-						Submit
-					</button>
+					<button type="submit" class="form-submit">Submit</button>
 				</form>
 			</div>
 		</div>

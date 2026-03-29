@@ -48,6 +48,7 @@
 								type="text"
 								name="full_name"
 								class="form-input"
+								required
 							/>
 						</label>
 						<label class="form-field">
@@ -56,6 +57,8 @@
 								type="text"
 								name="business_name"
 								class="form-input"
+								placeholder="Your business name"
+								required
 							/>
 						</label>
 						<label class="form-field">
@@ -65,6 +68,7 @@
 								name="phone"
 								class="form-input"
 								placeholder="+23490XXXXXXXX"
+								required
 							/>
 						</label>
 						<label class="form-field">
@@ -73,6 +77,8 @@
 								type="email"
 								name="email"
 								class="form-input"
+								placeholder="Your email address"
+								required
 							/>
 						</label>
 						<label class="form-field">
@@ -81,13 +87,19 @@
 								type="text"
 								name="state"
 								class="form-input"
+								required
 							/>
 						</label>
 						<label class="form-field">
 							<span>City</span>
-							<input type="text" name="city" class="form-input" />
+							<input
+								type="text"
+								name="city"
+								class="form-input"
+								required
+							/>
 						</label>
-						<button type="submit" class="form-submit" disabled>
+						<button type="submit" class="form-submit">
 							Submit
 						</button>
 					</form>
