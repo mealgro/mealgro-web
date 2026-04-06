@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "6755588662.app.mealgro.mobile",
+        "paths": ["*"]
+      }
+    ]
+  }
+}
