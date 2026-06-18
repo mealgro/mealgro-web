@@ -4,7 +4,19 @@
     "details": [
       {
         "appID": "6755588662.app.mealgro.mobile",
-        "paths": ["*"]
+        "paths": [
+          "NOT /about", "NOT /about/*",
+          "NOT /contact", "NOT /contact/*",
+          "NOT /help", "NOT /help/*",
+          "NOT /privacy", "NOT /privacy/*",
+          "NOT /terms", "NOT /terms/*",
+          "NOT /riders", "NOT /riders/*",
+          "NOT /vendors", "NOT /vendors/*",
+          "NOT /.well-known/*",
+          "NOT /assets/*",
+          "/link",
+          "/*"
+        ]
       }
     ]
   }
