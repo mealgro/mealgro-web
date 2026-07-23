@@ -62,6 +62,15 @@
 							/>
 						</label>
 						<label class="form-field">
+							<span>Business Address</span>
+							<input
+								type="text"
+								name="address"
+								class="form-input"
+								required
+							/>
+						</label>
+						<label class="form-field">
 							<span>Phone number (WhatsApp)</span>
 							<input
 								type="tel"
@@ -115,15 +124,15 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import becomeAVendorImage from "../../assets/vendors/becomeavendor.png";
-import foodViewImage from "../../assets/vendors/foodview.png";
-import vendorImage from "../../assets/vendors/vendor.png";
+import vendor2 from "../../assets/vendors/vendor_2.jpeg";
+import vendorImage from "../../assets/vendors/vendor_package.jpeg";
+import vendorRiderPickup from "../../assets/vendors/vendor_rider_pickup.png";
 
 const carouselImages = [
 	becomeAVendorImage,
-	foodViewImage,
+	vendor2,
 	vendorImage,
-	becomeAVendorImage,
-	foodViewImage,
+	vendorRiderPickup,
 ];
 const currentSlide = ref(0);
 

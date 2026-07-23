@@ -63,6 +63,33 @@
 							required
 						/>
 					</label>
+					<label class="form-field">
+						<span>State</span>
+						<input
+							type="text"
+							name="state"
+							class="form-input"
+							required
+						/>
+					</label>
+					<label class="form-field">
+						<span>City</span>
+						<input
+							type="text"
+							name="city"
+							class="form-input"
+							required
+						/>
+					</label>
+					<label class="form-field">
+						<span>Address</span>
+						<input
+							type="text"
+							name="address"
+							class="form-input"
+							required
+						/>
+					</label>
 					<button
 						type="submit"
 						class="form-submit bg-[#FF2509] hover:bg-[#FF2509]/90 focus-within:bg-[#FF2509]/80"
@@ -78,8 +105,18 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import workingManImage from "../../assets/riders/workingman.jpg";
+import riderBackPack from "../../assets/riders/rider_backpack.png";
+import riderDelivery from "../../assets/riders/rider_deliver.png";
+import riderInDelivery from "../../assets/riders/rider_in_delivery.jpg";
+import riderInDelivery2 from "../../assets/riders/rider_in_delivery_2.jpg";
 
-const carouselImages = [workingManImage, workingManImage, workingManImage];
+const carouselImages = [
+	workingManImage,
+	riderBackPack,
+	riderDelivery,
+	riderInDelivery,
+	riderInDelivery2,
+];
 const currentSlide = ref(0);
 
 let autoSlideInterval: ReturnType<typeof setInterval> | null = null;
@@ -194,13 +231,17 @@ onUnmounted(() => {
 }
 
 .form-title {
-	margin: 0 0 32px;
+	margin: 0 0 clamp(12px, 2vw, 16px);
 	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 700;
-	font-size: clamp(28px, 3vw, 36px);
-	line-height: clamp(34px, 3.6vw, 44px);
-	text-align: center;
-	color: #121212;
+	font-style: normal;
+	font-weight: 500;
+	font-size: 50px;
+	line-height: 54px;
+	letter-spacing: -0.25px;
+	text-align: left;
+	color: #000000;
+	width: 455px;
+	height: 110px;
 }
 
 .form-grid {
@@ -212,10 +253,16 @@ onUnmounted(() => {
 .form-field {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 6px;
 	font-family: "MADE Tommy Soft", sans-serif;
-	font-size: 18px;
-	color: #121212;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 16px;
+	letter-spacing: -0.25px;
+	color: #000000;
+	margin-bottom: 14px;
+	width: 100%;
+	position: relative;
 }
 
 .form-field span {
