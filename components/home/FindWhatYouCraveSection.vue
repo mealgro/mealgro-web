@@ -152,6 +152,39 @@ onUnmounted(() => {
   .mobile-carousel {
     display: block;
   }
+
+  .mobile-progress-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    gap: 2px;
+    width: 306px;
+    height: 28px;
+    margin: 24px auto 0;
+  }
+
+  .mobile-stepper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 4px;
+    width: 100.67px;
+    height: 25px;
+    flex: none;
+    flex-grow: 1;
+  }
+
+  .mobile-progress-bg {
+    width: 100.67px;
+    height: 4px;
+    border-radius: 100px;
+    flex: none;
+    align-self: stretch;
+    flex-grow: 0;
+    transition: background-color 0.3s ease;
+  }
 }
 
 @media (max-width: 768px) {
@@ -219,39 +252,6 @@ onUnmounted(() => {
     margin-left: 1rem;
     margin-right: 1rem;
     width: calc(100vw - 2rem);
-  }
-
-  .mobile-progress-bar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0;
-    gap: 2px;
-    width: 306px;
-    height: 28px;
-    margin: 24px auto 0;
-  }
-
-  .mobile-stepper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0;
-    gap: 4px;
-    width: 100.67px;
-    height: 25px;
-    flex: none;
-    flex-grow: 1;
-  }
-
-  .mobile-progress-bg {
-    width: 100.67px;
-    height: 4px;
-    border-radius: 100px;
-    flex: none;
-    align-self: stretch;
-    flex-grow: 0;
-    transition: background-color 0.3s ease;
   }
 }
 </style>

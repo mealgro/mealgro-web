@@ -190,6 +190,62 @@ import historyImage from '../../assets/vendors/X - 7.png';
     padding: 40px 20px 20px;
     background: #FFFFFF;
     position: relative;
+  }
+
+  .features-cards-section__mobile-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    z-index: 35;
+  }
+
+  /* Hide images inside cards */
+  .features-cards-section__image-wrapper {
+    display: none;
+  }
+
+  .features-cards-section__card {
+    min-height: 400px;
+    padding: 80px 20px 40px;
+    position: relative;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+  }
+
+  .features-cards-section__card--center {
+    border-radius: 0;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+  }
+
+  .features-cards-section__label {
+    font-weight: 700;
+  }
+
+  .features-cards-section__label--desktop {
+    display: none;
+  }
+
+  .features-cards-section__label--mobile {
+    display: block;
+  }
+}
+
+/*
+ * The stacked-card "peek" overlap effect below is tuned in percentage
+ * margins, which resolve against this section's own width (100vw), not
+ * its height. That's fine at real phone widths (~375px, -50% ≈ -187px)
+ * but becomes a -700px+ pull at tablet widths, dragging the whole section
+ * up over the hero above it. Scope the overlap effect to real phone
+ * widths only; the plain stacked layout above (no overlap) is the safe
+ * tablet fallback.
+ */
+@media (max-width: 640px) {
+  .features-cards-section__mobile-image-wrapper {
     margin-top: -50%;
   }
 
@@ -217,30 +273,9 @@ import historyImage from '../../assets/vendors/X - 7.png';
     position: relative;
   }
 
-  .features-cards-section__mobile-image {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto;
-    position: relative;
-    z-index: 35;
-  }
-
-  /* Hide images inside cards */
-  .features-cards-section__image-wrapper {
-    display: none;
-  }
-
   .features-cards-section__card {
-    min-height: 400px;
-    padding: 80px 20px 40px;
     margin-top: -70%;
-    position: relative;
     margin-bottom: -80%;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
     padding-bottom: 550px;
   }
 
@@ -250,8 +285,6 @@ import historyImage from '../../assets/vendors/X - 7.png';
 
   .features-cards-section__card--center {
     z-index: 35;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
     padding-bottom: 550px;
   }
 
@@ -260,23 +293,8 @@ import historyImage from '../../assets/vendors/X - 7.png';
     padding-bottom: 300px;
   }
 
-  .features-cards-section__card--center {
-    border-radius: 0;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
-  }
-
   .features-cards-section__label {
     margin-bottom: -50px;
-    font-weight: 700;
-  }
-
-  .features-cards-section__label--desktop {
-    display: none;
-  }
-
-  .features-cards-section__label--mobile {
-    display: block;
   }
 }
 </style>

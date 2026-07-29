@@ -149,6 +149,7 @@ onUnmounted(() => {
 .riders-hero__container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
   display: grid;
   grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
   grid-template-areas:
@@ -183,7 +184,7 @@ onUnmounted(() => {
   font-family: 'MADE Tommy Soft', sans-serif;
   font-weight: 800;
   margin: 0;
-  font-size: 64px;
+  font-size: clamp(40px, 5vw, 64px);
   line-height: 1.05;
   color: #ffffff;
 }
@@ -238,27 +239,16 @@ onUnmounted(() => {
   z-index: 1;
 }
 
-@media (max-width: 768px) {
-  .riders-hero {
-    padding: 40px 16px 20px;
-    overflow: visible;
-  }
-
+@media (max-width: 1024px) {
   .riders-hero__container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    grid-template-columns: 1fr;
     grid-template-areas:
-      'copy'
-      'visual'
-      'cta';
-    gap: 20px;
-    min-height: auto;
-    padding-bottom: 120px;
+      'topbar topbar'
+      'copy visual'
+      'cta visual';
   }
 
   .riders-hero__topbar {
+    grid-area: topbar;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -331,6 +321,26 @@ onUnmounted(() => {
     opacity: 0;
     transform: translateY(-10px);
   }
+}
+
+@media (max-width: 768px) {
+  .riders-hero {
+    padding: 40px 16px 20px;
+    overflow: visible;
+  }
+
+  .riders-hero__container {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'copy'
+      'visual'
+      'cta';
+    gap: 20px;
+    min-height: auto;
+    padding-bottom: 120px;
+  }
 
   .riders-hero__copy {
     align-items: center;
@@ -379,7 +389,7 @@ onUnmounted(() => {
   }
 
   .riders-hero__headline {
-    margin-bottom: -80px;
+    margin-bottom: clamp(-80px, -6vw, -20px);
   }
 }
 </style>

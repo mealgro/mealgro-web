@@ -1,5 +1,5 @@
 <template>
-	<section class="joinus-section">
+	<section id="join-us" class="joinus-section">
 		<div class="joinus-container">
 			<div class="joinus-media">
 				<div class="media-wrapper">
@@ -26,7 +26,7 @@
 					<div class="stepper stepper--last"></div>
 				</div>
 			</div>
-			<div class="joinus-form-wrapper">
+			<div id="join-us" class="joinus-form-wrapper">
 				<h2 class="form-title">Become a MealGro Vendor today</h2>
 				<p class="form-caption">
 					Join the waitlist for the future of food delivery
@@ -504,9 +504,10 @@ onUnmounted(() => {
 		height: auto;
 		min-height: 482px;
 		margin: 0;
-		border-radius: 0;
-		padding-left: 0;
-		padding-right: 0;
+		border-radius: 40px 40px 0 0;
+		padding-top: 30px;
+		padding-left: 20px;
+		padding-right: 20px;
 	}
 
 	.form-grid {

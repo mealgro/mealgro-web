@@ -30,7 +30,14 @@ import { getAnalytics } from "firebase/analytics";
 const pageContext = usePageContext();
 const isRedLogoPage = computed(() => {
 	const path = pageContext.urlPathname;
-	return path === "/" || path === "/riders";
+	return (
+		path === "/" ||
+		path === "/riders" ||
+		path === "/terms" ||
+		path === "/privacy" ||
+		path === "/about" ||
+		path === "/contact"
+	);
 });
 
 // Prevent zoom via keyboard shortcuts (Ctrl/Cmd + Plus/Minus/0)

@@ -101,7 +101,7 @@ const vehicles: VehicleOption[] = [
 .vehicle-option__label {
   font-family: 'MADE Tommy Soft', sans-serif;
   font-weight: 500;
-  font-size: 28px;
+  font-size: clamp(15px, 2vw, 28px);
   line-height: 1.3;
   letter-spacing: -0.25px;
   color: #000000;
@@ -111,13 +111,13 @@ const vehicles: VehicleOption[] = [
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 70px;
-  height: 70px;
+  width: clamp(36px, 5vw, 70px);
+  height: clamp(36px, 5vw, 70px);
 }
 
 .vehicle-option__icon img {
-  width: 70px;
-  height: 70px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 

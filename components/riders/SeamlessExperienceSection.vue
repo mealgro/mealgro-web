@@ -57,8 +57,9 @@ import handphoneImage from '../../assets/riders/handphone.svg';
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 800px;
-  width: 800px;
+  width: min(800px, 100%);
+  aspect-ratio: 1 / 1;
+  height: auto;
 }
 
 .seamless-media img {
@@ -176,10 +177,6 @@ import handphoneImage from '../../assets/riders/handphone.svg';
     width: 100%;
     justify-content: center;
     padding: 25px 32px;
-  }
-
-  .seamless-media {
-    height: auto;
   }
 
   .seamless-media img {

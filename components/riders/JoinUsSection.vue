@@ -24,7 +24,7 @@
 					/>
 				</div>
 			</div>
-			<div class="joinus-form-card">
+			<div id="join-us" class="joinus-form-card px-20">
 				<h2 class="form-title">Join us today!</h2>
 				<form
 					class="form-grid"
@@ -176,7 +176,7 @@ onUnmounted(() => {
 .media-wrapper {
 	position: relative;
 	width: min(520px, 90%);
-	height: 630px;
+	aspect-ratio: 520 / 630;
 	border-radius: 54px;
 	overflow: hidden;
 }
@@ -231,17 +231,13 @@ onUnmounted(() => {
 }
 
 .form-title {
-	margin: 0 0 clamp(12px, 2vw, 16px);
+	margin: 0 0 32px;
 	font-family: "MADE Tommy Soft", sans-serif;
-	font-style: normal;
-	font-weight: 500;
-	font-size: 50px;
-	line-height: 54px;
-	letter-spacing: -0.25px;
-	text-align: left;
-	color: #000000;
-	width: 455px;
-	height: 110px;
+	font-weight: 700;
+	font-size: clamp(28px, 3vw, 36px);
+	line-height: clamp(34px, 3.6vw, 44px);
+	text-align: center;
+	color: #121212;
 }
 
 .form-grid {
@@ -253,16 +249,10 @@ onUnmounted(() => {
 .form-field {
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 12px;
 	font-family: "MADE Tommy Soft", sans-serif;
-	font-style: normal;
-	font-weight: 400;
-	font-size: 16px;
-	letter-spacing: -0.25px;
-	color: #000000;
-	margin-bottom: 14px;
-	width: 100%;
-	position: relative;
+	font-size: 18px;
+	color: #121212;
 }
 
 .form-field span {
@@ -325,13 +315,11 @@ onUnmounted(() => {
 
 	.media-wrapper {
 		border-radius: 40px;
-		height: clamp(360px, 70vw, 520px);
 		width: min(420px, 100%);
 	}
 
 	.joinus-form-card {
 		padding: 28px;
-		width: 420px;
 		border-radius: 40px 40px 0 0;
 		margin-bottom: -70px;
 		z-index: 0;
