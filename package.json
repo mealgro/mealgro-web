@@ -7,7 +7,6 @@
 	},
 	"dependencies": {
 		"firebase": "^12.16.0",
-		"firebase-tools": "^15.24.0",
 		"marked": "^17.0.6",
 		"vike": "^0.4.260",
 		"vike-vue": "^0.9.13",

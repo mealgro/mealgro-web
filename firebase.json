@@ -1,19 +1,17 @@
 {
-  "hosting": {
-    "public": "dist/client",
-    "ignore": [
-      "firebase.json",
-      "**/node_modules/**"
-    ],
-    "headers": [
-      {
-        "source": "/.well-known/apple-app-site-association",
-        "headers": [{ "key": "Content-Type", "value": "application/json" }]
-      },
-      {
-        "source": "/.well-known/assetlinks.json",
-        "headers": [{ "key": "Content-Type", "value": "application/json" }]
-      }
-    ]
-  }
+	"hosting": {
+		"site": "mealgro-logistics",
+		"public": "dist/client",
+		"ignore": ["firebase.json", "**/node_modules/**"],
+		"headers": [
+			{
+				"source": "/.well-known/apple-app-site-association",
+				"headers": [{ "key": "Content-Type", "value": "application/json" }]
+			},
+			{
+				"source": "/.well-known/assetlinks.json",
+				"headers": [{ "key": "Content-Type", "value": "application/json" }]
+			}
+		]
+	}
 }
