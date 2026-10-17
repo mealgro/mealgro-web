@@ -1,12 +1,12 @@
 {
   "webcredentials": {
-    "apps": ["6755588662.app.mealgro.mobile"]
+    "apps": ["VN6MB332P6.app.mealgro.mobile"]
   },
   "applinks": {
     "apps": [],
     "details": [
       {
-        "appID": "6755588662.app.mealgro.mobile",
+        "appID": "VN6MB332P6.app.mealgro.mobile",
         "paths": [
           "NOT /about", "NOT /about/*",
           "NOT /contact", "NOT /contact/*",

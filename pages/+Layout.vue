@@ -31,6 +31,8 @@ const pageContext = usePageContext();
 const isRedLogoPage = computed(() => {
 	const path = pageContext.urlPathname;
 	return (
+		// The error page (light background).
+		pageContext.pageId === "/pages/_error" ||
 		path === "/" ||
 		path === "/riders" ||
 		path === "/terms" ||
