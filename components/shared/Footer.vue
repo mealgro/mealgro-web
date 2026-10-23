@@ -238,6 +238,12 @@
 							class="text-white hover:text-[#D62300] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D62300]"
 							>Terms of Service</a
 						>
+						<span class="text-white/40">•</span>
+						<a
+							href="/account-deletion"
+							class="text-white hover:text-[#D62300] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D62300]"
+							>Delete account</a
+						>
 					</div>
 				</div>
 			</div>
