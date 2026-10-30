@@ -1,0 +1,242 @@
+/* The affiliate area, on top of ../portal/portal.css (imported, not edited). */
+body {
+	margin: 0;
+}
+.aff {
+	font-size: 14px;
+}
+.aff .p-btn,
+.aff .p-input {
+	font-size: 15px;
+}
+.aff .p-input {
+	height: 44px;
+}
+.aff select.p-input {
+	appearance: auto;
+}
+.aff .p-btn {
+	height: 42px;
+}
+.aff .p-btn--sm {
+	height: 32px;
+	font-size: 13px;
+}
+.aff .p-btn--block {
+	width: 100%;
+}
+.aff .p-field small {
+	color: var(--muted);
+	font-size: 12px;
+}
+.aff .p-field .err {
+	color: var(--bad);
+}
+.aff .p-input[aria-invalid="true"] {
+	border-color: var(--bad);
+}
+.aff .p-alert a,
+.aff .link {
+	color: var(--brand);
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	background: none;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	font: inherit;
+}
+.aff .sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Banners shown above every page. */
+.aff-banner {
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+	padding: 14px 16px;
+	border-radius: 12px;
+	background: var(--warn-soft);
+	color: #7a3d06;
+	font-size: 14px;
+	line-height: 1.5;
+}
+.aff-banner strong {
+	display: block;
+	color: inherit;
+}
+.aff-banner p {
+	color: inherit;
+}
+.aff-banner--bad {
+	background: var(--bad-soft);
+	color: var(--bad);
+}
+.aff-banner svg {
+	flex: none;
+	margin-top: 2px;
+}
+
+/* Terms (Markdown). */
+.aff-md {
+	max-height: 320px;
+	overflow-y: auto;
+	padding: 14px 16px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: #fcfbfa;
+	font-size: 14px;
+	line-height: 1.6;
+}
+.aff-md:focus-visible {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+.aff-md h1,
+.aff-md h2,
+.aff-md h3 {
+	font-size: 15px;
+	margin: 14px 0 6px;
+}
+.aff-md h1:first-child,
+.aff-md h2:first-child,
+.aff-md h3:first-child {
+	margin-top: 0;
+}
+.aff-md p,
+.aff-md ul,
+.aff-md ol {
+	margin: 0 0 10px;
+}
+.aff-md ul,
+.aff-md ol {
+	padding-left: 20px;
+	list-style: revert;
+}
+.aff-md a {
+	color: var(--brand);
+}
+
+.aff-check {
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+	font-size: 14px;
+	cursor: pointer;
+}
+.aff-check input {
+	width: 18px;
+	height: 18px;
+	margin-top: 1px;
+	accent-color: var(--brand);
+	flex: none;
+}
+
+/* The 6-digit code. */
+.aff-otp {
+	height: 56px !important;
+	font-size: 26px !important;
+	letter-spacing: 0.5em;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	padding-left: 0.5em !important;
+}
+
+/* Sign-in and sign-up. */
+.aff-auth {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 32px 16px 48px;
+	gap: 18px;
+}
+.aff-auth-top {
+	width: 100%;
+	max-width: 520px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.aff-auth-top a {
+	text-decoration: none;
+}
+.aff-auth .box {
+	width: 100%;
+	max-width: 520px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 28px;
+}
+.aff-auth .box--narrow {
+	max-width: 420px;
+}
+@media (max-width: 480px) {
+	.aff-auth {
+		padding-top: 20px;
+	}
+	.aff-auth .box {
+		padding: 20px;
+	}
+}
+
+.aff-toasts {
+	position: fixed;
+	right: 16px;
+	bottom: 16px;
+	left: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	z-index: 80;
+	max-width: min(340px, calc(100vw - 32px));
+}
+.aff-toasts .p-alert {
+	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+	background: #fff;
+	border: 1px solid var(--line);
+}
+.aff-toasts .p-alert--ok {
+	border-color: var(--ok);
+}
+
+.aff-empty {
+	padding: 28px 12px;
+	text-align: center;
+	color: var(--muted);
+}
+.aff-list {
+	display: flex;
+	flex-direction: column;
+}
+.aff-list > li {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--line);
+}
+.aff-list > li:last-child {
+	border-bottom: 0;
+}
+.aff-list .sub {
+	color: var(--muted);
+	font-size: 12px;
+}
+.aff-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}

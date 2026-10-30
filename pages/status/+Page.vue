@@ -1,7 +1,8 @@
 <template>
   <div class="status-page">
     <div class="card">
-      <a href="/" class="brand">Mealgro</a>
+      <a href="/" class="brand"><img :src="logoImage" alt="Mealgro home" /></a>
+      <p class="eyebrow">System status</p>
       <div class="overall" :class="overall">
         <span class="dot" />
         <h1>{{ headline }}</h1>
@@ -24,6 +25,7 @@
 import { computed, onMounted, onUnmounted } from "vue";
 import { useData } from "vike-vue/useData";
 import type { ServiceState, StatusData } from "./+data";
+import logoImage from "../../assets/logo.svg";
 
 const data = useData<StatusData>();
 
@@ -68,89 +70,129 @@ onUnmounted(() => clearTimeout(timer));
 </script>
 
 <style scoped>
+/* Brand tokens: see brand.md. */
 .status-page {
+  --ink: #17130f;
+  --muted: #6b635b;
+  --line: #e8e2dc;
+  --ok: #17803d;
+  --warn: #b45309;
+  --bad: #b42318;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fafafa;
-  padding: 24px 16px;
+  background: #f6f6f6;
+  color: var(--ink);
+  padding: 140px 16px 48px;
 }
 .card {
-  max-width: 460px;
+  max-width: 480px;
   width: 100%;
-  background: #fff;
-  border-radius: 20px;
-  padding: 28px 24px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 28px;
 }
 .brand {
+  display: none;
+}
+.brand img {
+  display: block;
+  width: 72px;
+  height: auto;
+}
+.eyebrow {
+  margin: 0;
+  font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
-  text-decoration: none;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d62300;
 }
 .overall {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 20px 0 16px;
+  gap: 12px;
+  margin: 12px 0 20px;
 }
 .overall h1 {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 800;
   margin: 0;
-  color: #1a1a1a;
+  color: var(--ink);
 }
 .dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
   flex-shrink: 0;
 }
 .ok .dot {
-  background: #16a34a;
+  background: var(--ok);
 }
 .partial .dot {
-  background: #f59e0b;
+  background: var(--warn);
 }
 .unreachable .dot {
-  background: #dc2626;
+  background: var(--bad);
 }
 .checks {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--line);
 }
 .checks li {
   display: grid;
   grid-template-columns: 1fr auto 64px;
   gap: 12px;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 0.95rem;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
 }
-.name {
-  color: #1a1a1a;
+.state {
+  font-weight: 500;
 }
 .state.operational {
-  color: #16a34a;
+  color: var(--ok);
 }
 .state.down {
-  color: #dc2626;
+  color: var(--bad);
 }
 .state.unknown {
-  color: #888;
+  color: var(--muted);
 }
 .ms {
   text-align: right;
-  color: #888;
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 .meta {
   margin: 16px 0 0;
-  font-size: 0.8rem;
-  color: #888;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* No desktop nav or global logo below 1024px: the card carries the logo. */
+@media (max-width: 1024px) {
+  .status-page {
+    padding-top: 24px;
+    align-items: flex-start;
+  }
+  .brand {
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+@media (max-width: 480px) {
+  .card {
+    padding: 22px;
+  }
+  .overall h1 {
+    font-size: 24px;
+  }
 }
 </style>

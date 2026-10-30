@@ -1,0 +1,327 @@
+.portal {
+	--bg: #f6f6f6;
+	--surface: #ffffff;
+	--ink: #17130f;
+	--muted: #6b635b;
+	--line: #e8e2dc;
+	--brand: #d62300;
+	--brand-ink: #ffffff;
+	--brand-soft: #fdece8;
+	--ok: #17803d;
+	--ok-soft: #e4f5ea;
+	--warn: #b45309;
+	--warn-soft: #fdf1dc;
+	--bad: #b42318;
+	--bad-soft: #fde8e6;
+	background: var(--bg);
+	color: var(--ink);
+	min-height: 100vh;
+	font-family: "MADE Tommy Soft", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 14px;
+	line-height: 1.45;
+}
+.portal *,
+.portal *::before,
+.portal *::after {
+	font-family: inherit;
+	box-sizing: border-box;
+}
+.portal a {
+	color: inherit;
+}
+.portal h1,
+.portal h2,
+.portal h3,
+.portal p {
+	margin: 0;
+	letter-spacing: normal;
+	font-weight: 600;
+	color: var(--ink);
+}
+.portal h1 {
+	font-size: 22px;
+	line-height: 1.2;
+}
+.portal h2 {
+	font-size: 15px;
+}
+.portal ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.portal p {
+	font-weight: 400;
+}
+
+/* The Mealgro logo with the area's name under it (sidebar, sign-in). */
+.p-brand {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	text-decoration: none;
+}
+.p-brand img {
+	display: block;
+	width: 72px;
+	height: auto;
+}
+.p-brand small {
+	font-size: 12px;
+	color: var(--muted);
+}
+
+.p-card {
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: 14px;
+	padding: 18px;
+}
+.p-muted {
+	color: var(--muted);
+}
+.p-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+.p-between {
+	justify-content: space-between;
+}
+.p-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.p-grid {
+	display: grid;
+	gap: 14px;
+}
+.p-page-head {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 20px;
+	flex-wrap: wrap;
+}
+
+.p-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	height: 38px;
+	padding: 0 16px;
+	border-radius: 10px;
+	border: 1px solid var(--line);
+	background: var(--surface);
+	color: var(--ink);
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background 0.12s, border-color 0.12s, opacity 0.12s;
+}
+.p-btn:hover:not(:disabled) {
+	border-color: #cfc7bf;
+	background: #fbf9f7;
+}
+.p-btn:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+.p-btn:focus-visible,
+.p-input:focus-visible,
+.p-nav a:focus-visible {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+.p-btn--primary {
+	background: var(--brand);
+	border-color: var(--brand);
+	color: var(--brand-ink);
+}
+.p-btn--primary:hover:not(:disabled) {
+	background: #bd1f00;
+	border-color: #bd1f00;
+}
+.p-btn--danger {
+	color: var(--bad);
+}
+.p-btn--sm {
+	height: 32px;
+	padding: 0 12px;
+	font-size: 13px;
+}
+
+.p-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.p-field > span {
+	font-size: 13px;
+	font-weight: 600;
+}
+.p-input {
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: #fff;
+	color: var(--ink);
+	font-size: 14px;
+	width: 100%;
+}
+.p-input:focus {
+	border-color: var(--brand);
+	outline: none;
+}
+
+.p-badge {
+	display: inline-flex;
+	align-items: center;
+	height: 22px;
+	padding: 0 9px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	background: #efeae5;
+	color: var(--muted);
+	white-space: nowrap;
+}
+.p-badge--ok {
+	background: var(--ok-soft);
+	color: var(--ok);
+}
+.p-badge--warn {
+	background: var(--warn-soft);
+	color: var(--warn);
+}
+.p-badge--bad {
+	background: var(--bad-soft);
+	color: var(--bad);
+}
+.p-badge--brand {
+	background: var(--brand-soft);
+	color: var(--brand);
+}
+
+.p-alert {
+	padding: 10px 14px;
+	border-radius: 10px;
+	font-size: 13px;
+	background: var(--bad-soft);
+	color: var(--bad);
+}
+.p-alert--warn {
+	background: var(--warn-soft);
+	color: var(--warn);
+}
+.p-alert--ok {
+	background: var(--ok-soft);
+	color: var(--ok);
+}
+
+.p-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+.p-table th {
+	text-align: left;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--muted);
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--line);
+	white-space: nowrap;
+}
+.p-table td {
+	padding: 12px;
+	border-bottom: 1px solid var(--line);
+	vertical-align: middle;
+}
+.p-table tr:last-child td {
+	border-bottom: 0;
+}
+.p-table tbody tr.is-clickable {
+	cursor: pointer;
+}
+.p-table tbody tr.is-clickable:hover {
+	background: #fbf9f7;
+}
+.p-scroll {
+	overflow-x: auto;
+}
+
+.p-stat strong {
+	display: block;
+	font-size: 26px;
+	line-height: 1.1;
+	font-weight: 700;
+}
+.p-stat span {
+	color: var(--muted);
+	font-size: 13px;
+}
+
+.p-tabs {
+	display: inline-flex;
+	padding: 3px;
+	background: #efeae5;
+	border-radius: 10px;
+	gap: 2px;
+}
+.p-tabs button {
+	height: 30px;
+	padding: 0 14px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	font-weight: 600;
+	color: var(--muted);
+	cursor: pointer;
+}
+.p-tabs button[aria-pressed="true"] {
+	background: #fff;
+	color: var(--ink);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Modifiers and spacing for page layout, instead of inline styles. Scoped
+   under .portal so they win over the element resets at the top. */
+.portal .p-card--flush {
+	padding: 6px;
+}
+.portal .p-pad {
+	padding: 18px;
+}
+.portal .p-input--auto {
+	width: auto;
+}
+.portal .p-mt-xs {
+	margin-top: 6px;
+}
+.portal .p-mt {
+	margin-top: 24px;
+}
+.portal .p-mb-xs {
+	margin-bottom: 4px;
+}
+.portal .p-mb-sm {
+	margin-bottom: 12px;
+}
+.portal .p-mb {
+	margin-bottom: 14px;
+}
+.portal .p-ml-sm {
+	margin-left: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.portal * {
+		transition: none !important;
+	}
+}

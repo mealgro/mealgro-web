@@ -5,65 +5,8 @@
         <a href="/">
           <img :src="logoImage" alt="MealGro logo" class="riders-hero__logo" />
         </a>
-        <button
-          class="riders-hero__menu"
-          type="button"
-          :aria-expanded="isMobileMenuOpen"
-          aria-controls="riders-hero-mobile-menu"
-          @click="toggleMobileMenu"
-        >
-          <span class="sr-only">Toggle navigation menu</span>
-          <svg
-            v-if="!isMobileMenuOpen"
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-          <svg
-            v-else
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-        </button>
+        <MobileMenu />
       </div>
-
-      <transition name="riders-hero-mobile-menu">
-        <nav
-          v-if="isMobileMenuOpen"
-          id="riders-hero-mobile-menu"
-          class="riders-hero__mobile-menu"
-        >
-          <a
-            v-for="link in mobileNavLinks"
-            :key="link.href"
-            :href="link.href"
-            class="riders-hero__mobile-link"
-            @click="closeMobileMenu"
-          >
-            <span>{{ link.label }}</span>
-            <svg
-              v-if="link.hasDropdown"
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </a>
-        </nav>
-      </transition>
 
       <div class="riders-hero__copy">
         <h1 class="riders-hero__headline">
@@ -89,40 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
 import pizzaguyImage from '../../assets/riders/pizzaguy.svg';
 import appStoreIcon from '../../assets/download/appstore.svg';
 import playStoreIcon from '../../assets/download/playstore.svg';
 import logoImage from '../../assets/logo.svg';
-import { navLinks } from '../shared/navLinks';
-
-const isMobileMenuOpen = ref(false);
-
-const mobileNavLinks = computed(() => {
-  return navLinks.filter(link => link.href !== '/');
-});
-
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value;
-};
-
-const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false;
-};
-
-const handleEscape = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') {
-    closeMobileMenu();
-  }
-};
-
-onMounted(() => {
-  window.addEventListener('keydown', handleEscape);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleEscape);
-});
+import MobileMenu from '../shared/MobileMenu.vue';
 </script>
 
 <style scoped>
@@ -132,18 +46,6 @@ onUnmounted(() => {
   color: #ffffff;
   padding: clamp(80px, 10vw, 140px) 24px 0;
   overflow: hidden;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 .riders-hero__container {
@@ -266,61 +168,6 @@ onUnmounted(() => {
     filter: brightness(0) invert(1);
   }
 
-  .riders-hero__menu {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 24px;
-    border: none;
-    background: #ffffff;
-    color: #0E172B;
-    cursor: pointer;
-  }
-
-  .riders-hero__mobile-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 20px;
-    position: absolute;
-    top: 72px;
-    left: 0;
-    right: 0;
-    background: #ffffff;
-    border-radius: 0 0 24px 24px;
-    box-shadow: 0 10px 30px rgba(14, 23, 43, 0.12);
-    z-index: 95;
-  }
-
-  .riders-hero__mobile-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-decoration: none;
-    font-family: 'MADE Tommy Soft', sans-serif;
-    font-size: 15px;
-    line-height: 150%;
-    color: #0E172B;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(14, 23, 43, 0.07);
-  }
-
-  .riders-hero__mobile-link:last-of-type {
-    border-bottom: none;
-  }
-
-  .riders-hero__mobile-menu-enter-active,
-  .riders-hero__mobile-menu-leave-active {
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-
-  .riders-hero__mobile-menu-enter-from,
-  .riders-hero__mobile-menu-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
 }
 
 @media (max-width: 768px) {
@@ -392,4 +239,5 @@ onUnmounted(() => {
     margin-bottom: clamp(-80px, -6vw, -20px);
   }
 }
+
 </style>

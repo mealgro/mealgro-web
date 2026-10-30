@@ -5,65 +5,8 @@
       <div class="mobile-logo-container">
         <img :src="logoImage" alt="Mealgro Logo" class="mobile-logo" />
       </div>
-      <button
-        class="mobile-menu-button"
-        type="button"
-        :aria-expanded="isMobileMenuOpen"
-        aria-controls="mobile-nav-menu"
-        @click="toggleMobileMenu"
-      >
-        <span class="sr-only">Toggle navigation menu</span>
-        <svg
-          v-if="!isMobileMenuOpen"
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        <svg
-          v-else
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-      </button>
+      <MobileMenu />
     </div>
-
-    <transition name="mobile-menu">
-      <nav
-        v-if="isMobileMenuOpen"
-        id="mobile-nav-menu"
-        class="mobile-menu-panel"
-      >
-        <a
-          v-for="link in mobileNavLinks"
-          :key="link.href"
-          :href="link.href"
-          class="mobile-menu-link"
-          @click="closeMobileMenu"
-        >
-          <span>{{ link.label }}</span>
-          <svg
-            v-if="link.hasDropdown"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </a>
-      </nav>
-    </transition>
 
     <div class="hero-container">
       <!-- Left Food Images -->
@@ -107,28 +50,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { navLinks } from '../shared/navLinks';
+import MobileMenu from '../shared/MobileMenu.vue';
 import pizzaImage from '../../assets/hero-section/pizza.png';
 import burgerSmallImage from '../../assets/hero-section/burgersmall.png';
 import burgerBigImage from '../../assets/hero-section/burgerbig.png';
 import logoImage from '../../assets/logo.svg';
 import appStoreIcon from '../../assets/download/appstore.svg';
 import playStoreIcon from '../../assets/download/playstore.svg';
-
-const isMobileMenuOpen = ref(false);
-
-const mobileNavLinks = computed(() => {
-  return navLinks.filter(link => link.href !== '/');
-});
-
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value;
-};
-
-const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false;
-};
 </script>
 
 <style scoped>
@@ -360,14 +288,6 @@ const closeMobileMenu = () => {
   display: none;
 }
 
-.mobile-menu-button {
-  display: none;
-}
-
-.mobile-menu-panel {
-  display: none;
-}
-
 .mobile-download-button {
   display: none;
 }
@@ -401,75 +321,6 @@ const closeMobileMenu = () => {
   .mobile-logo {
     height: 24px;
     width: auto;
-  }
-
-  .mobile-menu-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    background: white;
-    border-radius: 50%;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    color: #0E172B;
-  }
-
-  .mobile-menu-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 20px;
-    position: absolute;
-    top: 72px;
-    left: 0;
-    right: 0;
-    background: #FFFFFF;
-    border-radius: 0 0 24px 24px;
-    box-shadow: 0 10px 30px rgba(14, 23, 43, 0.12);
-    z-index: 95;
-  }
-
-  .mobile-menu-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-decoration: none;
-    font-family: 'MADE Tommy Soft', sans-serif;
-    font-size: 15px;
-    line-height: 150%;
-    color: #0E172B;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(14, 23, 43, 0.07);
-  }
-
-  .mobile-menu-link:last-of-type {
-    border-bottom: none;
-  }
-
-  .mobile-menu-enter-active,
-  .mobile-menu-leave-active {
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-
-  .mobile-menu-enter-from,
-  .mobile-menu-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
   }
 
   .hero-section {
@@ -649,4 +500,5 @@ const closeMobileMenu = () => {
     height: 120px;
   }
 }
+
 </style>

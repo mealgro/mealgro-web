@@ -18,7 +18,11 @@
   p {
     @apply mb-2 mt-2;
   }
+  /* Brand red (see brand.md); components that style their own links override this. */
   a {
-    @apply text-blue-600 hover:text-pink-400 visited:text-blue-900;
+    color: #d62300;
+  }
+  a:hover {
+    color: #bd1f00;
   }
 }

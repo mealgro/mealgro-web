@@ -1,4 +1,5 @@
 User-agent: *
 Disallow: 
 Disallow: /cgi-bin/
+Disallow: /account
 Sitemap: https://mealgro.com/sitemap.xml

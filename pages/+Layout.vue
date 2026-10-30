@@ -1,7 +1,8 @@
 <!-- https://vike.dev/Layout -->
 
 <template>
-	<div id="page-container">
+	<slot v-if="isPortal" />
+	<div v-else id="page-container">
 		<Navigation />
 		<!-- Global Logo -->
 		<a href="/" class="global-logo-link">
@@ -28,6 +29,13 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
 const pageContext = usePageContext();
+// The vendor portal (/account) is an app, not a page of the marketing site:
+// it brings its own chrome and keeps the browser's zoom.
+const isPortal = computed(
+	() =>
+		pageContext.urlPathname === "/account" ||
+		pageContext.urlPathname.startsWith("/account/"),
+);
 const isRedLogoPage = computed(() => {
 	const path = pageContext.urlPathname;
 	return (
@@ -38,7 +46,8 @@ const isRedLogoPage = computed(() => {
 		path === "/terms" ||
 		path === "/privacy" ||
 		path === "/about" ||
-		path === "/contact"
+		path === "/contact" ||
+		path === "/status"
 	);
 });
 
@@ -70,6 +79,7 @@ const preventZoomTouch = (e: TouchEvent) => {
 };
 
 onMounted(() => {
+	if (isPortal.value) return;
 	document.addEventListener("keydown", preventZoomKeyboard);
 	document.addEventListener("wheel", preventZoomWheel, { passive: false });
 	document.addEventListener("touchstart", preventZoomTouch, {

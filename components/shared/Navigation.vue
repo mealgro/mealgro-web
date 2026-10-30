@@ -4,25 +4,21 @@
     <div class="nav-wrapper">
       <!-- Navigation Links -->
       <div class="nav-links">
-        <a
-          v-for="link in navLinks"
-          :key="link.href"
-          :href="link.href"
-          class="nav-link"
-          :class="{ 'nav-link-active': isActive(link.href) }"
-        >
-          <span class="nav-text">{{ link.label }}</span>
-          <svg 
-            v-if="link.hasDropdown" 
-            class="chevron-icon" 
-            width="16" 
-            height="16" 
-            viewBox="0 0 16 16" 
-            fill="none"
+        <template v-for="link in navLinks" :key="link.href">
+          <NavDropdown
+            v-if="link.children"
+            :link="link"
+            :active="isActive(link.href) || link.children.some((child) => isActive(child.href))"
+          />
+          <a
+            v-else
+            :href="link.href"
+            class="nav-link"
+            :class="{ 'nav-link-active': isActive(link.href) }"
           >
-            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
+            <span class="nav-text">{{ link.label }}</span>
+          </a>
+        </template>
       </div>
     </div>
   </nav>
@@ -31,6 +27,7 @@
 <script setup lang="ts">
 import { usePageContext } from 'vike-vue/usePageContext';
 import { navLinks } from './navLinks';
+import NavDropdown from './NavDropdown.vue';
 
 const pageContext = usePageContext();
 
