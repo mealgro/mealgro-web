@@ -1,4 +1,212 @@
-/* The affiliate area, on top of ../portal/portal.css (imported, not edited). */
+/* The affiliate area, on top of ../portal/portal.css (imported, not edited).
+   v2 visual system: ink and paper, cobalt/rose/sun/mint with a shape each,
+   Bricolage Grotesque for headlines and numbers, Instrument Sans for the
+   rest. Scoped to .aff, so the rest of the site keeps the Mealgro red. */
+.portal.aff {
+	--bg: #f1f0f5;
+	--surface: #ffffff;
+	--ink: #12121c;
+	--muted: #4a4a5c;
+	--line: #e2e0ec;
+	--brand: #2f3bff;
+	--brand-ink: #ffffff;
+	--brand-soft: #e9eaff;
+	--ok: #0a7b55;
+	--ok-soft: #cfebdd;
+	--warn: #7a4a00;
+	--warn-soft: #fff1c2;
+	--bad: #c8301a;
+	--bad-soft: #fbd9d2;
+	--cat-1: #2f3bff;
+	--cat-2: #ff5c8a;
+	--cat-3: #ffc52e;
+	--cat-4: #19b98a;
+	--on-1: #ffffff;
+	--ease: cubic-bezier(0.16, 1, 0.3, 1);
+	font-family: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	font-size: 15px;
+}
+@media (prefers-color-scheme: dark) {
+	.portal.aff {
+		--bg: #12121c;
+		--surface: #1b1b29;
+		--ink: #f1f0f5;
+		--muted: #b9b8cc;
+		--line: #2d2d42;
+		--brand: #7b85ff;
+		--brand-ink: #0e0e18;
+		--brand-soft: #25264d;
+		--ok: #3dd6a0;
+		--ok-soft: #123b2f;
+		--warn: #ffc52e;
+		--warn-soft: #3a3008;
+		--bad: #ff7a63;
+		--bad-soft: #3d1a14;
+		--cat-1: #7b85ff;
+		--on-1: #0e0e18;
+	}
+}
+.aff h1,
+.aff h2,
+.aff h3,
+.aff .disp {
+	font-family: "Bricolage Grotesque Variable", "Instrument Sans Variable", system-ui, sans-serif;
+	font-weight: 800;
+	letter-spacing: -0.03em;
+}
+.aff h1 {
+	font-size: clamp(30px, 4vw, 44px);
+	line-height: 1;
+	letter-spacing: -0.04em;
+}
+.aff h2 {
+	font-size: 22px;
+}
+.aff .p-card {
+	border-radius: 28px;
+	padding: 24px 26px;
+	border-color: transparent;
+}
+.aff .p-btn,
+.aff .p-tabs,
+.aff .p-tabs button {
+	border-radius: 999px;
+}
+.aff .p-btn {
+	border-width: 2px;
+	border-color: var(--ink);
+	transition: transform 0.12s var(--ease), background 0.12s, opacity 0.12s;
+}
+.aff .p-btn:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--ink) 8%, var(--surface));
+	border-color: var(--ink);
+}
+.aff .p-btn:active:not(:disabled) {
+	transform: scale(0.97);
+}
+.aff .p-btn--primary {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--surface);
+}
+.aff .p-btn--primary:hover:not(:disabled) {
+	background: var(--brand);
+	border-color: var(--brand);
+	color: var(--brand-ink);
+}
+.aff .p-btn--danger {
+	border-color: var(--bad);
+}
+.aff .p-input {
+	border-radius: 16px;
+	border-width: 2px;
+	border-color: color-mix(in srgb, var(--ink) 25%, var(--line));
+	background: var(--surface);
+}
+.aff .p-badge,
+.aff .p-alert {
+	border-radius: 999px;
+}
+.aff .p-alert {
+	padding: 10px 18px;
+}
+.aff .p-badge {
+	height: 26px;
+	padding: 0 12px 0 10px;
+	gap: 6px;
+	font-weight: 700;
+}
+/* Status badges carry a shape as well as a colour: ok a dot, warning a
+   ring, bad a square. */
+.aff .p-badge--ok::before,
+.aff .p-badge--warn::before,
+.aff .p-badge--bad::before,
+.aff .p-badge--brand::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	background: currentColor;
+	border-radius: 50%;
+}
+.aff .p-badge--warn::before {
+	background: transparent;
+	border: 2px solid currentColor;
+}
+.aff .p-badge--bad::before {
+	border-radius: 2px;
+}
+.aff .p-badge--brand::before {
+	border-radius: 1px;
+	transform: rotate(45deg) scale(0.9);
+}
+.aff .p-table th {
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-size: 11px;
+}
+.aff .p-stat strong {
+	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+	.aff * {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+.aff .arrive {
+	animation: aff-arrive 0.5s var(--ease) both;
+	animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes aff-arrive {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+}
+/* Shapes: square, circle, card, diamond. Size and colour come from --c. */
+.aff .sh {
+	display: inline-block;
+	flex: none;
+	width: 14px;
+	height: 14px;
+	background: var(--c, currentColor);
+}
+.aff .sh-sq {
+	border-radius: 3px;
+}
+.aff .sh-ci {
+	border-radius: 50%;
+}
+.aff .sh-cd {
+	width: 20px;
+	height: 13px;
+	border-radius: 4px;
+}
+.aff .sh-di {
+	border-radius: 2px;
+	transform: rotate(45deg) scale(0.82);
+}
+/* Coloured tiles that read in both themes. */
+.aff .tone-1 {
+	background: var(--cat-1);
+	color: var(--on-1);
+}
+.aff .tone-2 {
+	background: var(--cat-2);
+	color: #12121c;
+}
+.aff .tone-3 {
+	background: var(--cat-3);
+	color: #12121c;
+}
+.aff .tone-4 {
+	background: var(--cat-4);
+	color: #12121c;
+}
+
 body {
 	margin: 0;
 }
@@ -64,10 +272,10 @@ body {
 	display: flex;
 	gap: 12px;
 	align-items: flex-start;
-	padding: 14px 16px;
-	border-radius: 12px;
+	padding: 16px 20px;
+	border-radius: 24px;
 	background: var(--warn-soft);
-	color: #7a3d06;
+	color: var(--warn);
 	font-size: 14px;
 	line-height: 1.5;
 }
@@ -94,7 +302,7 @@ body {
 	padding: 14px 16px;
 	border: 1px solid var(--line);
 	border-radius: 10px;
-	background: #fcfbfa;
+	background: var(--bg);
 	font-size: 14px;
 	line-height: 1.6;
 }
@@ -204,7 +412,7 @@ body {
 }
 .aff-toasts .p-alert {
 	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-	background: #fff;
+	background: var(--surface);
 	border: 1px solid var(--line);
 }
 .aff-toasts .p-alert--ok {

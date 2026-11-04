@@ -2,6 +2,8 @@
 // The signed-in affiliate area's only layout (see
 // pages/affiliate/(app)/+config.ts): no marketing navigation, the browser's
 // zoom kept, the portal's look.
+import "@fontsource-variable/bricolage-grotesque/wght.css";
+import "@fontsource-variable/instrument-sans/wght.css";
 import "../portal/portal.css";
 import "./affiliate.css";
 import { toasts } from "../../lib/affiliate/toast";

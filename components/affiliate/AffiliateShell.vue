@@ -272,4 +272,80 @@ nav a.on {
 		padding: 20px 16px 64px;
 	}
 }
+
+/* v2: an ink rail in both themes, pill items. */
+.side {
+	--rail: #12121c;
+	background: var(--rail);
+	border-right: 0;
+	color: #ffffff;
+	padding: 22px 14px;
+}
+@media (prefers-color-scheme: dark) {
+	.side {
+		--rail: #0a0a12;
+	}
+}
+.side .p-muted,
+.side .more {
+	color: rgb(255 255 255 / 0.62);
+}
+.side .more:hover {
+	color: #ffffff;
+}
+.code {
+	background: rgb(255 255 255 / 0.1);
+	border-radius: 20px;
+	padding: 12px 16px;
+}
+.code strong {
+	color: #ffc52e;
+	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
+	font-weight: 800;
+	font-size: 20px;
+}
+nav a {
+	height: 42px;
+	padding: 0 14px;
+	border-radius: 999px;
+	color: rgb(255 255 255 / 0.82);
+}
+nav a:hover {
+	background: rgb(255 255 255 / 0.08);
+	color: #ffffff;
+}
+nav a.on {
+	background: rgb(255 255 255 / 0.16);
+	color: #ffffff;
+}
+nav a.on svg {
+	color: #ffc52e;
+}
+.who {
+	border-top-color: rgb(255 255 255 / 0.14);
+}
+.who .p-btn {
+	white-space: nowrap;
+	background: transparent;
+	border-color: rgb(255 255 255 / 0.5);
+	color: #ffffff;
+}
+.side .p-brand small {
+	color: rgb(255 255 255 / 0.62);
+}
+.side .p-brand img {
+	width: 80px;
+}
+@media (max-width: 860px) {
+	.mobile-bar {
+		background: var(--rail, #12121c);
+		color: #ffffff;
+		border-bottom: 0;
+	}
+	.mobile-bar .p-btn {
+		background: transparent;
+		border-color: rgb(255 255 255 / 0.5);
+		color: #ffffff;
+	}
+}
 </style>

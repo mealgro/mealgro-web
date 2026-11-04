@@ -218,3 +218,30 @@ None that can be changed in a style pass. Two things are deliberate:
 
 - Near-black has three values: `#121212` (marketing sections), `#17130F` (editorial pages and the app, `--ink`), `#000000` (hero bands, footer). They read as one black; new work uses `#121212` on marketing pages and `var(--ink)` elsewhere. Rewriting every committed section to one value would touch most of the site for no visible change.
 - `pages/+Layout.vue` and `pages/tailwind.css` both set the font family. The layout copy covers `body`, the Tailwind base covers every element; keep them in step if the stack ever changes.
+
+---
+
+## Affiliate area: v2 visual system
+
+The signed-in affiliate area (`pages/affiliate/(app)/*`, `components/affiliate/*`)
+uses the v2 system shared with the admin console, scoped to `.portal.aff` in
+`components/affiliate/affiliate.css`. The marketing site, `/affiliate` (public
+landing) and the vendor portal keep the Mealgro red and MADE Tommy Soft above;
+the affiliate area deliberately does not.
+
+| Token | Light | Dark (OS) |
+| --- | --- | --- |
+| Paper `--bg` | `#F1F0F5` | `#12121C` |
+| Surface `--surface` | `#FFFFFF` | `#1B1B29` |
+| Ink `--ink` | `#12121C` | `#F1F0F5` |
+| Brand `--brand` (cobalt) | `#2F3BFF` | `#7B85FF` |
+| `--cat-1..4` (cobalt, rose, sun, mint) | `#2F3BFF` `#FF5C8A` `#FFC52E` `#19B98A` | cobalt `#7B85FF`, rest same |
+| Ok / warn / bad | `#0A7B55` / `#7A4A00` / `#C8301A` | `#3DD6A0` / `#FFC52E` / `#FF7A63` |
+
+- Fonts (self-hosted, `@fontsource-variable`): Bricolage Grotesque 800 for headlines and big numbers (`h1`-`h3`, `.disp`, `.p-stat strong`), Instrument Sans for everything else.
+- Shapes: every category owns a colour AND a shape: `.sh` + `.sh-sq|sh-ci|sh-cd|sh-di`, colour via `--c`. Status badges (`.p-badge--ok|warn|bad|brand`) get a dot, ring, square or diamond automatically.
+- Tiles: `.tone-1..4` (coloured tile with readable text), one `.hero` ink panel per page, cards `28px` radius, buttons and tabs are pills, inputs `16px` with a 2px border.
+- Motion: `.arrive` (stagger with `style="--i: n"`) once on load, `transform: scale(.97)` on press; nothing loops; `prefers-reduced-motion` stops all of it.
+- Rail: `AffiliateShell.vue` is an ink rail with pill items in both themes.
+- Order on a page: what needs the person first, then totals, then history.
+- Worked example: `pages/affiliate/(app)/dashboard/+Page.vue`.
