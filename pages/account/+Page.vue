@@ -63,11 +63,11 @@ async function setOnline(value: boolean) {
 		</div>
 		<div v-if="error" class="p-alert p-alert--warn p-mb">{{ error }}</div>
 
-		<div class="p-grid top">
-			<section v-if="details" class="p-card p-row p-between">
+		<div class="p-stack">
+			<section v-if="details" class="p-hero arrive" aria-labelledby="st-h">
 				<div>
-					<span class="p-muted">Store status</span>
-					<h2>{{ details.is_online ? "Online — taking orders" : "Offline" }}</h2>
+					<span class="p-hero-h"><span class="sh sh-ci" :style="{ '--c': details.is_online ? 'var(--cat-4)' : 'var(--cat-2)' }" />Store status</span>
+					<h2 id="st-h">{{ details.is_online ? "Online — taking orders" : "Offline" }}</h2>
 					<p class="p-muted">{{ details.is_open ? "Within business hours" : "Outside business hours" }}</p>
 				</div>
 				<button
@@ -81,27 +81,35 @@ async function setOnline(value: boolean) {
 				</button>
 			</section>
 
-			<section v-if="sub" class="p-card p-row p-between">
-				<div>
-					<span class="p-muted">Plan</span>
-					<h2>{{ planTitles[sub.plan] ?? titleCase(sub.plan) }}</h2>
-					<p class="p-muted">
+			<div class="p-grid tiles">
+				<template v-if="overview">
+					<section class="p-tile tone-1 arrive" style="--i: 1" aria-label="Orders">
+						<span class="p-tile-h"><span class="sh sh-sq" />Orders</span>
+						<strong>{{ overview.total_orders.toLocaleString() }}</strong>
+					</section>
+					<section class="p-tile tone-4 arrive" style="--i: 2" aria-label="Customers">
+						<span class="p-tile-h"><span class="sh sh-di" />Customers</span>
+						<strong>{{ overview.total_customers.toLocaleString() }}</strong>
+					</section>
+					<section class="p-tile p-card arrive" style="--i: 3" aria-label="Cancellations">
+						<span class="p-tile-h"><span class="sh sh-tr" :style="{ '--c': 'var(--bad)' }" />Cancellations</span>
+						<strong>{{ overview.total_cancellation.toLocaleString() }}</strong>
+					</section>
+				</template>
+				<section v-if="sub" class="p-tile tone-2 arrive" style="--i: 4" aria-label="Plan">
+					<span class="p-tile-h"><span class="sh sh-cd" />Plan</span>
+					<strong>{{ planTitles[sub.plan] ?? titleCase(sub.plan) }}</strong>
+					<small>
 						<template v-if="sub.status === 'paused'">Payment due</template>
 						<template v-else-if="sub.plan !== 'starter'">{{ sub.renews ? "Renews" : "Ends" }} {{ day(sub.expires_at) }}</template>
 						<template v-else>Free plan</template>
-					</p>
-				</div>
-				<a class="p-btn" href="/account/subscription">Manage</a>
-			</section>
+						· <a href="/account/subscription">Manage</a>
+					</small>
+				</section>
+			</div>
 		</div>
 
-		<div v-if="overview" class="p-grid stats">
-			<div class="p-card p-stat"><strong>{{ overview.total_orders.toLocaleString() }}</strong><span>Orders</span></div>
-			<div class="p-card p-stat"><strong>{{ overview.total_customers.toLocaleString() }}</strong><span>Customers</span></div>
-			<div class="p-card p-stat"><strong>{{ overview.total_cancellation.toLocaleString() }}</strong><span>Cancellations</span></div>
-		</div>
-
-		<section v-if="session.can('view-orders')" class="p-mt">
+		<section v-if="session.can('view-orders')" class="p-mt arrive" style="--i: 5">
 			<div class="p-row p-between p-mb-sm">
 				<h2>Recent orders</h2>
 				<a href="/account/orders">View all</a>
@@ -116,11 +124,18 @@ async function setOnline(value: boolean) {
 </template>
 
 <style scoped>
-.top {
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	margin-bottom: 14px;
+.tiles {
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
-.stats {
-	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+.p-tile strong {
+	overflow-wrap: anywhere;
+}
+.tiles > :last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+}
+.p-tile.tone-2 small a {
+	color: inherit;
+	font-weight: 700;
+	text-decoration: underline;
 }
 </style>

@@ -136,6 +136,10 @@ function label(p: PlanDetails): string {
 	return rank[p.plan] > rank[cur.plan] ? "Upgrade" : "Switch";
 }
 const disabled = (p: PlanDetails) => !current.value || (p.plan === current.value.plan && !paused.value) || busy.value;
+
+/** Each plan owns a colour and a shape, in the order the plans are listed. */
+const PLAN_SHAPES = ["sh-sq", "sh-ci", "sh-cd"];
+const PLAN_COLORS = ["var(--ink)", "var(--cat-1)", "var(--cat-2)"];
 </script>
 
 <template>
@@ -155,10 +159,10 @@ const disabled = (p: PlanDetails) => !current.value || (p.plan === current.value
 				Pay the {{ currentTitle }} invoice below{{ current.renews ? ", or change the card it renews on" : "" }}.
 			</div>
 
-			<section class="p-card now">
+			<section class="p-hero now arrive">
 				<div>
-					<span class="p-muted">Plan for {{ session.store.value?.display_name ?? "this branch" }}</span>
-					<h1>{{ currentTitle }}</h1>
+					<span class="p-hero-h"><span class="sh sh-cd" :style="{ '--c': 'var(--cat-2)' }" />Plan for {{ session.store.value?.display_name ?? "this branch" }}</span>
+					<h2>{{ currentTitle }}</h2>
 					<div class="p-row p-mt-xs">
 						<span class="p-badge" :class="paused ? 'p-badge--warn' : 'p-badge--ok'">{{ paused ? "Payment due" : "Active" }}</span>
 						<span v-if="current.plan !== 'starter'" class="p-muted">
@@ -177,9 +181,9 @@ const disabled = (p: PlanDetails) => !current.value || (p.plan === current.value
 			<h2 class="p-mt p-mb-xs">Plans</h2>
 			<p v-if="session.stores.value.length > 1" class="p-muted p-mb-sm">Each branch has its own plan.</p>
 			<div class="p-grid plans">
-				<article v-for="p in plans" :key="p.plan" class="p-card plan" :class="{ here: p.plan === current.plan }">
+				<article v-for="(p, i) in plans" :key="p.plan" class="p-card plan arrive" :style="{ '--i': i }" :class="{ here: p.plan === current.plan }">
 					<div>
-						<h2>{{ p.title }}</h2>
+						<h2 class="plan-h"><span class="sh" :class="PLAN_SHAPES[i % 3]" :style="{ '--c': PLAN_COLORS[i % 3] }" />{{ p.title }}</h2>
 						<p class="price"><strong>{{ p.amount ? money(p.amount) : "Free" }}</strong><span v-if="p.amount" class="p-muted"> / month</span></p>
 					</div>
 					<ul>
@@ -223,7 +227,13 @@ const disabled = (p: PlanDetails) => !current.value || (p.plan === current.value
 	gap: 14px;
 }
 .plan.here {
-	border-color: var(--brand);
+	outline: 3px solid var(--brand);
+	outline-offset: -3px;
+}
+.plan-h {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 .plan ul {
 	display: flex;
@@ -236,6 +246,9 @@ const disabled = (p: PlanDetails) => !current.value || (p.plan === current.value
 	margin-top: -6px;
 }
 .price strong {
-	font-size: 24px;
+	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
+	font-weight: 800;
+	font-size: 34px;
+	letter-spacing: -0.03em;
 }
 </style>

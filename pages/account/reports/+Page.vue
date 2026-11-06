@@ -100,11 +100,27 @@ const periodLabel = (iso: string) =>
 				This total covers {{ report.branches.length }} of your {{ session.stores.value.length }} branches — the ones where you can see finances.
 			</p>
 			<div class="p-grid stats">
-				<div class="p-card p-stat"><strong>{{ money(report.totals.gross_sales) }}</strong><span>Gross sales</span></div>
-				<div class="p-card p-stat"><strong>{{ money(report.totals.earnings) }}</strong><span>Your earnings</span></div>
-				<div class="p-card p-stat"><strong>{{ report.totals.completed.toLocaleString() }}</strong><span>Completed of {{ report.totals.orders.toLocaleString() }} orders</span></div>
-				<div class="p-card p-stat"><strong>{{ money(report.totals.average_order) }}</strong><span>Average order</span></div>
-				<div class="p-card p-stat"><strong>{{ report.totals.cancelled.toLocaleString() }}</strong><span>Cancelled or rejected</span></div>
+				<section class="p-tile p-hero-tile arrive" style="--i: 0" aria-label="Gross sales">
+					<span class="p-tile-h"><span class="sh sh-ci" :style="{ '--c': 'var(--cat-2)' }" />Gross sales</span>
+					<strong>{{ money(report.totals.gross_sales) }}</strong>
+				</section>
+				<section class="p-tile tone-1 arrive" style="--i: 1" aria-label="Your earnings">
+					<span class="p-tile-h"><span class="sh sh-sq" />Your earnings</span>
+					<strong>{{ money(report.totals.earnings) }}</strong>
+				</section>
+				<section class="p-tile tone-4 arrive" style="--i: 2" aria-label="Completed orders">
+					<span class="p-tile-h"><span class="sh sh-di" />Completed</span>
+					<strong>{{ report.totals.completed.toLocaleString() }}</strong>
+					<small>of {{ report.totals.orders.toLocaleString() }} orders</small>
+				</section>
+				<section class="p-tile tone-2 arrive" style="--i: 3" aria-label="Average order">
+					<span class="p-tile-h"><span class="sh sh-cd" />Average order</span>
+					<strong>{{ money(report.totals.average_order) }}</strong>
+				</section>
+				<section class="p-tile p-card arrive" style="--i: 4" aria-label="Cancelled or rejected">
+					<span class="p-tile-h"><span class="sh sh-tr" :style="{ '--c': 'var(--bad)' }" />Cancelled or rejected</span>
+					<strong>{{ report.totals.cancelled.toLocaleString() }}</strong>
+				</section>
 			</div>
 
 			<section v-if="report.scope === 'brand' && report.branches.length > 1" class="p-card block">
@@ -130,7 +146,7 @@ const periodLabel = (iso: string) =>
 					<ul v-else class="bars" role="list">
 						<li v-for="p in report.series" :key="p.period">
 							<span class="when">{{ periodLabel(p.period) }}</span>
-							<span class="bar" :aria-label="money(p.gross_sales)"><span :style="{ width: `${(p.gross_sales / peak) * 100}%` }" /></span>
+							<span class="bar" :aria-label="money(p.gross_sales)"><span class="grow-x" :style="{ width: `${(p.gross_sales / peak) * 100}%` }" /></span>
 							<span class="amt">{{ money(p.gross_sales) }}</span>
 						</li>
 					</ul>
@@ -162,8 +178,42 @@ const periodLabel = (iso: string) =>
 	min-width: 140px;
 }
 .stats {
-	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+	grid-template-columns: repeat(6, minmax(0, 1fr));
 	margin: 14px 0;
+}
+.stats > .p-tile {
+	grid-column: span 2;
+	min-width: 0;
+}
+.stats > .p-tile:nth-child(-n + 2) {
+	grid-column: span 3;
+}
+.stats > .p-tile strong {
+	font-size: clamp(30px, 3.6vw, 48px);
+	overflow-wrap: anywhere;
+}
+@media (max-width: 720px) {
+	.stats {
+		grid-template-columns: 1fr;
+	}
+	.stats > .p-tile,
+	.stats > .p-tile:nth-child(-n + 2) {
+		grid-column: auto;
+	}
+}
+.p-hero-tile {
+	background: #17130f;
+	color: #ffffff;
+}
+:root[data-theme="dark"] .p-hero-tile {
+	background: var(--surface);
+	color: var(--ink);
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .p-hero-tile {
+		background: var(--surface);
+		color: var(--ink);
+	}
 }
 .block {
 	display: flex;
@@ -190,7 +240,7 @@ const periodLabel = (iso: string) =>
 	color: var(--muted);
 }
 .bar {
-	height: 10px;
+	height: 12px;
 	background: var(--line);
 	border-radius: 999px;
 	overflow: hidden;

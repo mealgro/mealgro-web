@@ -221,27 +221,37 @@ None that can be changed in a style pass. Two things are deliberate:
 
 ---
 
-## Affiliate area: v2 visual system
+## v2 visual system: vendor portal and affiliate area
 
-The signed-in affiliate area (`pages/affiliate/(app)/*`, `components/affiliate/*`)
-uses the v2 system shared with the admin console, scoped to `.portal.aff` in
-`components/affiliate/affiliate.css`. The marketing site, `/affiliate` (public
-landing) and the vendor portal keep the Mealgro red and MADE Tommy Soft above;
-the affiliate area deliberately does not.
+The signed-in areas (`/account/*` vendor portal, `/affiliate/(app)/*`) share the
+v2 visual system of the admin console (see `mealgro-admin/brand.md`): ink rail,
+pill buttons and tabs, 28px cards, one bold ink panel per page, coloured tiles,
+display type for headlines and numbers, a shape beside every colour, motion on
+arrival only, and Day / Night / System. The marketing site keeps the red and
+MADE Tommy Soft sections above. Everything lives in `components/portal/portal.css`
+(scoped to `.portal`); the affiliate area only overrides the palette in
+`components/affiliate/affiliate.css`.
 
-| Token | Light | Dark (OS) |
+**Vendor portal palette (Mealgro colour profile)**
+
+| Token | Day | Night |
 | --- | --- | --- |
-| Paper `--bg` | `#F1F0F5` | `#12121C` |
-| Surface `--surface` | `#FFFFFF` | `#1B1B29` |
-| Ink `--ink` | `#12121C` | `#F1F0F5` |
-| Brand `--brand` (cobalt) | `#2F3BFF` | `#7B85FF` |
-| `--cat-1..4` (cobalt, rose, sun, mint) | `#2F3BFF` `#FF5C8A` `#FFC52E` `#19B98A` | cobalt `#7B85FF`, rest same |
-| Ok / warn / bad | `#0A7B55` / `#7A4A00` / `#C8301A` | `#3DD6A0` / `#FFC52E` / `#FF7A63` |
+| `--bg` paper | `#F6F6F6` | `#14100D` |
+| `--surface` | `#FFFFFF` | `#1E1915` |
+| `--ink` | `#17130F` | `#F6F1EC` |
+| `--muted` | `#5F574F` | `#BDB3A9` |
+| `--line` | `#E8E2DC` | `#352C26` |
+| `--brand` (red) / `--brand-deep` hover | `#D62300` / `#B81D00` | `#FF5A3C` / `#FF7A5F` |
+| `--cat-1` red, square `sh-sq` | `#D62300` | `#FF5A3C` |
+| `--cat-2` yellow, circle `sh-ci` / card `sh-cd` | `#FFE100` | same |
+| `--cat-3` ink, | `#17130F` | `#F6F1EC` |
+| `--cat-4` mint, diamond `sh-di` | `#19B98A` | same |
+| ok / warn / bad | `#17803D` / `#8A4400` / `#B42318` | `#3DD6A0` / `#FFC866` / `#FF8A7A` |
 
-- Fonts (self-hosted, `@fontsource-variable`): Bricolage Grotesque 800 for headlines and big numbers (`h1`-`h3`, `.disp`, `.p-stat strong`), Instrument Sans for everything else.
-- Shapes: every category owns a colour AND a shape: `.sh` + `.sh-sq|sh-ci|sh-cd|sh-di`, colour via `--c`. Status badges (`.p-badge--ok|warn|bad|brand`) get a dot, ring, square or diamond automatically.
-- Tiles: `.tone-1..4` (coloured tile with readable text), one `.hero` ink panel per page, cards `28px` radius, buttons and tabs are pills, inputs `16px` with a 2px border.
-- Motion: `.arrive` (stagger with `style="--i: n"`) once on load, `transform: scale(.97)` on press; nothing loops; `prefers-reduced-motion` stops all of it.
-- Rail: `AffiliateShell.vue` is an ink rail with pill items in both themes.
-- Order on a page: what needs the person first, then totals, then history.
-- Worked example: `pages/affiliate/(app)/dashboard/+Page.vue`.
+**Affiliate palette:** the cobalt/rose/sun/mint set (`--brand #2F3BFF`, `--cat-1..4`), with an ink primary button.
+
+**Shared classes** (`portal.css`): `.p-hero` (the ink panel, `.p-hero-h` its small title), `.p-tile` + `.tone-1..4` (coloured tiles; `a.p-tile` lifts on hover; `.p-tile.p-card` is the plain white one), `.sh` + `.sh-sq|ci|cd|di|tr` (shapes, colour from `--c`), `.arrive` (stagger with `style="--i: n"`), `.grow-x` (bars), `.p-card`, `.p-btn`, `.p-badge` (gets a shape automatically), the old `p-*` helpers. Page headings use `h1`-`h3` (Bricolage Grotesque 800); card headings 19px.
+
+**Theme:** `lib/theme.ts` + `components/portal/ThemeSwitch.vue` (sidebar). Day / Night set `data-theme` on `<html>` (saved in `localStorage` as `mg.theme`); Auto removes it so `prefers-color-scheme` decides. Dark-only values are written twice: for `:root[data-theme="dark"]` and for the OS query with `:root:not([data-theme="light"])`.
+
+**Worked examples:** `pages/account/+Page.vue` (hero + tiles), `pages/account/reports/+Page.vue`, `pages/account/subscription/+Page.vue`, `pages/affiliate/(app)/dashboard/+Page.vue`.

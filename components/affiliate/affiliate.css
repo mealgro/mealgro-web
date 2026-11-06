@@ -21,13 +21,33 @@
 	--cat-2: #ff5c8a;
 	--cat-3: #ffc52e;
 	--cat-4: #19b98a;
+	--brand-deep: #2f3bff;
 	--on-1: #ffffff;
+	--on-3: #12121c;
 	--ease: cubic-bezier(0.16, 1, 0.3, 1);
 	font-family: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 	font-size: 15px;
 }
+:root[data-theme="dark"] .portal.aff {
+	--bg: #12121c;
+	--surface: #1b1b29;
+	--ink: #f1f0f5;
+	--muted: #b9b8cc;
+	--line: #2d2d42;
+	--brand: #7b85ff;
+	--brand-ink: #0e0e18;
+	--brand-soft: #25264d;
+	--ok: #3dd6a0;
+	--ok-soft: #123b2f;
+	--warn: #ffc52e;
+	--warn-soft: #3a3008;
+	--bad: #ff7a63;
+	--bad-soft: #3d1a14;
+	--cat-1: #7b85ff;
+	--on-1: #0e0e18;
+}
 @media (prefers-color-scheme: dark) {
-	.portal.aff {
+	:root:not([data-theme="light"]) .portal.aff {
 		--bg: #12121c;
 		--surface: #1b1b29;
 		--ink: #f1f0f5;
@@ -46,167 +66,6 @@
 		--on-1: #0e0e18;
 	}
 }
-.aff h1,
-.aff h2,
-.aff h3,
-.aff .disp {
-	font-family: "Bricolage Grotesque Variable", "Instrument Sans Variable", system-ui, sans-serif;
-	font-weight: 800;
-	letter-spacing: -0.03em;
-}
-.aff h1 {
-	font-size: clamp(30px, 4vw, 44px);
-	line-height: 1;
-	letter-spacing: -0.04em;
-}
-.aff h2 {
-	font-size: 22px;
-}
-.aff .p-card {
-	border-radius: 28px;
-	padding: 24px 26px;
-	border-color: transparent;
-}
-.aff .p-btn,
-.aff .p-tabs,
-.aff .p-tabs button {
-	border-radius: 999px;
-}
-.aff .p-btn {
-	border-width: 2px;
-	border-color: var(--ink);
-	transition: transform 0.12s var(--ease), background 0.12s, opacity 0.12s;
-}
-.aff .p-btn:hover:not(:disabled) {
-	background: color-mix(in srgb, var(--ink) 8%, var(--surface));
-	border-color: var(--ink);
-}
-.aff .p-btn:active:not(:disabled) {
-	transform: scale(0.97);
-}
-.aff .p-btn--primary {
-	background: var(--ink);
-	border-color: var(--ink);
-	color: var(--surface);
-}
-.aff .p-btn--primary:hover:not(:disabled) {
-	background: var(--brand);
-	border-color: var(--brand);
-	color: var(--brand-ink);
-}
-.aff .p-btn--danger {
-	border-color: var(--bad);
-}
-.aff .p-input {
-	border-radius: 16px;
-	border-width: 2px;
-	border-color: color-mix(in srgb, var(--ink) 25%, var(--line));
-	background: var(--surface);
-}
-.aff .p-badge,
-.aff .p-alert {
-	border-radius: 999px;
-}
-.aff .p-alert {
-	padding: 10px 18px;
-}
-.aff .p-badge {
-	height: 26px;
-	padding: 0 12px 0 10px;
-	gap: 6px;
-	font-weight: 700;
-}
-/* Status badges carry a shape as well as a colour: ok a dot, warning a
-   ring, bad a square. */
-.aff .p-badge--ok::before,
-.aff .p-badge--warn::before,
-.aff .p-badge--bad::before,
-.aff .p-badge--brand::before {
-	content: "";
-	width: 8px;
-	height: 8px;
-	background: currentColor;
-	border-radius: 50%;
-}
-.aff .p-badge--warn::before {
-	background: transparent;
-	border: 2px solid currentColor;
-}
-.aff .p-badge--bad::before {
-	border-radius: 2px;
-}
-.aff .p-badge--brand::before {
-	border-radius: 1px;
-	transform: rotate(45deg) scale(0.9);
-}
-.aff .p-table th {
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	font-size: 11px;
-}
-.aff .p-stat strong {
-	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
-	font-weight: 800;
-	letter-spacing: -0.03em;
-	font-variant-numeric: tabular-nums;
-}
-@media (prefers-reduced-motion: reduce) {
-	.aff * {
-		animation-duration: 0.01ms !important;
-		transition-duration: 0.01ms !important;
-	}
-}
-.aff .arrive {
-	animation: aff-arrive 0.5s var(--ease) both;
-	animation-delay: calc(var(--i, 0) * 60ms);
-}
-@keyframes aff-arrive {
-	from {
-		opacity: 0;
-		transform: translateY(16px);
-	}
-}
-/* Shapes: square, circle, card, diamond. Size and colour come from --c. */
-.aff .sh {
-	display: inline-block;
-	flex: none;
-	width: 14px;
-	height: 14px;
-	background: var(--c, currentColor);
-}
-.aff .sh-sq {
-	border-radius: 3px;
-}
-.aff .sh-ci {
-	border-radius: 50%;
-}
-.aff .sh-cd {
-	width: 20px;
-	height: 13px;
-	border-radius: 4px;
-}
-.aff .sh-di {
-	border-radius: 2px;
-	transform: rotate(45deg) scale(0.82);
-}
-/* Coloured tiles that read in both themes. */
-.aff .tone-1 {
-	background: var(--cat-1);
-	color: var(--on-1);
-}
-.aff .tone-2 {
-	background: var(--cat-2);
-	color: #12121c;
-}
-.aff .tone-3 {
-	background: var(--cat-3);
-	color: #12121c;
-}
-.aff .tone-4 {
-	background: var(--cat-4);
-	color: #12121c;
-}
-
 body {
 	margin: 0;
 }
@@ -270,9 +129,9 @@ body {
 /* Banners shown above every page. */
 .aff-banner {
 	display: flex;
-	gap: 12px;
+	gap: 14px;
 	align-items: flex-start;
-	padding: 16px 20px;
+	padding: 20px 24px;
 	border-radius: 24px;
 	background: var(--warn-soft);
 	color: var(--warn);
@@ -299,9 +158,9 @@ body {
 .aff-md {
 	max-height: 320px;
 	overflow-y: auto;
-	padding: 14px 16px;
+	padding: 18px 20px;
 	border: 1px solid var(--line);
-	border-radius: 10px;
+	border-radius: 12px;
 	background: var(--bg);
 	font-size: 14px;
 	line-height: 1.6;
@@ -314,7 +173,7 @@ body {
 .aff-md h2,
 .aff-md h3 {
 	font-size: 15px;
-	margin: 14px 0 6px;
+	margin: 20px 0 8px;
 }
 .aff-md h1:first-child,
 .aff-md h2:first-child,
@@ -324,7 +183,7 @@ body {
 .aff-md p,
 .aff-md ul,
 .aff-md ol {
-	margin: 0 0 10px;
+	margin: 0 0 14px;
 }
 .aff-md ul,
 .aff-md ol {
@@ -337,9 +196,10 @@ body {
 
 .aff-check {
 	display: flex;
-	gap: 10px;
+	gap: 12px;
 	align-items: flex-start;
 	font-size: 14px;
+	line-height: 1.5;
 	cursor: pointer;
 }
 .aff-check input {
@@ -366,8 +226,8 @@ body {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 32px 16px 48px;
-	gap: 18px;
+	padding: 40px 16px 56px;
+	gap: 24px;
 }
 .aff-auth-top {
 	width: 100%;
@@ -384,8 +244,8 @@ body {
 	max-width: 520px;
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
-	padding: 28px;
+	gap: 22px;
+	padding: 36px 32px;
 }
 .aff-auth .box--narrow {
 	max-width: 420px;
@@ -395,7 +255,7 @@ body {
 		padding-top: 20px;
 	}
 	.aff-auth .box {
-		padding: 20px;
+		padding: 24px 20px;
 	}
 }
 
@@ -432,8 +292,8 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
-	gap: 12px;
-	padding: 12px 0;
+	gap: 16px;
+	padding: 16px 0;
 	border-bottom: 1px solid var(--line);
 }
 .aff-list > li:last-child {
@@ -447,4 +307,16 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 6px;
+}
+
+/* The affiliate area's primary button is ink, with the cobalt on hover. */
+.portal.aff .p-btn--primary {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--surface);
+}
+.portal.aff .p-btn--primary:hover:not(:disabled) {
+	background: var(--brand);
+	border-color: var(--brand);
+	color: var(--brand-ink);
 }

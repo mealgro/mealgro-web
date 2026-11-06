@@ -7,6 +7,7 @@ import { usePageContext } from "vike-vue/usePageContext";
 import { LOGIN, session } from "../../lib/affiliate/session";
 import PauseBanner from "./PauseBanner.vue";
 import TermsGate from "./TermsGate.vue";
+import ThemeSwitch from "../portal/ThemeSwitch.vue";
 import logoImage from "../../assets/logo.svg";
 
 defineProps<{ title: string }>();
@@ -85,6 +86,7 @@ onMounted(async () => {
 				</ul>
 			</nav>
 			<a class="more" href="/affiliate?view=public">How the program works</a>
+			<ThemeSwitch />
 			<div class="who">
 				<div class="who-text">
 					<strong>{{ user?.full_name || "You" }}</strong>
@@ -198,7 +200,6 @@ nav a.on {
 	padding: 0 10px;
 }
 .who {
-	margin-top: auto;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -220,16 +221,16 @@ nav a.on {
 }
 .main {
 	margin-left: 232px;
-	padding: 28px 32px 64px;
+	padding: 36px 40px 72px;
 	outline: none;
 }
 .main-in {
 	max-width: 1040px;
 	margin: 0 auto;
-	gap: 16px;
+	gap: 24px;
 }
 .main-in > .p-page-head {
-	margin-bottom: 4px;
+	margin-bottom: 8px;
 }
 .mobile-bar,
 .scrim {
@@ -281,8 +282,11 @@ nav a.on {
 	color: #ffffff;
 	padding: 22px 14px;
 }
+:root[data-theme="dark"] .side {
+	--rail: #0a0a12;
+}
 @media (prefers-color-scheme: dark) {
-	.side {
+	:root:not([data-theme="light"]) .side {
 		--rail: #0a0a12;
 	}
 }
@@ -347,5 +351,8 @@ nav a.on svg {
 		border-color: rgb(255 255 255 / 0.5);
 		color: #ffffff;
 	}
+}
+.side > :nth-last-child(2) {
+	margin-top: auto;
 }
 </style>

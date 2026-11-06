@@ -1,24 +1,91 @@
+@import "@fontsource-variable/bricolage-grotesque/wght.css";
+@import "@fontsource-variable/instrument-sans/wght.css";
+
+/* v2 visual system (the same as the admin console and the affiliate area), in
+   the Mealgro colour profile: brand red, yellow and ink on paper. Each kind of
+   thing owns a colour AND a shape; see brand.md. */
 .portal {
 	--bg: #f6f6f6;
 	--surface: #ffffff;
 	--ink: #17130f;
-	--muted: #6b635b;
+	--muted: #5f574f;
 	--line: #e8e2dc;
 	--brand: #d62300;
+	--brand-deep: #b81d00;
 	--brand-ink: #ffffff;
 	--brand-soft: #fdece8;
 	--ok: #17803d;
 	--ok-soft: #e4f5ea;
-	--warn: #b45309;
+	--warn: #8a4400;
 	--warn-soft: #fdf1dc;
 	--bad: #b42318;
 	--bad-soft: #fde8e6;
+	--cat-1: #d62300;
+	--cat-2: #ffe100;
+	--cat-3: #17130f;
+	--cat-4: #19b98a;
+	--on-1: #ffffff;
+	--on-3: #ffffff;
+	--ease: cubic-bezier(0.16, 1, 0.3, 1);
 	background: var(--bg);
 	color: var(--ink);
 	min-height: 100vh;
-	font-family: "MADE Tommy Soft", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-	font-size: 14px;
+	font-family: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	font-size: 15px;
 	line-height: 1.45;
+}
+:root[data-theme="dark"] .portal {
+	--bg: #14100d;
+	--surface: #1e1915;
+	--ink: #f6f1ec;
+	--muted: #bdb3a9;
+	--line: #352c26;
+	--brand: #ff5a3c;
+	--brand-deep: #ff7a5f;
+	--brand-ink: #1a0804;
+	--brand-soft: #3a1b12;
+	--ok: #3dd6a0;
+	--ok-soft: #123b2f;
+	--warn: #ffc866;
+	--warn-soft: #3a2c0c;
+	--bad: #ff8a7a;
+	--bad-soft: #3d1a14;
+	--cat-1: #ff5a3c;
+	--cat-3: #f6f1ec;
+	--on-1: #1a0804;
+	--on-3: #14100d;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .portal {
+		--bg: #14100d;
+		--surface: #1e1915;
+		--ink: #f6f1ec;
+		--muted: #bdb3a9;
+		--line: #352c26;
+		--brand: #ff5a3c;
+		--brand-deep: #ff7a5f;
+		--brand-ink: #1a0804;
+		--brand-soft: #3a1b12;
+		--ok: #3dd6a0;
+		--ok-soft: #123b2f;
+		--warn: #ffc866;
+		--warn-soft: #3a2c0c;
+		--bad: #ff8a7a;
+		--bad-soft: #3d1a14;
+		--cat-1: #ff5a3c;
+		--cat-3: #f6f1ec;
+		--on-1: #1a0804;
+		--on-3: #14100d;
+	}
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	background: #14100d;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		color-scheme: dark;
+	}
 }
 .portal *,
 .portal *::before,
@@ -52,6 +119,12 @@
 }
 .portal p {
 	font-weight: 400;
+	line-height: 1.55;
+}
+/* A heading, then its lead-in, then the content: room between each. */
+.portal h1 + p,
+.portal h2 + p {
+	margin-top: 6px;
 }
 
 /* The Mealgro logo with the area's name under it (sidebar, sign-in). */
@@ -75,8 +148,8 @@
 .p-card {
 	background: var(--surface);
 	border: 1px solid var(--line);
-	border-radius: 14px;
-	padding: 18px;
+	border-radius: 16px;
+	padding: 24px;
 }
 .p-muted {
 	color: var(--muted);
@@ -92,18 +165,18 @@
 .p-stack {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 18px;
 }
 .p-grid {
 	display: grid;
-	gap: 14px;
+	gap: 20px;
 }
 .p-page-head {
 	display: flex;
 	align-items: flex-end;
 	justify-content: space-between;
 	gap: 16px;
-	margin-bottom: 20px;
+	margin-bottom: 28px;
 	flex-wrap: wrap;
 }
 
@@ -112,9 +185,9 @@
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
-	height: 38px;
-	padding: 0 16px;
-	border-radius: 10px;
+	height: 42px;
+	padding: 0 20px;
+	border-radius: 12px;
 	border: 1px solid var(--line);
 	background: var(--surface);
 	color: var(--ink);
@@ -152,24 +225,25 @@
 }
 .p-btn--sm {
 	height: 32px;
-	padding: 0 12px;
+	padding: 0 14px;
 	font-size: 13px;
 }
 
 .p-field {
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 8px;
 }
 .p-field > span {
 	font-size: 13px;
 	font-weight: 600;
+	line-height: 1.3;
 }
 .p-input {
-	height: 40px;
-	padding: 0 12px;
+	height: 44px;
+	padding: 0 14px;
 	border: 1px solid var(--line);
-	border-radius: 10px;
+	border-radius: 12px;
 	background: #fff;
 	color: var(--ink);
 	font-size: 14px;
@@ -210,9 +284,10 @@
 }
 
 .p-alert {
-	padding: 10px 14px;
-	border-radius: 10px;
+	padding: 14px 18px;
+	border-radius: 12px;
 	font-size: 13px;
+	line-height: 1.5;
 	background: var(--bad-soft);
 	color: var(--bad);
 }
@@ -234,12 +309,12 @@
 	font-size: 12px;
 	font-weight: 600;
 	color: var(--muted);
-	padding: 8px 12px;
+	padding: 12px 16px;
 	border-bottom: 1px solid var(--line);
 	white-space: nowrap;
 }
 .p-table td {
-	padding: 12px;
+	padding: 16px;
 	border-bottom: 1px solid var(--line);
 	vertical-align: middle;
 }
@@ -318,6 +393,287 @@
 }
 .portal .p-ml-sm {
 	margin-left: 8px;
+}
+
+/* ── v2 components: pills, big rounded cards, display type, shapes, tones ── */
+.portal h1,
+.portal h2,
+.portal h3,
+.portal .disp {
+	font-family: "Bricolage Grotesque Variable", "Instrument Sans Variable", system-ui, sans-serif;
+	font-weight: 800;
+	letter-spacing: -0.03em;
+}
+.portal h1 {
+	font-size: clamp(30px, 4vw, 44px);
+	line-height: 1;
+	letter-spacing: -0.04em;
+}
+.portal h2 {
+	font-size: 22px;
+}
+.portal .p-card {
+	border-radius: 28px;
+	padding: 24px 26px;
+	border-color: transparent;
+}
+.portal .p-btn,
+.portal .p-tabs,
+.portal .p-tabs button {
+	border-radius: 999px;
+}
+.portal .p-btn {
+	border-width: 2px;
+	border-color: var(--ink);
+	transition: transform 0.12s var(--ease), background 0.12s, opacity 0.12s;
+}
+.portal .p-btn:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--ink) 8%, var(--surface));
+	border-color: var(--ink);
+}
+.portal .p-btn:active:not(:disabled) {
+	transform: scale(0.97);
+}
+.portal .p-btn--primary {
+	background: var(--brand);
+	border-color: var(--brand);
+	color: var(--brand-ink);
+}
+.portal .p-btn--primary:hover:not(:disabled) {
+	background: var(--brand-deep);
+	border-color: var(--brand-deep);
+}
+.portal .p-btn--danger {
+	border-color: var(--bad);
+}
+.portal .p-input {
+	border-radius: 16px;
+	border-width: 2px;
+	border-color: color-mix(in srgb, var(--ink) 25%, var(--line));
+	background: var(--surface);
+}
+.portal .p-badge,
+.portal .p-alert {
+	border-radius: 999px;
+}
+.portal .p-alert {
+	padding: 10px 18px;
+}
+.portal .p-badge {
+	height: 26px;
+	padding: 0 12px 0 10px;
+	gap: 6px;
+	font-weight: 700;
+}
+/* Status badges carry a shape as well as a colour: ok a dot, warning a
+   ring, bad a square. */
+.portal .p-badge--ok::before,
+.portal .p-badge--warn::before,
+.portal .p-badge--bad::before,
+.portal .p-badge--brand::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	background: currentColor;
+	border-radius: 50%;
+}
+.portal .p-badge--warn::before {
+	background: transparent;
+	border: 2px solid currentColor;
+}
+.portal .p-badge--bad::before {
+	border-radius: 2px;
+}
+.portal .p-badge--brand::before {
+	border-radius: 1px;
+	transform: rotate(45deg) scale(0.9);
+}
+.portal .p-table th {
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-size: 11px;
+}
+.portal .p-stat strong {
+	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+}
+/* The one bold panel on a page, and coloured tiles for the headline numbers. */
+.portal .p-hero {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	flex-wrap: wrap;
+	padding: 30px 32px;
+	border-radius: 32px;
+	background: #17130f;
+	color: #ffffff;
+}
+:root[data-theme="dark"] .portal .p-hero {
+	background: var(--surface);
+	color: var(--ink);
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .portal .p-hero {
+		background: var(--surface);
+		color: var(--ink);
+	}
+}
+.portal .p-hero h2,
+.portal .p-hero p,
+.portal .p-hero .p-muted {
+	color: inherit;
+}
+.portal .p-hero .p-muted {
+	opacity: 0.72;
+}
+.portal .p-hero::after {
+	content: "";
+	position: absolute;
+	right: -70px;
+	top: -80px;
+	width: 220px;
+	height: 220px;
+	border-radius: 50%;
+	border: 30px solid currentColor;
+	opacity: 0.06;
+	pointer-events: none;
+}
+.portal .p-hero .p-btn {
+	background: transparent;
+	border-color: currentColor;
+	color: inherit;
+}
+.portal .p-hero .p-btn--primary {
+	background: var(--cat-2);
+	border-color: var(--cat-2);
+	color: #17130f;
+}
+.portal .p-hero-h {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 700;
+	font-size: 14px;
+	opacity: 0.8;
+}
+.portal .p-hero h2 {
+	font-size: clamp(26px, 3.4vw, 40px);
+	line-height: 1.05;
+	margin: 6px 0;
+}
+.portal .p-tile {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 22px 24px;
+	border-radius: 28px;
+	text-decoration: none;
+	color: inherit;
+	transition: transform 0.3s var(--ease);
+}
+a.p-tile:hover {
+	transform: translateY(-3px);
+}
+.portal .p-tile-h {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 700;
+	font-size: 15px;
+}
+.portal .p-tile strong {
+	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+	font-size: clamp(34px, 4.6vw, 52px);
+	line-height: 0.95;
+	color: inherit;
+}
+.portal .p-tile small {
+	font-size: 13px;
+	opacity: 0.8;
+}
+.portal .p-tile.p-card {
+	border: 0;
+}
+.portal .p-section-h {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.portal .grow-x {
+	transform-origin: left;
+	animation: p-grow-x 1s var(--ease) both;
+}
+@keyframes p-grow-x {
+	from {
+		transform: scaleX(0);
+	}
+}
+.portal .p-card h2 {
+	font-size: 19px;
+}
+@media (prefers-reduced-motion: reduce) {
+	.portal * {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+.portal .arrive {
+	animation: p-arrive 0.5s var(--ease) both;
+	animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes p-arrive {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+}
+/* Shapes: square, circle, card, diamond. Size and colour come from --c. */
+.portal .sh {
+	display: inline-block;
+	flex: none;
+	width: 14px;
+	height: 14px;
+	background: var(--c, currentColor);
+}
+.portal .sh-sq {
+	border-radius: 3px;
+}
+.portal .sh-ci {
+	border-radius: 50%;
+}
+.portal .sh-cd {
+	width: 20px;
+	height: 13px;
+	border-radius: 4px;
+}
+.portal .sh-di {
+	border-radius: 2px;
+	transform: rotate(45deg) scale(0.82);
+}
+/* Coloured tiles that read in both themes. */
+.portal .tone-1 {
+	background: var(--cat-1);
+	color: var(--on-1);
+}
+.portal .tone-2 {
+	background: var(--cat-2);
+	color: #17130f;
+}
+.portal .tone-3 {
+	background: var(--cat-3);
+	color: var(--on-3);
+}
+.portal .tone-4 {
+	background: var(--cat-4);
+	color: #17130f;
 }
 
 @media (prefers-reduced-motion: reduce) {

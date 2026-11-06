@@ -1,15 +1,17 @@
 [
-  {
-    "relation": [
-      "delegate_permission/common.handle_all_urls",
-      "delegate_permission/common.get_login_creds"
-    ],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "app.mealgro.mobile",
-      "sha256_cert_fingerprints": [
-        "SHA256_FINGERPRINT"
-      ]
-    }
-  }
+	{
+		"relation": [
+			"delegate_permission/common.handle_all_urls",
+			"delegate_permission/common.get_login_creds"
+		],
+		"target": {
+			"namespace": "android_app",
+			"package_name": "app.mealgro.mobile",
+			"sha256_cert_fingerprints": [
+				"64:E4:4B:67:DD:29:6E:E2:19:31:BC:32:D4:9E:FD:48:29:E7:9C:54:37:04:85:61:EC:1A:F7:13:2B:9D:36:28",
+				"AC:6A:96:3C:D8:76:65:62:18:8A:48:D1:B7:89:C8:D8:98:E5:57:55:8A:05:B5:F6:20:7A:1E:04:A1:41:B6:B9",
+				"48:28:99:F2:A0:E6:E2:35:84:08:A1:C1:45:09:BA:0E:B2:7B:D8:52:81:9C:7C:CA:40:B3:C1:FA:7C:1B:38:A6"
+			]
+		}
+	}
 ]

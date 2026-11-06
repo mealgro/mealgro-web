@@ -75,8 +75,8 @@ async function submit() {
 	max-width: 400px;
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
-	padding: 28px;
+	gap: 22px;
+	padding: 36px 32px;
 }
 .small {
 	font-size: 12px;

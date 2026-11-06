@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { usePageContext } from "vike-vue/usePageContext";
 import "./portal.css";
 import logoImage from "../../assets/logo.svg";
+import ThemeSwitch from "./ThemeSwitch.vue";
 import { session } from "../../lib/portal/session";
 import { toasts } from "../../lib/portal/toast";
 import type { Capability } from "../../lib/portal/types";
@@ -85,6 +86,7 @@ onMounted(async () => {
 						</li>
 					</ul>
 				</nav>
+				<ThemeSwitch />
 				<div class="who">
 					<div class="who-text">
 						<strong>{{ user?.full_name || "You" }}</strong>
@@ -195,7 +197,7 @@ nav a.on {
 }
 .main {
 	margin-left: 232px;
-	padding: 28px 32px 64px;
+	padding: 36px 40px 72px;
 }
 .main-in {
 	max-width: 1040px;
@@ -247,6 +249,94 @@ nav a.on {
 	.main {
 		margin-left: 0;
 		padding: 20px 16px 64px;
+	}
+}
+
+/* v2: an ink rail in both themes, pill items. */
+.side {
+	--rail: #17130f;
+	background: var(--rail);
+	border-right: 0;
+	color: #ffffff;
+	padding: 22px 14px;
+}
+:root[data-theme="dark"] .side {
+	--rail: #0d0a08;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .side {
+		--rail: #0d0a08;
+	}
+}
+.side .p-muted,
+.side .switch span {
+	color: rgb(255 255 255 / 0.65);
+}
+.switch strong {
+	color: #ffffff;
+}
+.side .p-input {
+	background: rgb(255 255 255 / 0.1);
+	border-color: rgb(255 255 255 / 0.25);
+	color: #ffffff;
+}
+.side .p-input option {
+	color: #17130f;
+}
+nav a {
+	height: 42px;
+	padding: 0 14px;
+	border-radius: 999px;
+	color: rgb(255 255 255 / 0.82);
+}
+nav a:hover {
+	background: rgb(255 255 255 / 0.08);
+	color: #ffffff;
+}
+nav a.on {
+	background: rgb(255 255 255 / 0.16);
+	color: #ffffff;
+}
+nav a.on svg {
+	color: #ffe100;
+}
+.who {
+	border-top-color: rgb(255 255 255 / 0.14);
+}
+.who-text strong {
+	color: #ffffff;
+}
+.who .p-btn {
+	white-space: nowrap;
+	background: transparent;
+	border-color: rgb(255 255 255 / 0.5);
+	color: #ffffff;
+}
+.side .p-brand small {
+	color: rgb(255 255 255 / 0.65);
+}
+.side .p-brand img {
+	width: 80px;
+}
+.side > :nth-last-child(2) {
+	margin-top: auto;
+}
+.who {
+	margin-top: 0;
+}
+@media (max-width: 860px) {
+	.mobile-bar {
+		background: var(--rail, #17130f);
+		color: #ffffff;
+		border-bottom: 0;
+	}
+	.mobile-bar strong {
+		color: #ffffff;
+	}
+	.mobile-bar .p-btn {
+		background: transparent;
+		border-color: rgb(255 255 255 / 0.5);
+		color: #ffffff;
 	}
 }
 </style>

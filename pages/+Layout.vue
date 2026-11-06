@@ -24,6 +24,7 @@ import { computed, onMounted, onUnmounted } from "vue";
 import { usePageContext } from "vike-vue/usePageContext";
 import Navigation from "../components/shared/Navigation.vue";
 import logoImage from "../assets/logo.svg";
+import "../lib/theme";
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";

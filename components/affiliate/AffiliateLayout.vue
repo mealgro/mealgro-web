@@ -7,6 +7,7 @@ import "@fontsource-variable/instrument-sans/wght.css";
 import "../portal/portal.css";
 import "./affiliate.css";
 import { toasts } from "../../lib/affiliate/toast";
+import "../../lib/theme";
 </script>
 
 <template>
