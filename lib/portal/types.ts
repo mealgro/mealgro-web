@@ -187,6 +187,9 @@ export type Branch = {
 	address: string | null;
 	city: string;
 	state: string;
+	/** `copying` while a menu from another market's branch is on its way;
+	 *  `failed` when it stopped, keeping what got copied. */
+	menu_copy: "none" | "copying" | "done" | "failed";
 };
 
 export type BrandBranches = { id: string; name: string; branches: Branch[] };
@@ -214,4 +217,5 @@ export type Report = {
 	top_items: { name: string; quantity: number; sales: number }[];
 };
 
-export type Place = { id: string; name: string };
+/** `code` is the ISO country code on a country, lower or upper case. */
+export type Place = { id: string; name: string; code?: string };

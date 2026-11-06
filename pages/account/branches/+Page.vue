@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import Modal from "../../../components/portal/Modal.vue";
 import PortalShell from "../../../components/portal/PortalShell.vue";
 import { branches as api, places } from "../../../lib/portal/api";
+import { MARKETS, marketOfCountry } from "../../../lib/portal/markets";
 import { describe, titleCase } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
 import { toast } from "../../../lib/portal/toast";
@@ -21,18 +22,36 @@ async function load() {
 }
 onMounted(load);
 
+// A menu going to another market's branch copies in the background: keep
+// asking until it has ended, so "Copying" doesn't outlive the copy.
+const COPY_POLL_MS = 15_000;
+let copyPoll: ReturnType<typeof setTimeout> | undefined;
+watch(brand, (now) => {
+	clearTimeout(copyPoll);
+	if (now?.branches.some((b) => b.menu_copy === "copying")) copyPoll = setTimeout(load, COPY_POLL_MS);
+});
+onBeforeUnmount(() => clearTimeout(copyPoll));
+
 // ── open a branch ──────────────────────────────────────────────────────────
 const opening = ref(false);
 const busy = ref(false);
 const formError = ref("");
-const form = ref({ label: "", state: "", city: "", address: "", copy_menu: true });
+const form = ref({ label: "", state: "", city: "", address: "", copy_menu: true, currency: "" });
 const countries = ref<Place[]>([]);
 const country = ref("");
 const states = ref<Place[]>([]);
 const cities = ref<Place[]>([]);
+const chosenCountry = computed(() => countries.value.find((c) => c.id === country.value));
 
 async function startOpening() {
-	form.value = { label: "", state: "", city: "", address: "", copy_menu: true };
+	form.value = {
+		label: "",
+		state: "",
+		city: "",
+		address: "",
+		copy_menu: true,
+		currency: marketOfCountry(chosenCountry.value)?.code ?? "",
+	};
 	formError.value = "";
 	opening.value = true;
 	if (!countries.value.length) {
@@ -49,6 +68,8 @@ async function startOpening() {
 }
 watch(country, async (id) => {
 	form.value.state = "";
+	// The country's currency, until the vendor says otherwise.
+	form.value.currency = marketOfCountry(chosenCountry.value)?.code ?? "";
 	states.value = id ? await places.states(id).catch(() => []) : [];
 });
 watch(
@@ -140,6 +161,8 @@ const tone = (s: Branch["status"]) =>
 						</div>
 					</div>
 					<p v-if="b.status === 'inactive'" class="p-muted small">Waiting for Mealgro to approve it before it can take orders.</p>
+					<p v-if="b.menu_copy === 'copying'" class="p-muted small" role="status">Copying your menu… prices are being converted to this branch's currency. We'll tell you when it's done.</p>
+					<div v-else-if="b.menu_copy === 'failed'" class="p-alert" role="alert">We couldn't finish copying your menu. What was copied is still on this branch; add the rest yourself in the Mealgro app.</div>
 					<div class="p-row">
 						<button v-if="b.id !== session.store.value?.id" class="p-btn p-btn--sm" @click="session.switchTo(b.id)">Work on this branch</button>
 						<span v-else class="p-muted small">You're working on this branch</span>
@@ -171,6 +194,16 @@ const tone = (s: Branch["status"]) =>
 						</select>
 					</label>
 				</div>
+				<label class="p-field"><span>Currency</span>
+					<select v-model="form.currency" class="p-input" required>
+						<option value="" disabled>Choose</option>
+						<option v-for="m in MARKETS" :key="m.code" :value="m.code">{{ m.label }}</option>
+					</select>
+					<small class="p-muted">
+						<template v-if="chosenCountry && !marketOfCountry(chosenCountry)">Mealgro doesn't trade in {{ chosenCountry.name }} yet, so choose the currency this branch will charge in. </template>
+						A branch keeps its currency for life.
+					</small>
+				</label>
 				<label class="p-field"><span>Street address</span>
 					<input v-model="form.address" class="p-input" placeholder="12 Example Street" />
 				</label>
@@ -180,13 +213,13 @@ const tone = (s: Branch["status"]) =>
 				</label>
 				<label class="check">
 					<input v-model="form.copy_menu" type="checkbox" />
-					Copy the main branch's menu (categories, items and options). You can change it afterwards.
+					Copy the main branch's menu (categories, items and options). You can change it afterwards. In another currency, prices are converted at today's rate and the copy finishes in the background.
 				</label>
 				<p class="p-muted small">The new branch starts offline. Mealgro approves it before it can take orders.</p>
 			</form>
 			<template #footer>
 				<button class="p-btn" type="button" @click="opening = false">Cancel</button>
-				<button class="p-btn p-btn--primary" form="branch-form" :disabled="busy || !form.city || !form.label.trim()">
+				<button class="p-btn p-btn--primary" form="branch-form" :disabled="busy || !form.city || !form.currency || !form.label.trim()">
 					{{ busy ? "Opening…" : "Open branch" }}
 				</button>
 			</template>

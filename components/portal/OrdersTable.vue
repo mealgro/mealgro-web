@@ -10,7 +10,7 @@ defineEmits<{ open: [order: Order] }>();
 	<div class="p-scroll">
 		<table class="p-table">
 			<thead>
-				<tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th><th>Placed</th></tr>
+				<tr><th>Order</th><th>Customer</th><th>Status</th><th>Order total (excl. service charge)</th><th>Placed</th></tr>
 			</thead>
 			<tbody>
 				<tr v-for="o in orders" :key="o.id" class="is-clickable" tabindex="0" @click="$emit('open', o)" @keydown.enter="$emit('open', o)">

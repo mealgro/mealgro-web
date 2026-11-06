@@ -92,7 +92,7 @@ async function act(status: "accepted" | "rejected" | "ready" | "cancelled") {
 			<div class="totals">
 				<div class="p-row p-between"><span class="p-muted">Subtotal</span><span>{{ money(order.sub_total) }}</span></div>
 				<div class="p-row p-between"><span class="p-muted">Delivery</span><span>{{ money(order.delivery_fee) }}</span></div>
-				<div class="p-row p-between"><span class="p-muted">Total paid</span><strong>{{ money(order.total_amount) }}</strong></div>
+				<div class="p-row p-between"><span class="p-muted">Order total (excl. service charge)</span><strong>{{ money(order.total_amount) }}</strong></div>
 				<div class="p-row p-between"><span class="p-muted">Your earning</span><strong>{{ money(order.vendor_earning) }}</strong></div>
 			</div>
 			<p v-if="order.store_message">“{{ order.store_message }}”</p>

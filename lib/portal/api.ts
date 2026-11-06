@@ -112,6 +112,7 @@ export const branches = {
 		city: string;
 		address?: string;
 		copy_menu: boolean;
+		currency?: string;
 	}) => api<Branch>("POST", "/vendor/branches", body),
 	relabel: (id: string, label: string) => api<null>("PUT", `/vendor/branches/${id}`, { label }),
 	renameBrand: (name: string) => api<null>("PUT", "/vendor/brand", { name }),
