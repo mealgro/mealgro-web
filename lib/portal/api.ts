@@ -19,9 +19,20 @@ import type {
 
 export const orders = {
 	recent: () => api<Order[]>("GET", "/vendor/orders"),
+	/** Orders past their delivery time and waiting on the store, from any day
+	 *  (today's list does not hold yesterday's late order). */
+	attention: () => api<Order[]>("GET", "/vendor/orders/attention"),
+	/** A month of the current year (the API takes no other year). Only 1-12 is
+	 *  ever sent: anything else makes the API fail. */
 	history: (month?: number) =>
-		api<Order[]>("GET", `/vendor/orders/history${qs({ month })}`),
+		api<Order[]>(
+			"GET",
+			`/vendor/orders/history${qs({ month: month && month >= 1 && month <= 12 ? month : undefined })}`,
+		),
 	get: (id: string) => api<Order>("GET", `/vendor/orders/${id}`),
+	/** Adds minutes to an accepted order's delivery time. */
+	extend: (id: string, minutes: number) =>
+		api<unknown>("POST", `/vendor/orders/${id}/extend`, { minutes }),
 	setStatus: (
 		id: string,
 		body: {

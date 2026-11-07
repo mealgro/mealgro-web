@@ -68,7 +68,8 @@ export type OrderItem = {
 	name: string;
 	price: Amount;
 	quantity: number;
-	modifiers: { name?: string; [k: string]: unknown }[];
+	/** What the customer chose on the item ("Spice (Mild)"). */
+	modifiers: { name?: string; quantity?: number; [k: string]: unknown }[];
 	thumbnail: string;
 };
 
@@ -91,6 +92,17 @@ export type Order = {
 	cancelled_reason: string | null;
 	created_at: string;
 	updated_at: string;
+	/** The end of the delivery window; null until the order is accepted. */
+	due_at?: string | null;
+	/** Past due and waiting on the store. */
+	needs_attention?: boolean;
+	/** Whether the store may cancel now (the server's answer). */
+	can_cancel?: boolean;
+	/** When cancelling opens, if time alone will do it. */
+	cancel_opens_at?: string | null;
+	/** Extensions left, and the minutes they can add up to. 0 when it can't be extended. */
+	extensions_left?: number;
+	extension_minutes_left?: number;
 };
 
 export type SubscriptionPlan = "starter" | "premium" | "odogwu";

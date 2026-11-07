@@ -21,6 +21,8 @@ const open = ref<Order | null>(null);
 const error = ref("");
 const loading = ref(true);
 const toggling = ref(false);
+/** Orders past their delivery time and waiting on the store. */
+const attention = ref(0);
 
 async function load() {
 	error.value = "";
@@ -29,7 +31,14 @@ async function load() {
 		jobs.push(storeApi.details().then((d) => void (details.value = d)));
 	if (session.can("view-orders")) {
 		jobs.push(storeApi.overview().then((o) => void (overview.value = o)));
-		jobs.push(orders.recent().then((r) => void (recent.value = r.slice(0, 6))));
+		jobs.push(
+			Promise.all([orders.recent(), orders.attention().catch(() => [] as Order[])]).then(([today, late]) => {
+				attention.value = late.length;
+				const ids = new Set(late.map((o) => o.id));
+				// Late orders first, then today's, six in all.
+				recent.value = [...late, ...today.filter((o) => !ids.has(o.id))].slice(0, 6);
+			}),
+		);
 	}
 	if (session.can("manage-store")) {
 		jobs.push(subscription.current().then((s) => void (sub.value = s)));
@@ -48,6 +57,7 @@ async function load() {
 onMounted(load);
 
 async function setOnline(value: boolean) {
+	if (toggling.value) return;
 	toggling.value = true;
 	try {
 		await storeApi.setOnline(value);
@@ -93,12 +103,22 @@ async function setOnline(value: boolean) {
 
 			<div class="ov-tiles">
 				<template v-if="overview">
+					<StatTile
+						href="/account/orders"
+						:order="0"
+						:tone="attention ? 5 : 0"
+						shape="di"
+						color="var(--bad)"
+						label="Needs attention"
+						:value="attention.toLocaleString()"
+						:sub="attention ? 'Past their delivery time' : 'Nothing is late'"
+					/>
 					<StatTile :order="1" :tone="1" shape="sq" label="Orders" :value="overview.total_orders.toLocaleString()" />
 					<StatTile :order="2" :tone="2" shape="ci" label="Customers" :value="overview.total_customers.toLocaleString()" />
-					<StatTile :order="3" :tone="5" shape="tr" label="Cancellations" :value="overview.total_cancellation.toLocaleString()" />
+					<StatTile :order="3" :tone="0" shape="tr" color="var(--bad)" label="Cancellations" :value="overview.total_cancellation.toLocaleString()" />
 				</template>
 				<template v-else-if="loading && session.can('view-orders')">
-					<div v-for="i in 3" :key="i" class="p-skeleton p-skeleton--block" aria-hidden="true" />
+					<div v-for="i in 4" :key="i" class="p-skeleton p-skeleton--block" aria-hidden="true" />
 				</template>
 				<StatTile
 					v-if="sub"
@@ -109,7 +129,7 @@ async function setOnline(value: boolean) {
 					:value="planTitles[sub.plan] ?? titleCase(sub.plan)"
 					:sub="sub.status === 'paused' ? 'Payment due' : sub.plan !== 'starter' ? `${sub.renews ? 'Renews' : 'Ends'} ${day(sub.expires_at)}` : 'Free plan'"
 				>
-					<a class="manage" href="/account/subscription">Manage plan →</a>
+					<a class="manage p-tap" href="/account/subscription">Manage plan →</a>
 				</StatTile>
 			</div>
 		</div>
@@ -117,12 +137,12 @@ async function setOnline(value: boolean) {
 		<section v-if="session.can('view-orders')" class="card-box card-box--flush arrive" style="--i: 5" aria-labelledby="ov-recent">
 			<div class="card-h ov-recent-h">
 				<div>
-					<h3 id="ov-recent">Recent orders</h3>
-					<p>The latest orders on this branch</p>
+					<h3 id="ov-recent">Today's orders</h3>
+					<p>Placed today on this branch, and any that are late</p>
 				</div>
-				<a class="link" href="/account/orders">View all</a>
+				<a class="link p-tap" href="/account/orders">View all</a>
 			</div>
-			<OrdersTable :orders="recent" :loading="loading" empty="No orders yet." @open="open = $event" />
+			<OrdersTable :orders="recent" :loading="loading" empty="No orders today." @open="open = $event" />
 		</section>
 
 		<OrderDetail v-if="open" :order="open" @close="open = null" @changed="load" />
@@ -145,6 +165,9 @@ async function setOnline(value: boolean) {
 	display: grid;
 	gap: 20px;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ov-tiles > :last-child:nth-child(odd) {
+	grid-column: 1 / -1;
 }
 .ov-hero {
 	min-height: 144px;
@@ -170,8 +193,12 @@ async function setOnline(value: boolean) {
 	}
 }
 @media (max-width: 559px) {
+	/* Four tiles in a 2x2, so the orders are not four screens down. */
 	.ov-tiles {
-		grid-template-columns: minmax(0, 1fr);
+		gap: 12px;
+	}
+	.ov-tiles :deep(.p-tile) {
+		padding: 16px;
 	}
 }
 </style>
