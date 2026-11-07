@@ -1,13 +1,37 @@
 <script setup lang="ts">
-// Toasts for either area: a short pill with a shape (dot for done, square for
-// a problem), bottom right, above the phone's bottom edge.
-defineProps<{ toasts: { id: number; text: string; tone: "ok" | "bad" }[] }>();
+// Toasts for either area: a short card with a shape (dot for done, square for
+// a problem), bottom right. A problem stays 5 seconds, a result 3; hovering or
+// focusing a toast holds it so it can be read, and a failed action can offer
+// Retry. See lib/portal/toast.ts.
+import { dismiss, hold, release, type Toast } from "../../lib/portal/toast";
+
+defineProps<{ toasts: Toast[] }>();
 </script>
 
 <template>
 	<div class="p-toasts" aria-live="polite" role="status">
-		<div v-for="t in toasts" :key="t.id" class="p-alert p-toast" :class="{ 'p-alert--ok': t.tone === 'ok' }">
-			{{ t.text }}
+		<div
+			v-for="t in toasts"
+			:key="t.id"
+			class="p-alert p-toast"
+			:class="{ 'p-alert--ok': t.tone === 'ok' }"
+			@mouseenter="hold(t.id)"
+			@mouseleave="release(t.id)"
+			@focusin="hold(t.id)"
+			@focusout="release(t.id)"
+		>
+			<span>{{ t.text }}</span>
+			<button
+				v-if="t.retry"
+				class="p-btn p-btn--sm"
+				type="button"
+				@click="
+					dismiss(t.id);
+					t.retry();
+				"
+			>
+				Retry
+			</button>
 		</div>
 	</div>
 </template>
@@ -35,5 +59,12 @@ defineProps<{ toasts: { id: number; text: string; tone: "ok" | "bad" }[] }>();
 }
 .portal .p-toast.p-alert--ok::before {
 	color: var(--ok);
+}
+@media (max-width: 639px) {
+	.p-toasts {
+		left: 16px;
+		right: 16px;
+		max-width: none;
+	}
 }
 </style>

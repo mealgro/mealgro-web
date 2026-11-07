@@ -4,13 +4,15 @@
 // body, toasts and the confirm dialog. The shells (PortalShell,
 // AffiliateShell) only say what goes in the rail and who is signed in; the
 // look lives here and in portal.css.
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { usePageContext } from "vike-vue/usePageContext";
 import "./portal.css";
 import logoImage from "../../assets/logo.svg";
 import ConfirmHost from "./ConfirmHost.vue";
 import ThemeToggle from "./ThemeToggle.vue";
 import ToastHost from "./ToastHost.vue";
+import { watchAlerts } from "./alertFocus";
+import type { Toast } from "../../lib/portal/toast";
 
 export type RailItem = { href: string; label: string; icon: string };
 
@@ -25,17 +27,57 @@ const props = defineProps<{
 	isActive: (href: string, path: string) => boolean;
 	userName: string;
 	userSub?: string;
-	toasts: { id: number; text: string; tone: "ok" | "bad" }[];
+	toasts: Toast[];
 	/** The session is still being restored. */
 	loading?: boolean;
+	/** Restoring it failed or took too long: say so, with Retry. */
+	bootError?: string;
+	/** The signed-in person may not open this page: say so instead of the page. */
+	denied?: boolean;
 }>();
-defineEmits<{ signOut: [] }>();
+defineEmits<{ signOut: []; retry: [] }>();
 
 const pageContext = usePageContext();
 const path = computed(() => pageContext.urlPathname.replace(/\/$/, "") || props.homeHref);
 const menu = ref(false);
 // A new page closes the drawer.
 watch(path, () => (menu.value = false));
+
+// Below 1024px the rail is a drawer: while it is open the page behind it is
+// inert, Escape closes it, and focus goes in and comes back to the button.
+const narrow = ref(false);
+const side = ref<HTMLElement>();
+const burger = ref<HTMLElement>();
+const page = ref<HTMLElement>();
+let mq: MediaQueryList | undefined;
+const onMq = () => {
+	narrow.value = !!mq?.matches;
+	if (!narrow.value) menu.value = false;
+};
+let stopAlerts = () => {};
+onMounted(() => {
+	mq = window.matchMedia("(max-width: 1023px)");
+	onMq();
+	mq.addEventListener("change", onMq);
+});
+onBeforeUnmount(() => {
+	mq?.removeEventListener("change", onMq);
+	stopAlerts();
+});
+watch(page, (el) => {
+	stopAlerts();
+	if (el) stopAlerts = watchAlerts(el);
+});
+watch(menu, async (open) => {
+	if (!narrow.value) return;
+	await nextTick();
+	if (open) side.value?.querySelector<HTMLElement>("a, button, select")?.focus();
+	else burger.value?.focus();
+});
+const onKeydown = (e: KeyboardEvent) => {
+	if (e.key === "Escape" && menu.value && narrow.value) menu.value = false;
+};
+const drawerOpen = computed(() => menu.value && narrow.value);
 
 const initials = computed(
 	() =>
@@ -49,15 +91,23 @@ const initials = computed(
 </script>
 
 <template>
-	<div class="portal pf">
-		<div v-if="loading" class="pf-boot" role="status" aria-label="Loading">
+	<div class="portal pf" @keydown="onKeydown">
+		<div v-if="bootError" class="pf-boot" role="alert">
+			<img :src="logoImage" alt="Mealgro" />
+			<p>{{ bootError }}</p>
+			<button class="p-btn p-btn--primary" type="button" @click="$emit('retry')">Retry</button>
+		</div>
+		<div v-else-if="loading" class="pf-boot" role="status" aria-label="Loading">
 			<img :src="logoImage" alt="Mealgro" />
 			<span class="p-skeleton" style="width: 120px" />
 		</div>
 		<template v-else>
 			<a class="pf-skip p-btn p-btn--primary" href="#pf-main">Skip to content</a>
 
-			<aside id="pf-side" class="pf-side" :class="{ open: menu }" aria-label="Navigation">
+			<aside id="pf-side" ref="side" class="pf-side" :class="{ open: menu }" aria-label="Navigation">
+				<button class="pf-close" type="button" aria-label="Close menu" @click="menu = false">
+					<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+				</button>
 				<a :href="homeHref" class="pf-brand">
 					<img :src="logoImage" alt="Mealgro" />
 					<span class="pf-area">{{ area }}</span>
@@ -87,9 +137,10 @@ const initials = computed(
 			</aside>
 			<div v-if="menu" class="pf-scrim" aria-hidden="true" @click="menu = false" />
 
-			<div class="pf-main">
+			<div class="pf-main" :inert="drawerOpen || undefined">
 				<header class="pf-top">
 					<button
+						ref="burger"
 						class="pf-burger"
 						type="button"
 						aria-controls="pf-side"
@@ -105,10 +156,20 @@ const initials = computed(
 					<h1 class="pf-title">{{ title }}</h1>
 					<ThemeToggle />
 				</header>
-				<main id="pf-main" class="pf-page" tabindex="-1">
-					<slot name="banners" />
-					<div v-if="$slots.actions" class="p-toolbar"><slot name="actions" /></div>
-					<slot />
+				<main id="pf-main" ref="page" class="pf-page" tabindex="-1">
+					<template v-if="denied">
+						<section class="card-box p-state" role="alert">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+							<h2>You don't have access to this.</h2>
+							<p class="hint">Ask the owner of your store to give you access.</p>
+							<a class="p-btn p-btn--sm" :href="homeHref">Go to your start page</a>
+						</section>
+					</template>
+					<template v-else>
+						<slot name="banners" />
+						<div v-if="$slots.actions" class="p-toolbar"><slot name="actions" /></div>
+						<slot />
+					</template>
 				</main>
 			</div>
 
@@ -126,6 +187,10 @@ const initials = computed(
 	justify-items: center;
 	gap: 14px;
 	color: var(--muted);
+}
+.pf-boot p {
+	max-width: 32ch;
+	text-align: center;
 }
 .pf-boot img {
 	width: 88px;
@@ -160,6 +225,20 @@ const initials = computed(
 .pf-side :deep(.p-muted),
 .pf-side :deep(.rail-label) {
 	color: color-mix(in srgb, var(--on-rail) 66%, transparent);
+}
+.pf-close {
+	display: none;
+	position: absolute;
+	right: 8px;
+	top: 8px;
+	width: 44px;
+	height: 44px;
+	place-items: center;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
 }
 .pf-brand {
 	display: inline-flex;
@@ -339,6 +418,9 @@ const initials = computed(
 	.pf-side.open {
 		transform: none;
 		visibility: visible;
+	}
+	.pf-close {
+		display: inline-grid;
 	}
 	.pf-scrim {
 		display: block;

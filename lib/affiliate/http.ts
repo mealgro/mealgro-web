@@ -74,6 +74,8 @@ function headers(auth: string | null, body: boolean): HeadersInit {
 	return h;
 }
 
+const REQUEST_TIMEOUT_MS = 30_000;
+
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 async function call<T>(method: Method, path: string, body: unknown, auth: string | null): Promise<T> {
@@ -83,6 +85,8 @@ async function call<T>(method: Method, path: string, body: unknown, auth: string
 			method,
 			headers: headers(auth, body !== undefined),
 			body: body === undefined ? undefined : JSON.stringify(body),
+			// Never wait for ever: a hung API reads as an error with a retry.
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
 		});
 	} catch {
 		throw new AffiliateApiError(

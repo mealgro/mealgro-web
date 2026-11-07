@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import { watchAlerts } from "./alertFocus";
+import { useDialog } from "./useDialog";
 
 defineProps<{ title: string; wide?: boolean }>();
 const emit = defineEmits<{ close: [] }>();
 const panel = ref<HTMLElement>();
+useDialog(panel, () => emit("close"));
 
-const onKey = (e: KeyboardEvent) => e.key === "Escape" && emit("close");
+let stop = () => {};
 onMounted(() => {
-	document.addEventListener("keydown", onKey);
-	panel.value?.focus();
+	if (panel.value) stop = watchAlerts(panel.value);
 });
-onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
+onBeforeUnmount(() => stop());
 </script>
 
 <template>

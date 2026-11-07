@@ -68,6 +68,8 @@ export function setCurrentStore(id: string | null) {
 	currentStore = id;
 }
 
+const REQUEST_TIMEOUT_MS = 30_000;
+
 type CallOptions = { store?: string | null; raw?: boolean };
 
 function headers(auth: string | null, body: boolean, store: string | null): HeadersInit {
@@ -91,6 +93,8 @@ async function call<T>(
 			method,
 			headers: headers(auth, body !== undefined, opts.store ?? currentStore),
 			body: body === undefined ? undefined : JSON.stringify(body),
+			// Never wait for ever: a hung API reads as an error with a retry.
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
 		});
 	} catch {
 		throw new PortalError(

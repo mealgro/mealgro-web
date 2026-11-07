@@ -7,6 +7,8 @@ export type ConfirmOptions = {
 	title: string;
 	message?: string;
 	confirmText?: string;
+	/** The cancel button's label, when "Cancel" would be confusing ("Keep it"). */
+	cancelText?: string;
 	/** Red confirm button, for a step that can't be undone. */
 	destructive?: boolean;
 	/** Asks for a line of text too. */
@@ -24,7 +26,11 @@ export const confirmState = () => state;
  *  input) and `null` when cancelled. */
 export function confirmAction(opts: ConfirmOptions): Promise<ConfirmResult | null> {
 	resolver?.(null);
-	Object.assign(state, { message: undefined, confirmText: undefined, destructive: false, input: undefined }, opts);
+	Object.assign(
+		state,
+		{ message: undefined, confirmText: undefined, cancelText: undefined, destructive: false, input: undefined },
+		opts,
+	);
 	state.value = opts.input?.value ?? "";
 	state.open = true;
 	return new Promise((resolve) => {

@@ -78,6 +78,12 @@
 	font-size: 18px;
 	line-height: 1.2;
 }
+/* A very long name wraps inside its card instead of pushing it wider. */
+.portal h1,
+.portal h2,
+.portal h3 {
+	overflow-wrap: anywhere;
+}
 .portal h1 + p,
 .portal h2 + p,
 .portal h3 + p {
@@ -966,6 +972,10 @@
 	justify-content: center;
 	padding: 16px;
 }
+/* A question asked from inside a dialog sits above it. */
+.portal.p-modal-back--top {
+	z-index: 100;
+}
 .portal .p-modal {
 	background: var(--surface);
 	color: var(--ink);
@@ -1052,25 +1062,33 @@
 	}
 }
 
-/* ── Phones: 44px touch targets ───────────────────────────────────────────── */
-@media (max-width: 639px) {
-	.portal .p-btn {
+/* ── Touch: 44px targets on phones and tablets (and anything with a coarse pointer) */
+@media (max-width: 1023px), (pointer: coarse) {
+	.portal .p-btn,
+	.portal .p-btn--sm,
+	.portal .p-tabs button {
 		min-height: 44px;
 	}
 	.portal .p-btn--sm {
-		min-height: 44px;
 		padding: 0 16px;
-	}
-	.portal .p-input {
-		height: 48px;
-		font-size: 16px; /* stops iOS zooming into the field */
-	}
-	.portal .p-tabs button {
-		min-height: 44px;
 	}
 	.portal .p-check {
 		min-height: 44px;
 		align-items: center;
+	}
+	/* A link that stands on its own (View all, Manage plan) is a target too. */
+	.portal .p-tap {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+	}
+}
+
+/* ── Phones ───────────────────────────────────────────────────────────────── */
+@media (max-width: 639px) {
+	.portal .p-input {
+		height: 48px;
+		font-size: 16px; /* stops iOS zooming into the field */
 	}
 	.portal .p-card:not(.p-card--flush),
 	.portal .card-box:not(.card-box--flush) {
