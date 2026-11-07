@@ -11,11 +11,16 @@ withDefaults(defineProps<{ href?: string }>(), { href: "/" });
 </template>
 
 <style scoped>
-.home-link {
-	display: inline-grid;
-	place-items: center;
+/* Doubled: the auth layout's own rule for links in this slot (inline-flex, no
+   centring) would otherwise win and push the icon to one side of its circle. */
+.home-link.home-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	width: 44px;
 	height: 44px;
+	min-height: 0;
+	padding: 0;
 	border-radius: 50%;
 	color: inherit;
 	text-decoration: none;
@@ -23,10 +28,10 @@ withDefaults(defineProps<{ href?: string }>(), { href: "/" });
 		transform 0.12s var(--ease),
 		background 0.12s;
 }
-.home-link:hover {
+.home-link.home-link:hover {
 	background: color-mix(in srgb, currentColor 10%, transparent);
 }
-.home-link:active {
+.home-link.home-link:active {
 	transform: scale(0.94);
 }
 </style>
