@@ -54,74 +54,89 @@ async function save() {
 
 <template>
 	<AffiliateShell title="Profile">
-		<form v-if="user" class="p-card p-stack form" novalidate @submit.prevent="save">
-			<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
-			<p v-if="locked" class="p-alert p-alert--warn">
-				{{
-					!termsCurrent
-						? "Accept the updated terms above to change your details."
-						: "Your account is suspended, so your details can't be changed right now."
-				}}
-			</p>
-			<label class="p-field">
-				<span>Full name</span>
-				<input
-					v-model="form.full_name"
-					class="p-input"
-					autocomplete="name"
-					:disabled="locked"
-					:aria-invalid="bad === 'full_name'"
-					required
-				/>
-			</label>
-			<label class="p-field">
-				<span>Phone number</span>
-				<input
-					v-model="form.phone"
-					class="p-input"
-					type="tel"
-					inputmode="tel"
-					autocomplete="tel"
-					:disabled="locked"
-					:aria-invalid="bad === 'phone'"
-					required
-				/>
-			</label>
-			<label class="p-field">
-				<span>Email</span>
-				<input class="p-input" type="email" :value="user.email" readonly aria-describedby="aff-email-fixed" />
-				<small id="aff-email-fixed">Your email can't be changed here. Contact support if you need to.</small>
-			</label>
-			<div class="p-row p-between foot">
-				<span class="p-muted small">Affiliate since {{ day(user.joined_at) }} · code {{ user.code }}</span>
-				<button class="p-btn p-btn--primary" :disabled="locked || !changed || busy">
-					{{ busy ? "Saving…" : "Save" }}
-				</button>
-			</div>
-		</form>
+		<div class="cols">
+			<form v-if="user" class="card-box p-stack-sm arrive" novalidate @submit.prevent="save">
+				<div class="card-h">
+					<div>
+						<h2>Your details</h2>
+						<p>Affiliate since {{ day(user.joined_at) }}</p>
+					</div>
+					<span class="p-badge p-badge--brand">Code {{ user.code }}</span>
+				</div>
+				<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
+				<p v-if="locked" class="p-alert p-alert--warn">
+					{{
+						!termsCurrent
+							? "Accept the updated terms above to change your details."
+							: "Your account is suspended, so your details can't be changed right now."
+					}}
+				</p>
+				<label class="p-field">
+					<span>Full name</span>
+					<input
+						v-model="form.full_name"
+						class="p-input"
+						autocomplete="name"
+						:disabled="locked"
+						:aria-invalid="bad === 'full_name'"
+						required
+					/>
+				</label>
+				<label class="p-field">
+					<span>Phone number</span>
+					<input
+						v-model="form.phone"
+						class="p-input"
+						type="tel"
+						inputmode="tel"
+						autocomplete="tel"
+						:disabled="locked"
+						:aria-invalid="bad === 'phone'"
+						required
+					/>
+				</label>
+				<label class="p-field">
+					<span>Email</span>
+					<input class="p-input" type="email" :value="user.email" readonly aria-describedby="aff-email-fixed" />
+					<small id="aff-email-fixed">Your email can't be changed here. Contact support if you need to.</small>
+				</label>
+				<div class="foot">
+					<button class="p-btn p-btn--primary" :disabled="locked || !changed || busy">
+						{{ busy ? "Saving…" : "Save" }}
+					</button>
+				</div>
+			</form>
+			<div v-else class="p-skeleton p-skeleton--block" aria-hidden="true" />
 
-		<section class="p-card p-row p-between signout">
-			<div>
-				<h2>Sign out</h2>
-				<p class="p-muted">Signs you out of the affiliate area on this browser.</p>
-			</div>
-			<button class="p-btn" type="button" @click="session.signOut()">Sign out</button>
-		</section>
+			<section class="card-box p-stack-sm signout arrive" style="--i: 1">
+				<div>
+					<h2>Sign out</h2>
+					<p class="p-muted">Signs you out of the affiliate area on this browser.</p>
+				</div>
+				<div><button class="p-btn" type="button" @click="session.signOut()">Sign out</button></div>
+			</section>
+		</div>
 	</AffiliateShell>
 </template>
 
 <style scoped>
-.form {
-	max-width: 560px;
+.cols {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: minmax(0, 1fr);
+	align-items: start;
+	max-width: 1000px;
 }
-.foot,
-.signout {
-	flex-wrap: wrap;
+.card-h {
+	margin-bottom: 4px;
 }
-.signout {
-	max-width: 560px;
+.foot {
+	display: flex;
+	justify-content: flex-end;
 }
-.small {
-	font-size: 13px;
+@media (min-width: 1024px) {
+	.cols {
+		grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+	}
 }
 </style>

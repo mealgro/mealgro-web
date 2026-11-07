@@ -3,7 +3,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { auth, publicApi } from "../../../../lib/affiliate/api";
 import { describe, errorCode, money } from "../../../../lib/affiliate/format";
 import { HOME, session } from "../../../../lib/affiliate/session";
-import logoImage from "../../../../assets/logo.svg";
+import AuthLayout from "../../../../components/portal/AuthLayout.vue";
 import type { Program, Terms } from "../../../../lib/affiliate/types";
 import CodeStep from "../../../../components/affiliate/CodeStep.vue";
 import PauseBanner from "../../../../components/affiliate/PauseBanner.vue";
@@ -99,33 +99,19 @@ const done = () => location.assign(HOME);
 </script>
 
 <template>
-	<div class="aff-auth">
-		<div class="aff-auth-top">
-			<a href="/affiliate" class="p-brand">
-				<img :src="logoImage" alt="Mealgro" />
-				<small>Affiliate program</small>
-			</a>
-			<a class="link" href="/affiliate/login">Sign in</a>
-		</div>
+	<AuthLayout area="Affiliate program" home-href="/affiliate" headline="Earn for every vendor you bring." tagline="Restaurants and food vendors join Mealgro with your code. We pay you when we approve them." wide>
+		<template #top><a class="link" href="/affiliate/login">Sign in</a></template>
+		<div class="p-stack">
+			<PauseBanner v-if="program && !program.active" look="portal" variant="public" :message="program.message" />
 
-		<PauseBanner
-			v-if="program && !program.active"
-			class="wide"
-			variant="public"
-			:message="program.message"
-		/>
-
-		<div class="p-card box">
 			<div>
 				<h1>{{ step === "form" ? "Become a Mealgro affiliate" : "Check your email" }}</h1>
 				<p v-if="step === 'form'" class="p-muted">
-					Bring restaurants and food vendors to Mealgro<template v-if="program?.reward">
-						and earn {{ money(program.reward) }} for every vendor we approve</template
-					>.
+					Bring restaurants and food vendors to Mealgro<template v-if="program?.reward"> and earn {{ money(program.reward) }} for every vendor we approve</template>.
 				</p>
 			</div>
 
-			<form v-if="step === 'form'" class="p-stack" novalidate @submit.prevent="submit">
+			<form v-if="step === 'form'" class="p-stack-sm" novalidate @submit.prevent="submit">
 				<div v-if="error" class="p-alert" role="alert">
 					{{ error }}
 					<template v-if="exists"> <a href="/affiliate/login">Sign in</a></template>
@@ -176,9 +162,9 @@ const done = () => location.assign(HOME);
 						<button class="link" type="button" @click="loadTerms">Try again</button>
 					</div>
 					<TermsText v-else-if="terms" :content="terms.content" />
-					<p v-else class="p-muted" role="status">Loading the terms…</p>
+					<div v-else class="p-skeleton p-skeleton--block" role="status" aria-label="Loading the terms" />
 				</div>
-				<label class="aff-check">
+				<label class="p-check">
 					<input
 						v-model="agreed"
 						type="checkbox"
@@ -195,7 +181,7 @@ const done = () => location.assign(HOME);
 				>
 					{{ busy ? "Sending code…" : "Sign up" }}
 				</button>
-				<p class="p-muted small">
+				<p class="p-muted p-small">
 					Already an affiliate? <a class="link" href="/affiliate/login">Sign in</a>
 				</p>
 			</form>
@@ -211,15 +197,5 @@ const done = () => location.assign(HOME);
 				@done="done"
 			/>
 		</div>
-	</div>
+	</AuthLayout>
 </template>
-
-<style scoped>
-.wide {
-	width: 100%;
-	max-width: 520px;
-}
-.small {
-	font-size: 13px;
-}
-</style>

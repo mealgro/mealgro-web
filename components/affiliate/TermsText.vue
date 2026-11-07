@@ -11,7 +11,7 @@ const html = computed(() => markdown(props.content));
 	     Markdown is escaped and links are limited to safe schemes (format.ts). -->
 	<!-- eslint-disable vue/no-v-html -->
 	<div
-		class="aff-md"
+		class="p-md"
 		tabindex="0"
 		role="region"
 		:aria-label="label ?? 'Affiliate terms'"

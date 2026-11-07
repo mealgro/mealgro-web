@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue";
 import { auth } from "../../../../lib/affiliate/api";
 import { describe, errorCode } from "../../../../lib/affiliate/format";
 import { HOME, session } from "../../../../lib/affiliate/session";
-import logoImage from "../../../../assets/logo.svg";
+import AuthLayout from "../../../../components/portal/AuthLayout.vue";
 import CodeStep from "../../../../components/affiliate/CodeStep.vue";
 
 const step = ref<"email" | "code">("email");
@@ -39,14 +39,9 @@ const done = () => location.assign(HOME);
 </script>
 
 <template>
-	<div class="aff-auth">
-		<div class="aff-auth-top">
-			<a href="/affiliate" class="p-brand">
-				<img :src="logoImage" alt="Mealgro" />
-				<small>Affiliate program</small>
-			</a>
-		</div>
-		<div class="p-card box box--narrow">
+	<AuthLayout area="Affiliate program" home-href="/affiliate" headline="Bring vendors. Get paid." tagline="Share your code with restaurants and food vendors. You earn a reward for every one we approve.">
+		<template #top><a class="link" href="/affiliate/signup">Become an affiliate</a></template>
+		<div class="p-stack">
 			<div>
 				<h1>Sign in</h1>
 				<p class="p-muted">
@@ -58,7 +53,7 @@ const done = () => location.assign(HOME);
 				mistake.
 			</div>
 
-			<form v-if="step === 'email'" class="p-stack" @submit.prevent="send">
+			<form v-if="step === 'email'" class="p-stack-sm" @submit.prevent="send">
 				<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
 				<label class="p-field">
 					<span>Email</span>
@@ -88,15 +83,9 @@ const done = () => location.assign(HOME);
 				@done="done"
 			/>
 
-			<p class="p-muted small">
+			<p class="p-muted p-small">
 				New here? <a class="link" href="/affiliate/signup">Become an affiliate</a>
 			</p>
 		</div>
-	</div>
+	</AuthLayout>
 </template>
-
-<style scoped>
-.small {
-	font-size: 13px;
-}
-</style>

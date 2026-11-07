@@ -1,16 +1,16 @@
 <script setup lang="ts">
-// Shown while the affiliate program is switched off.
-defineProps<{
-	/** The admin's note, if any. */
-	message?: string | null;
-	/** `public`: the landing and sign-up pages; `account`: signed-in pages. */
-	variant?: "public" | "account";
-}>();
+// "look" is the surface it sits on: the public affiliate page (the site's own
+// banner, styled there) or the signed-in area and sign-up (the portals' alert).
+withDefaults(defineProps<{ variant?: "account" | "public"; message?: string | null; look?: "site" | "portal" }>(), {
+	variant: undefined,
+	message: undefined,
+	look: "site",
+});
 </script>
 
 <template>
-	<div class="aff-banner" role="status">
-		<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+	<div :class="look === 'portal' ? 'p-alert p-alert--warn' : 'aff-banner'" role="status">
+		<svg v-if="look === 'site'" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
 			<circle cx="12" cy="12" r="10" />
 			<path d="M10 9v6M14 9v6" />
 		</svg>

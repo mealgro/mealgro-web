@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import AffiliateShell from "../../../../components/affiliate/AffiliateShell.vue";
+import HeroPanel from "../../../../components/portal/HeroPanel.vue";
 import Modal from "../../../../components/portal/Modal.vue";
+import StatTile from "../../../../components/portal/StatTile.vue";
+import StateBlock from "../../../../components/portal/StateBlock.vue";
 import { bank, wallet as walletApi } from "../../../../lib/affiliate/api";
 import {
 	dateTime,
@@ -131,34 +134,40 @@ const coolOff = computed(() => {
 
 <template>
 	<AffiliateShell title="Wallet">
-		<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
+		<div v-if="error" class="p-alert" role="alert">
+			{{ error }}
+			<button class="p-btn p-btn--sm" type="button" @click="load">Retry</button>
+		</div>
 
-		<section v-if="wallet" class="p-grid tiles" aria-label="Balances">
-			<div class="p-card p-stat">
-				<strong>{{ money(wallet.available) }}</strong>
-				<span>Available to withdraw</span>
+		<div v-if="wallet" class="top" aria-label="Balances">
+			<HeroPanel
+				class="top-hero"
+				numeric
+				eyebrow="Available to withdraw"
+				shape="sq"
+				color="var(--cat-1)"
+				:title="money(wallet.available)"
+			/>
+			<div class="top-tiles">
+				<StatTile :order="1" :tone="3" shape="cd" label="In a withdrawal" :value="money(wallet.reserved)" />
+				<StatTile :order="2" :tone="0" shape="ci" color="var(--cat-2)" label="Minimum withdrawal" :value="money(wallet.min_withdrawal)" />
 			</div>
-			<div class="p-card p-stat">
-				<strong>{{ money(wallet.reserved) }}</strong>
-				<span>In a withdrawal</span>
-			</div>
-			<div class="p-card p-stat">
-				<strong>{{ money(wallet.min_withdrawal) }}</strong>
-				<span>Minimum withdrawal</span>
-			</div>
-		</section>
-		<p v-else-if="!error" class="p-muted" role="status">Loading…</p>
+		</div>
+		<div v-else-if="!error" class="top" aria-hidden="true">
+			<div class="p-skeleton p-skeleton--block top-hero" />
+			<div class="p-skeleton p-skeleton--block" />
+		</div>
 
-		<section v-if="wallet" class="p-card p-stack" aria-labelledby="aff-withdraw-h">
+		<section v-if="wallet" class="card-box p-stack-sm arrive" style="--i: 3" aria-labelledby="aff-withdraw-h">
 			<h2 id="aff-withdraw-h">Withdraw</h2>
 			<div v-if="!wallet.can_withdraw" class="p-alert p-alert--warn" role="status">
 				{{ wallet.blocked_reason || "Withdrawals aren't available right now." }}
 				<template v-if="coolOff"> Withdrawals open {{ dateTime(coolOff) }}.</template>
 				<template v-if="!account"> <a href="/affiliate/bank">Add your bank account</a></template>
 			</div>
-			<form class="p-stack" novalidate @submit.prevent="review">
+			<form class="p-stack-sm" novalidate @submit.prevent="review">
 				<div v-if="formError" class="p-alert" role="alert">{{ formError }}</div>
-				<div class="p-row withdraw-row">
+				<div class="withdraw-row">
 					<label class="p-field grow">
 						<span>Amount ({{ symbol }})</span>
 						<input
@@ -185,7 +194,7 @@ const coolOff = computed(() => {
 						Continue
 					</button>
 				</div>
-				<small id="aff-withdraw-hint" class="p-muted">
+				<small id="aff-withdraw-hint" class="p-hint">
 					Minimum {{ money(wallet.min_withdrawal) }}.
 					<template v-if="account">
 						Paid to {{ account.bank_name }} {{ account.account_number }} ({{ account.account_name }}).
@@ -196,74 +205,78 @@ const coolOff = computed(() => {
 			</form>
 		</section>
 
-		<section class="p-card p-stack" aria-labelledby="aff-wd-h">
-			<h2 id="aff-wd-h">Withdrawals</h2>
-			<p v-if="withdrawals === null" class="p-muted" role="status">Loading…</p>
-			<p v-else-if="!withdrawals.length" class="aff-empty">No withdrawals yet.</p>
-			<ul v-else class="aff-list">
-				<li v-for="w in withdrawals" :key="w.id">
-					<div class="p-stack tight">
-						<strong>{{ money(w.amount) }}</strong>
-						<span class="sub">Requested {{ dateTime(w.created_at) }}<template v-if="w.updated_at !== w.created_at"> · updated {{ dateTime(w.updated_at) }}</template></span>
-						<span v-if="w.failure_reason && ['failed', 'reversed', 'rejected'].includes(w.status)" class="reason">
-							{{ w.failure_reason }}
-						</span>
-					</div>
-					<div class="p-row end">
-						<span class="p-badge" :class="withdrawalTone(w.status) && `p-badge--${withdrawalTone(w.status)}`">
-							{{ withdrawalLabel[w.status] ?? w.status }}
-						</span>
-						<button
-							v-if="w.status === 'pending'"
-							class="p-btn p-btn--sm p-btn--danger"
-							type="button"
-							@click="cancelling = w"
-						>
-							Cancel
-						</button>
-					</div>
-				</li>
-			</ul>
+		<section class="card-box arrive" style="--i: 4" aria-labelledby="aff-wd-h">
+			<div class="card-h">
+				<h2 id="aff-wd-h">Withdrawals</h2>
+			</div>
+			<StateBlock
+				:loading="withdrawals === null"
+				:empty="withdrawals !== null && !withdrawals.length"
+				empty-text="No withdrawals yet."
+			>
+				<ul class="p-list">
+					<li v-for="w in withdrawals ?? []" :key="w.id">
+						<div class="p-stack-sm tight">
+							<strong>{{ money(w.amount) }}</strong>
+							<span class="sub">Requested {{ dateTime(w.created_at) }}<template v-if="w.updated_at !== w.created_at"> · updated {{ dateTime(w.updated_at) }}</template></span>
+							<span v-if="w.failure_reason && ['failed', 'reversed', 'rejected'].includes(w.status)" class="reason">
+								{{ w.failure_reason }}
+							</span>
+						</div>
+						<div class="p-row p-wrap end">
+							<span class="p-badge" :class="withdrawalTone(w.status) && `p-badge--${withdrawalTone(w.status)}`">
+								{{ withdrawalLabel[w.status] ?? w.status }}
+							</span>
+							<button
+								v-if="w.status === 'pending'"
+								class="p-btn p-btn--sm p-btn--danger"
+								type="button"
+								@click="cancelling = w"
+							>
+								Cancel
+							</button>
+						</div>
+					</li>
+				</ul>
+			</StateBlock>
 		</section>
 
-		<section v-if="wallet" class="p-card p-stack" aria-labelledby="aff-hist-h">
-			<h2 id="aff-hist-h">History</h2>
-			<p v-if="!wallet.history.length" class="aff-empty">
-				Rewards and withdrawals will show up here.
-			</p>
-			<ul v-else class="aff-list">
-				<li v-for="(h, i) in wallet.history" :key="i">
-					<div class="p-stack tight">
-						<strong>{{ h.title }}</strong>
-						<span class="sub">{{ dateTime(h.at) }}</span>
-					</div>
-					<div class="p-row end">
-						<span v-if="h.status" class="p-badge" :class="withdrawalTone(h.status) && `p-badge--${withdrawalTone(h.status)}`">
-							{{ withdrawalLabel[h.status as keyof typeof withdrawalLabel] ?? h.status }}
-						</span>
-						<strong :class="h.kind === 'reward' ? 'plus' : ''">
-							{{ h.kind === "reward" ? "+" : "−" }}{{ money(h.amount) }}
-						</strong>
-					</div>
-				</li>
-			</ul>
+		<section v-if="wallet" class="card-box arrive" style="--i: 5" aria-labelledby="aff-hist-h">
+			<div class="card-h">
+				<h2 id="aff-hist-h">History</h2>
+			</div>
+			<StateBlock :empty="!wallet.history.length" empty-text="Rewards and withdrawals will show up here.">
+				<ul class="p-list">
+					<li v-for="(h, i) in wallet.history" :key="i">
+						<div class="p-stack-sm tight">
+							<strong>{{ h.title }}</strong>
+							<span class="sub">{{ dateTime(h.at) }}</span>
+						</div>
+						<div class="p-row p-wrap end">
+							<span v-if="h.status" class="p-badge" :class="withdrawalTone(h.status) && `p-badge--${withdrawalTone(h.status)}`">
+								{{ withdrawalLabel[h.status as keyof typeof withdrawalLabel] ?? h.status }}
+							</span>
+							<strong class="amt" :class="h.kind === 'reward' ? 'plus' : ''">
+								{{ h.kind === "reward" ? "+" : "−" }}{{ money(h.amount) }}
+							</strong>
+						</div>
+					</li>
+				</ul>
+			</StateBlock>
 		</section>
 
 		<Modal v-if="confirming && wallet && naira !== null" title="Confirm withdrawal" @close="confirming = false">
-			<div class="p-stack">
+			<div class="p-stack-sm">
 				<p>
 					Withdraw <strong>{{ money(asAmount(naira)) }}</strong>
-					<template v-if="account">
-						to <strong>{{ account.account_name }}</strong>, {{ account.bank_name }}
-						{{ account.account_number }}</template
-					>?
+					<template v-if="account"> to <strong>{{ account.account_name }}</strong>, {{ account.bank_name }} {{ account.account_number }}</template>?
 				</p>
 				<p class="p-muted">
 					We review each withdrawal before paying it. You can cancel it while it's pending.
 				</p>
 			</div>
 			<template #footer>
-				<button class="p-btn" type="button" @click="confirming = false">Back</button>
+				<button class="p-btn p-btn--ghost" type="button" @click="confirming = false">Back</button>
 				<button class="p-btn p-btn--primary" type="button" :disabled="busy" @click="withdraw">
 					{{ busy ? "Requesting…" : "Withdraw" }}
 				</button>
@@ -276,8 +289,8 @@ const coolOff = computed(() => {
 				later.
 			</p>
 			<template #footer>
-				<button class="p-btn" type="button" @click="cancelling = null">Keep it</button>
-				<button class="p-btn p-btn--primary" type="button" :disabled="busy" @click="cancel">
+				<button class="p-btn p-btn--ghost" type="button" @click="cancelling = null">Keep it</button>
+				<button class="p-btn p-btn--danger p-btn--fill" type="button" :disabled="busy" @click="cancel">
 					{{ busy ? "Cancelling…" : "Cancel withdrawal" }}
 				</button>
 			</template>
@@ -286,12 +299,24 @@ const coolOff = computed(() => {
 </template>
 
 <style scoped>
-.tiles {
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+.top {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: minmax(0, 1fr);
+}
+.top-tiles {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.card-h {
+	margin-bottom: 8px;
 }
 .withdraw-row {
+	display: flex;
 	align-items: flex-end;
 	flex-wrap: wrap;
+	gap: 12px;
 }
 .grow {
 	flex: 1 1 200px;
@@ -306,18 +331,33 @@ const coolOff = computed(() => {
 .reason {
 	color: var(--bad);
 	font-size: 13px;
+	font-weight: 600;
 }
 .end {
 	gap: 8px;
-	flex-wrap: wrap;
 	justify-content: flex-end;
+}
+.amt {
+	font-variant-numeric: tabular-nums;
 }
 .plus {
 	color: var(--ok);
 }
-@media (max-width: 720px) {
-	.tiles {
-		grid-template-columns: 1fr;
+@media (min-width: 1280px) {
+	.top {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+	.top-hero {
+		grid-column: span 3;
+	}
+	.top-tiles {
+		grid-column: span 2;
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+@media (max-width: 559px) {
+	.top-tiles {
+		grid-template-columns: minmax(0, 1fr);
 	}
 }
 </style>

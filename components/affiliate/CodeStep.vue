@@ -93,7 +93,7 @@ async function again() {
 </script>
 
 <template>
-	<form class="p-stack" novalidate @submit.prevent="submit">
+	<form class="p-stack-sm" novalidate @submit.prevent="submit">
 		<p v-if="lead" class="p-muted">{{ lead }}</p>
 		<p v-else class="p-muted">
 			We emailed a 6-digit code to <strong>{{ email }}</strong>. It works for 5 minutes.
@@ -104,7 +104,7 @@ async function again() {
 			<span>Code</span>
 			<input
 				ref="input"
-				class="p-input aff-otp"
+				class="p-input p-otp"
 				:value="code"
 				type="text"
 				inputmode="numeric"
@@ -122,7 +122,7 @@ async function again() {
 		<button v-if="!burned" class="p-btn p-btn--primary p-btn--block" :disabled="busy || !valid">
 			{{ busy ? "Checking…" : (submitLabel ?? "Continue") }}
 		</button>
-		<div class="p-row p-between resend">
+		<div class="p-row p-between p-wrap resend">
 			<button class="link" type="button" @click="emit('back')">
 				{{ backLabel ?? "Use a different email" }}
 			</button>
@@ -141,7 +141,9 @@ async function again() {
 
 <style scoped>
 .resend {
-	flex-wrap: wrap;
 	gap: 10px;
+}
+.link {
+	min-height: 44px;
 }
 </style>

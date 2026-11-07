@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import AffiliateShell from "../../../../components/affiliate/AffiliateShell.vue";
 import CodeStep from "../../../../components/affiliate/CodeStep.vue";
+import StateBlock from "../../../../components/portal/StateBlock.vue";
 import { bank } from "../../../../lib/affiliate/api";
 import { dateTime, describe } from "../../../../lib/affiliate/format";
 import { session } from "../../../../lib/affiliate/session";
@@ -101,14 +102,20 @@ function done() {
 
 <template>
 	<AffiliateShell title="Bank account">
-		<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
+		<div v-if="error" class="p-alert" role="alert">
+			{{ error }}
+			<button class="p-btn p-btn--sm" type="button" @click="load">Retry</button>
+		</div>
 
-		<section class="p-card p-stack" aria-labelledby="aff-bank-h">
-			<div class="p-row p-between head">
-				<h2 id="aff-bank-h">Where we pay you</h2>
+		<section class="card-box p-stack-sm arrive" aria-labelledby="aff-bank-h">
+			<div class="card-h">
+				<div>
+					<h2 id="aff-bank-h">Where we pay you</h2>
+					<p>Withdrawals go to this account</p>
+				</div>
 				<button
 					v-if="loaded && !editing"
-					class="p-btn p-btn--sm"
+					class="p-btn"
 					:class="{ 'p-btn--primary': !account }"
 					type="button"
 					:disabled="locked"
@@ -117,16 +124,17 @@ function done() {
 					{{ account ? "Change" : "Add bank account" }}
 				</button>
 			</div>
-			<p v-if="!loaded" class="p-muted" role="status">Loading…</p>
-			<dl v-else-if="account" class="acct">
-				<div><dt>Account name</dt><dd>{{ account.account_name }}</dd></div>
-				<div><dt>Bank</dt><dd>{{ account.bank_name }}</dd></div>
-				<div><dt>Account number</dt><dd>{{ account.account_number }}</dd></div>
-				<div><dt>Last changed</dt><dd>{{ dateTime(account.updated_at) }}</dd></div>
-			</dl>
-			<p v-else class="p-muted">
-				You haven't added a bank account yet. You need one to withdraw your earnings.
-			</p>
+			<StateBlock :loading="!loaded" :lines="3">
+				<dl v-if="account" class="kv">
+					<div><dt>Account name</dt><dd>{{ account.account_name }}</dd></div>
+					<div><dt>Bank</dt><dd>{{ account.bank_name }}</dd></div>
+					<div><dt>Account number</dt><dd class="mono">{{ account.account_number }}</dd></div>
+					<div><dt>Last changed</dt><dd>{{ dateTime(account.updated_at) }}</dd></div>
+				</dl>
+				<p v-else class="p-muted">
+					You haven't added a bank account yet. You need one to withdraw your earnings.
+				</p>
+			</StateBlock>
 			<p v-if="locked && loaded" class="p-alert p-alert--warn">
 				{{
 					!termsCurrent
@@ -136,16 +144,14 @@ function done() {
 			</p>
 		</section>
 
-		<section v-if="editing" class="p-card p-stack" aria-labelledby="aff-bank-edit-h">
+		<section v-if="editing" class="card-box p-stack-sm arrive" aria-labelledby="aff-bank-edit-h">
 			<h2 id="aff-bank-edit-h">{{ account ? "Change bank account" : "Add a bank account" }}</h2>
-			<div class="aff-banner" role="note">
-				<p>
-					<strong>Withdrawals pause for 24 hours after a change.</strong>
-					This protects your earnings if someone else gets into your email.
-				</p>
+			<div class="p-alert p-alert--warn" role="note">
+				<strong>Withdrawals pause for 24 hours after a change.</strong>
+				This protects your earnings if someone else gets into your email.
 			</div>
 
-			<form v-if="step === 'details'" class="p-stack" novalidate @submit.prevent="sendCode">
+			<form v-if="step === 'details'" class="p-stack-sm edit" novalidate @submit.prevent="sendCode">
 				<div v-if="formError" class="p-alert" role="alert">{{ formError }}</div>
 				<label class="p-field">
 					<span>Bank</span>
@@ -187,55 +193,39 @@ function done() {
 						Account name: <strong>{{ resolved }}</strong>
 					</div>
 				</div>
-				<div class="p-row actions">
-					<button class="p-btn" type="button" @click="editing = false">Cancel</button>
+				<div class="p-row p-wrap actions">
+					<button class="p-btn p-btn--ghost" type="button" @click="editing = false">Cancel</button>
 					<button class="p-btn p-btn--primary" :disabled="!resolved || busy">
 						{{ busy ? "Sending code…" : "This is my account — send code" }}
 					</button>
 				</div>
 			</form>
 
-			<CodeStep
-				v-else
-				:email="user?.email ?? ''"
-				:lead="`To confirm the change, enter the 6-digit code we emailed to ${user?.email ?? 'you'}.`"
-				:verify="verify"
-				:resend="resend"
-				submit-label="Save bank account"
-				back-label="Change the details"
-				@back="step = 'details'"
-				@done="done"
-			/>
+			<div v-else class="edit">
+				<CodeStep
+					:email="user?.email ?? ''"
+					:lead="`To confirm the change, enter the 6-digit code we emailed to ${user?.email ?? 'you'}.`"
+					:verify="verify"
+					:resend="resend"
+					submit-label="Save bank account"
+					back-label="Change the details"
+					@back="step = 'details'"
+					@done="done"
+				/>
+			</div>
 		</section>
 	</AffiliateShell>
 </template>
 
 <style scoped>
-.head {
-	flex-wrap: wrap;
+.mono {
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.04em;
 }
-.acct {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 14px;
-	margin: 0;
-}
-.acct dt {
-	font-size: 12px;
-	color: var(--muted);
-}
-.acct dd {
-	margin: 2px 0 0;
-	font-weight: 600;
-	overflow-wrap: anywhere;
+.edit {
+	max-width: 520px;
 }
 .actions {
 	justify-content: flex-end;
-	flex-wrap: wrap;
-}
-@media (max-width: 560px) {
-	.acct {
-		grid-template-columns: 1fr;
-	}
 }
 </style>

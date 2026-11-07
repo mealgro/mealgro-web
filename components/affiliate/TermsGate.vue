@@ -43,7 +43,7 @@ async function accept() {
 </script>
 
 <template>
-	<section class="p-card p-stack gate" aria-labelledby="aff-terms-gate">
+	<section class="card-box p-stack-sm gate" aria-labelledby="aff-terms-gate">
 		<div>
 			<h2 id="aff-terms-gate">We've updated the affiliate terms</h2>
 			<p class="p-muted">
@@ -54,8 +54,8 @@ async function accept() {
 		<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
 		<TermsText v-if="terms" :content="terms.content" label="Updated affiliate terms" />
 		<p v-else-if="!error" class="p-muted" role="status">Loading the terms…</p>
-		<form v-if="terms" class="p-row accept" @submit.prevent="accept">
-			<label class="aff-check">
+		<form v-if="terms" class="p-row p-wrap p-between" @submit.prevent="accept">
+			<label class="p-check">
 				<input v-model="agreed" type="checkbox" required />
 				<span>I've read and accept the updated affiliate terms</span>
 			</label>
@@ -68,10 +68,6 @@ async function accept() {
 
 <style scoped>
 .gate {
-	border-color: var(--brand);
-}
-.accept {
-	justify-content: space-between;
-	flex-wrap: wrap;
+	border: 2px solid var(--brand);
 }
 </style>
