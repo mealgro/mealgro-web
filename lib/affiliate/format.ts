@@ -107,6 +107,7 @@ export const withdrawalLabel: Record<WithdrawalStatus, string> = {
 	failed: "Failed",
 	reversed: "Reversed",
 	rejected: "Rejected",
+	cancelled: "Cancelled",
 };
 
 export const withdrawalTone = (s: string): Tone =>
@@ -119,6 +120,7 @@ export const withdrawalTone = (s: string): Tone =>
 			failed: "bad",
 			reversed: "bad",
 			rejected: "bad",
+			cancelled: "",
 		}) as Record<string, Tone>
 	)[s] ?? "";
 

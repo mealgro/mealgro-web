@@ -118,7 +118,8 @@ export type WithdrawalStatus =
 	| "paid"
 	| "failed"
 	| "reversed"
-	| "rejected";
+	| "rejected"
+	| "cancelled";
 
 export type Withdrawal = {
 	id: string;
