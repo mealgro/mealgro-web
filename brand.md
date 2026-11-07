@@ -201,6 +201,7 @@ affiliate area's `+Layout.ts`; the vendor portal's pages wrap themselves in
 | Theme (sun/moon, Auto = follow the OS) | `lib/theme.ts`, `components/portal/ThemeToggle.vue` |
 | The frame: ink rail, top bar, drawer, toasts, confirm dialog | `components/portal/PortalFrame.vue`; `PortalShell.vue` (vendor) and `components/affiliate/AffiliateShell.vue` only say what goes in the rail |
 | Sign-in / sign-up | `components/portal/AuthLayout.vue` |
+| "Continue with Google / Apple" under a sign-in form | `components/portal/SocialSignIn.vue` (`.p-or`, `.p-social`, `.p-btn--apple`, `.p-link-hint` in `portal.css`); the flow and error words in `lib/portal/social.ts`. Google draws its own white pill; Apple's is an ink pill (black in the day, white at night) with Apple's mark. Hidden unless `PUBLIC_ENV__GOOGLE_CLIENT_ID` / `PUBLIC_ENV__APPLE_CLIENT_ID` is set |
 | Hero panel, tiles | `HeroPanel.vue`, `StatTile.vue` |
 | Loading / empty / error | `StateBlock.vue` (cards), `TableState.vue` (table rows) |
 | Dialogs | `Modal.vue` (collects input), `ConfirmHost.vue` + `lib/portal/confirm.ts` (`confirmAction`, replaces `window.confirm` / `prompt`), `ToastHost.vue` (fed by `lib/portal/toast.ts`, `lib/affiliate/toast.ts`) |

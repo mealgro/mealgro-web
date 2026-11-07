@@ -132,6 +132,26 @@ export const session = {
 		return res.user;
 	},
 
+	/** Takes a sign-in that did not come from the password form (Google, Apple,
+	 *  linking): the same session, held the same way. */
+	adopt(res: AuthResponse): SessionUser {
+		tokens.set(res);
+		remember(res.user);
+		state.ready = true;
+		return res.user;
+	},
+
+	/** Ends a session just taken without leaving the page, for a sign-in page
+	 *  that has something to say about why. */
+	async discard() {
+		try {
+			await api("POST", "/auth/logout");
+		} catch {
+			// Signing out locally is enough if the call fails.
+		}
+		endSession();
+	},
+
 	async signOut() {
 		try {
 			await api("POST", "/auth/logout");

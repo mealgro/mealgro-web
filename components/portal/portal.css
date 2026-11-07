@@ -284,6 +284,81 @@
 	flex: none;
 }
 
+/* ── Sign in with a provider ──────────────────────────────────────────────────
+   "Continue with Google / Apple" under a sign-in form. Google draws its own
+   button (a pill, in its day or night colours, from SocialSignIn.vue); Apple's
+   is a pill in ink with Apple's mark, black in the day and white at night, as
+   its guidelines allow. */
+.portal .p-or {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 13px;
+	color: var(--muted);
+}
+.portal .p-or::before,
+.portal .p-or::after {
+	content: "";
+	flex: 1;
+	height: 1px;
+	background: var(--line);
+}
+.portal .p-social-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+.portal .p-social {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	transition: opacity 0.12s;
+}
+.portal .p-social[inert] {
+	opacity: 0.55;
+}
+.portal .p-social-google {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 40px;
+}
+.portal .p-social-google.is-hidden {
+	display: none;
+}
+.portal .p-social-google-slot {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	/* Google sets the colour scheme of its frame; keep the page's from fighting it. */
+	color-scheme: normal;
+}
+.portal .p-btn--apple {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--surface);
+	font-size: 15px;
+}
+.portal .p-btn--apple:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--ink) 86%, var(--surface));
+}
+/* The account a Google or Apple sign-in found, to be recognised and confirmed. */
+.portal .p-link-hint {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 16px 20px;
+	border-radius: 1.5rem;
+	background: var(--bg);
+	font-size: 14px;
+}
+.portal .p-link-hint strong {
+	font-family: var(--font-display);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	font-size: 16px;
+}
+
 /* ── Fields: pill inputs, label over field ────────────────────────────────── */
 .portal .p-field {
 	display: flex;
@@ -1067,6 +1142,10 @@
 	.portal .p-btn,
 	.portal .p-btn--sm,
 	.portal .p-tabs button {
+		min-height: 44px;
+	}
+	/* Google's button is 40px tall; give it the same row as the others. */
+	.portal .p-social-google {
 		min-height: 44px;
 	}
 	.portal .p-btn--sm {

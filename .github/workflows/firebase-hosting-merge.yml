@@ -12,6 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm install && npm run build
+        env:
+          # Public OAuth client IDs for the vendor portal's Google and Apple
+          # sign-in (Settings > Secrets and variables > Actions > Variables).
+          # Unset, the buttons are simply not shown.
+          PUBLIC_ENV__GOOGLE_CLIENT_ID: ${{ vars.PUBLIC_ENV__GOOGLE_CLIENT_ID }}
+          PUBLIC_ENV__APPLE_CLIENT_ID: ${{ vars.PUBLIC_ENV__APPLE_CLIENT_ID }}
+          PUBLIC_ENV__APPLE_REDIRECT_URI: ${{ vars.PUBLIC_ENV__APPLE_REDIRECT_URI }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
