@@ -43,6 +43,29 @@ const resolveError = ref("");
 const busy = ref(false);
 const formError = ref("");
 
+// The bank list: A to Z, one entry per name (an old code kept under a
+// "(Brand)" suffix is hidden when the plain name is there), and a search.
+const bankSearch = ref("");
+type Bank = { code: string; name: string };
+const baseName = (n: string) => n.toLowerCase().replace(/\s*\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+const byName = (a: Bank, b: Bank) => a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+function tidy(list: Bank[]): Bank[] {
+	const kept = new Map<string, Bank>();
+	for (const b of [...list].sort(byName)) {
+		const key = baseName(b.name);
+		const have = kept.get(key);
+		// Prefer the plain name over the "(Brand)" variant.
+		if (!have || (have.name.includes("(") && !b.name.includes("("))) kept.set(key, b);
+	}
+	return [...kept.values()].sort(byName);
+}
+const matches = (list: Bank[]) => {
+	const q = bankSearch.value.trim().toLowerCase();
+	return q ? list.filter((b) => b.name.toLowerCase().includes(q)) : list;
+};
+const commercial = computed(() => matches(tidy(directory.value?.commercial ?? [])));
+const microfinance = computed(() => matches(tidy(directory.value?.microfinance ?? [])));
+
 const validNumber = computed(() => /^\d{10}$/.test(number.value));
 let seq = 0;
 
@@ -72,6 +95,7 @@ function start() {
 	step.value = "details";
 	bankCode.value = "";
 	number.value = "";
+	bankSearch.value = "";
 	formError.value = "";
 }
 
@@ -154,19 +178,21 @@ function done() {
 			<form v-if="step === 'details'" class="p-stack-sm edit" novalidate @submit.prevent="sendCode">
 				<div v-if="formError" class="p-alert" role="alert">{{ formError }}</div>
 				<label class="p-field">
+					<span>Find your bank</span>
+					<input v-model="bankSearch" class="p-input" type="search" maxlength="60" placeholder="Type part of the name…" :disabled="!directory" />
+				</label>
+				<label class="p-field">
 					<span>Bank</span>
 					<select v-model="bankCode" class="p-input" required :disabled="!directory">
-						<option value="" disabled>{{ directory ? "Choose your bank" : "Loading banks…" }}</option>
+						<option value="" disabled>
+							{{ !directory ? "Loading banks…" : commercial.length + microfinance.length ? "Choose your bank" : "No bank matches that" }}
+						</option>
 						<template v-if="directory">
-							<optgroup label="Banks">
-								<option v-for="b in directory.commercial" :key="`c-${b.code}`" :value="b.code">
-									{{ b.name }}
-								</option>
+							<optgroup v-if="commercial.length" label="Banks">
+								<option v-for="b in commercial" :key="`c-${b.code}`" :value="b.code">{{ b.name }}</option>
 							</optgroup>
-							<optgroup v-if="directory.microfinance.length" label="Microfinance banks">
-								<option v-for="b in directory.microfinance" :key="`m-${b.code}`" :value="b.code">
-									{{ b.name }}
-								</option>
+							<optgroup v-if="microfinance.length" label="Microfinance banks">
+								<option v-for="b in microfinance" :key="`m-${b.code}`" :value="b.code">{{ b.name }}</option>
 							</optgroup>
 						</template>
 					</select>

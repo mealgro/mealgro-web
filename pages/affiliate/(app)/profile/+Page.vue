@@ -77,6 +77,7 @@ async function save() {
 						v-model="form.full_name"
 						class="p-input"
 						autocomplete="name"
+						maxlength="80"
 						:disabled="locked"
 						:aria-invalid="bad === 'full_name'"
 						required
@@ -90,6 +91,7 @@ async function save() {
 						type="tel"
 						inputmode="tel"
 						autocomplete="tel"
+						maxlength="20"
 						:disabled="locked"
 						:aria-invalid="bad === 'phone'"
 						required

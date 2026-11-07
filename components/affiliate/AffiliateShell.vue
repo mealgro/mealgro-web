@@ -2,7 +2,7 @@
 // The signed-in affiliate area's frame: rail items, the pause/suspension
 // banners and the terms gate on every page. A sibling of
 // components/portal/PortalShell.vue; the look is PortalFrame's.
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import PortalFrame, { type RailItem } from "../portal/PortalFrame.vue";
 import { LOGIN, session } from "../../lib/affiliate/session";
 import { toasts } from "../../lib/affiliate/toast";
@@ -12,6 +12,7 @@ import TermsGate from "./TermsGate.vue";
 defineProps<{ title: string }>();
 
 const ready = ref(false);
+const bootError = ref("");
 
 const items: RailItem[] = [
 	{ href: "/affiliate/dashboard", label: "Dashboard", icon: "M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" },
@@ -26,9 +27,18 @@ const user = session.user;
 const overview = session.overview;
 const programActive = session.programActive;
 const termsCurrent = session.termsCurrent;
+const suspended = computed(() => user.value?.status === "suspended");
 
+const reload = () => location.reload();
+const BOOT_MS = 15_000;
 onMounted(async () => {
-	if (!(await session.restore())) {
+	const slow = new Promise<"slow">((r) => setTimeout(() => r("slow"), BOOT_MS));
+	const signedIn = await Promise.race([session.restore(), slow]);
+	if (signedIn === "slow") {
+		bootError.value = "Mealgro is taking too long to answer. Check your connection and try again.";
+		return;
+	}
+	if (!signedIn) {
 		location.replace(LOGIN);
 		return;
 	}
@@ -49,6 +59,8 @@ onMounted(async () => {
 		:user-sub="user?.email"
 		:toasts="toasts"
 		:loading="!ready"
+		:boot-error="bootError"
+		@retry="reload"
 		@sign-out="session.signOut()"
 	>
 		<template #rail>
@@ -61,15 +73,18 @@ onMounted(async () => {
 			<a class="more" href="/affiliate?view=public">How the program works</a>
 		</template>
 		<template #banners>
-			<PauseBanner v-if="!programActive" look="portal" variant="account" :message="overview?.program_message" />
-			<div v-if="user?.status === 'suspended'" class="p-alert" role="status">
+			<!-- One notice at a time, the most serious first: a suspension says it all. -->
+			<div v-if="suspended" class="p-alert" role="status">
 				<p>
 					<strong>Your account is suspended.</strong>
 					You can sign in and read your account, but you can't withdraw or make changes.
-					<template v-if="user.status_reason"> Reason: {{ user.status_reason }}</template>
+					Contact Mealgro support if you think this is a mistake.
 				</p>
 			</div>
-			<TermsGate v-if="!termsCurrent" />
+			<template v-else>
+				<PauseBanner v-if="!programActive" look="portal" variant="account" :message="overview?.program_message" />
+				<TermsGate v-if="!termsCurrent" />
+			</template>
 		</template>
 		<template v-if="$slots.actions" #actions><slot name="actions" /></template>
 		<slot />

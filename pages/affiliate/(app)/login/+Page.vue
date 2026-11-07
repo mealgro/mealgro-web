@@ -11,8 +11,15 @@ const email = ref("");
 const busy = ref(false);
 const error = ref("");
 const closed = ref(false);
+const ended = ref(false);
 
 onMounted(async () => {
+	try {
+		ended.value = sessionStorage.getItem("mg.affiliate.ended") === "1";
+		sessionStorage.removeItem("mg.affiliate.ended");
+	} catch {
+		// Storage blocked: the message is simply not shown.
+	}
 	closed.value = new URLSearchParams(location.search).has("closed");
 	if (await session.restore()) location.replace(HOME);
 });
@@ -48,6 +55,7 @@ const done = () => location.assign(HOME);
 					{{ step === "email" ? "We'll email you a 6-digit code. No password needed." : "Enter the code from your email." }}
 				</p>
 			</div>
+			<div v-if="ended && step === 'email' && !closed" class="p-alert p-alert--info" role="status">Your session ended. Sign in again.</div>
 			<div v-if="closed && step === 'email'" class="p-alert" role="alert">
 				This affiliate account has been closed. Contact Mealgro support if you think this is a
 				mistake.
@@ -63,6 +71,7 @@ const done = () => location.assign(HOME);
 						type="email"
 						inputmode="email"
 						autocomplete="email"
+						maxlength="254"
 						placeholder="you@example.com"
 						required
 					/>

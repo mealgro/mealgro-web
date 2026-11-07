@@ -135,7 +135,7 @@ const stats = computed(() => {
 					<h2 id="aff-notices-h">Notices</h2>
 					<p>Approvals and payouts, newest first</p>
 				</div>
-				<a class="link" href="/affiliate/referrals">See referrals</a>
+				<a class="link p-tap" href="/affiliate/referrals">See referrals</a>
 			</div>
 			<StateBlock
 				:loading="notices === null"
@@ -218,8 +218,12 @@ const stats = computed(() => {
 	}
 }
 @media (max-width: 559px) {
+	/* The tiles stay side by side, so the form or the numbers below are not pushed off the screen. */
 	.top-tiles {
-		grid-template-columns: minmax(0, 1fr);
+		gap: 12px;
+	}
+	.top-tiles :deep(.p-tile) {
+		padding: 16px;
 	}
 }
 </style>

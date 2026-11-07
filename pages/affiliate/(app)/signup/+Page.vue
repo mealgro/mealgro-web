@@ -122,6 +122,7 @@ const done = () => location.assign(HOME);
 						v-model="form.full_name"
 						class="p-input"
 						autocomplete="name"
+						maxlength="80"
 						:aria-invalid="bad === 'full_name'"
 						required
 					/>
@@ -134,6 +135,7 @@ const done = () => location.assign(HOME);
 						type="email"
 						inputmode="email"
 						autocomplete="email"
+						maxlength="254"
 						placeholder="you@example.com"
 						:aria-invalid="bad === 'email'"
 						aria-describedby="aff-email-hint"
@@ -149,6 +151,7 @@ const done = () => location.assign(HOME);
 						type="tel"
 						inputmode="tel"
 						autocomplete="tel"
+						maxlength="20"
 						placeholder="0803 123 4567"
 						:aria-invalid="bad === 'phone'"
 						required

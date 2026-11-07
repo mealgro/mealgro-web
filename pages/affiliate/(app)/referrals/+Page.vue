@@ -98,14 +98,14 @@ onMounted(async () => {
 											{{ referralLabel[r.status] }}
 										</span>
 										<span v-else class="p-badge p-badge--bad">
-											voided{{ r.void_reason ? `: ${voidReason(r.void_reason)}` : "" }}
+											Voided{{ r.void_reason ? `: ${voidReason(r.void_reason)}` : "" }}
 										</span>
 										<span
 											v-if="r.status === 'pending' && r.area_active === false"
 											class="p-badge p-badge--warn"
 											title="Rewards aren't active in this store's area right now. If the area is switched on before approval, it pays."
 										>
-											area not active
+											Area not active
 										</span>
 									</div>
 									<small v-if="r.approved_at" class="sub">Approved {{ day(r.approved_at) }}</small>

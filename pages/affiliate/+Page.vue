@@ -27,7 +27,11 @@ onMounted(async () => {
 	}
 });
 
-const reward = computed(() => (program.value?.reward ? money(program.value.reward) : null));
+/** While the program is paused nothing is promised: no reward is quoted. */
+const paused = computed(() => !!program.value && !program.value.active);
+const reward = computed(() =>
+	program.value?.reward && !paused.value ? money(program.value.reward) : null,
+);
 const minimum = computed(() => (program.value ? money(program.value.min_withdrawal) : null));
 
 const steps = [
@@ -58,12 +62,19 @@ const steps = [
 
 				<p class="eyebrow">Mealgro Affiliate Program</p>
 				<h1>
-					<template v-if="reward">Earn {{ reward }} for every vendor we approve</template>
+					<template v-if="paused">Our affiliate program is paused for now</template>
+					<template v-else-if="reward">Earn {{ reward }} for every vendor we approve</template>
 					<template v-else>Earn a cash reward for every vendor we approve</template>
 				</h1>
 				<p class="lead">
-					Know restaurants, kitchens and food sellers? Bring them to Mealgro with your affiliate
-					code and get paid when they're approved. Free to join.
+					<template v-if="paused">
+						New vendors you bring in won't earn a reward until it's back. Sign up now and we'll tell
+						you when it resumes. Free to join.
+					</template>
+					<template v-else>
+						Know restaurants, kitchens and food sellers? Bring them to Mealgro with your affiliate
+						code and get paid when they're approved. Free to join.
+					</template>
 				</p>
 				<div class="cta">
 					<template v-if="signedIn">

@@ -2,10 +2,10 @@
 import { computed, onMounted, ref } from "vue";
 import AffiliateShell from "../../../../components/affiliate/AffiliateShell.vue";
 import HeroPanel from "../../../../components/portal/HeroPanel.vue";
-import Modal from "../../../../components/portal/Modal.vue";
 import StatTile from "../../../../components/portal/StatTile.vue";
 import StateBlock from "../../../../components/portal/StateBlock.vue";
 import { bank, wallet as walletApi } from "../../../../lib/affiliate/api";
+import { confirmAction } from "../../../../lib/portal/confirm";
 import {
 	dateTime,
 	describe,
@@ -43,7 +43,6 @@ onMounted(async () => {
 // ---- Withdraw ----
 const amountText = ref("");
 const formError = ref("");
-const confirming = ref(false);
 const busy = ref(false);
 
 // Amounts from the API (AmountDto) are in naira; the withdrawal is sent in kobo.
@@ -77,9 +76,19 @@ function all() {
 	formError.value = "";
 }
 
-function review() {
+async function review() {
+	if (busy.value) return;
 	formError.value = check();
-	if (!formError.value) confirming.value = true;
+	if (formError.value || naira.value === null) return;
+	const to = account.value
+		? ` to ${account.value.account_name}, ${account.value.bank_name} ${account.value.account_number}`
+		: "";
+	const ok = await confirmAction({
+		title: `Withdraw ${money(asAmount(naira.value))}${to}?`,
+		message: "We review each withdrawal before paying it. You can cancel it while it's pending.",
+		confirmText: "Withdraw",
+	});
+	if (ok) await withdraw();
 }
 
 async function withdraw() {
@@ -87,12 +96,10 @@ async function withdraw() {
 	busy.value = true;
 	try {
 		await walletApi.withdraw(Math.round(naira.value * 100));
-		confirming.value = false;
 		amountText.value = "";
 		toast("Withdrawal requested. We'll email you when it's paid.");
 		await Promise.all([load(), session.loadOverview().catch(() => {})]);
 	} catch (e) {
-		confirming.value = false;
 		formError.value =
 			errorCode(e) === "AffiliateErrorBelowMinimum" && wallet.value
 				? `The minimum withdrawal is ${money(wallet.value.min_withdrawal)}.`
@@ -107,18 +114,22 @@ async function withdraw() {
 }
 
 // ---- Cancel ----
-const cancelling = ref<Withdrawal | null>(null);
-async function cancel() {
-	const w = cancelling.value;
-	if (!w || busy.value) return;
+async function cancel(w: Withdrawal) {
+	if (busy.value) return;
+	const ok = await confirmAction({
+		title: "Cancel this withdrawal?",
+		message: `${money(w.amount)} goes back to your available balance. You can ask again later.`,
+		confirmText: "Cancel withdrawal",
+		cancelText: "Keep it",
+		destructive: true,
+	});
+	if (!ok || busy.value) return;
 	busy.value = true;
 	try {
 		await walletApi.cancel(w.id);
 		toast("Withdrawal cancelled. The money is back in your balance.");
-		cancelling.value = null;
 		await load();
 	} catch (e) {
-		cancelling.value = null;
 		toast(describe(e), "bad");
 		await load();
 	} finally {
@@ -174,6 +185,7 @@ const coolOff = computed(() => {
 							v-model="amountText"
 							class="p-input"
 							inputmode="decimal"
+							maxlength="14"
 							autocomplete="off"
 							:placeholder="String(minimum)"
 							:disabled="!wallet.can_withdraw"
@@ -190,7 +202,7 @@ const coolOff = computed(() => {
 					>
 						Withdraw all
 					</button>
-					<button class="p-btn p-btn--primary" :disabled="!wallet.can_withdraw || !amountText">
+					<button class="p-btn p-btn--primary" :disabled="!wallet.can_withdraw || !amountText.trim()">
 						Continue
 					</button>
 				</div>
@@ -231,7 +243,7 @@ const coolOff = computed(() => {
 								v-if="w.status === 'pending'"
 								class="p-btn p-btn--sm p-btn--danger"
 								type="button"
-								@click="cancelling = w"
+								@click="cancel(w)"
 							>
 								Cancel
 							</button>
@@ -264,37 +276,6 @@ const coolOff = computed(() => {
 				</ul>
 			</StateBlock>
 		</section>
-
-		<Modal v-if="confirming && wallet && naira !== null" title="Confirm withdrawal" @close="confirming = false">
-			<div class="p-stack-sm">
-				<p>
-					Withdraw <strong>{{ money(asAmount(naira)) }}</strong>
-					<template v-if="account"> to <strong>{{ account.account_name }}</strong>, {{ account.bank_name }} {{ account.account_number }}</template>?
-				</p>
-				<p class="p-muted">
-					We review each withdrawal before paying it. You can cancel it while it's pending.
-				</p>
-			</div>
-			<template #footer>
-				<button class="p-btn p-btn--ghost" type="button" @click="confirming = false">Back</button>
-				<button class="p-btn p-btn--primary" type="button" :disabled="busy" @click="withdraw">
-					{{ busy ? "Requesting…" : "Withdraw" }}
-				</button>
-			</template>
-		</Modal>
-
-		<Modal v-if="cancelling" title="Cancel this withdrawal?" @close="cancelling = null">
-			<p>
-				{{ money(cancelling.amount) }} goes back to your available balance. You can ask again
-				later.
-			</p>
-			<template #footer>
-				<button class="p-btn p-btn--ghost" type="button" @click="cancelling = null">Keep it</button>
-				<button class="p-btn p-btn--danger p-btn--fill" type="button" :disabled="busy" @click="cancel">
-					{{ busy ? "Cancelling…" : "Cancel withdrawal" }}
-				</button>
-			</template>
-		</Modal>
 	</AffiliateShell>
 </template>
 
@@ -339,6 +320,7 @@ const coolOff = computed(() => {
 }
 .amt {
 	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
 }
 .plus {
 	color: var(--ok);
@@ -356,8 +338,12 @@ const coolOff = computed(() => {
 	}
 }
 @media (max-width: 559px) {
+	/* The tiles stay side by side, so the form or the numbers below are not pushed off the screen. */
 	.top-tiles {
-		grid-template-columns: minmax(0, 1fr);
+		gap: 12px;
+	}
+	.top-tiles :deep(.p-tile) {
+		padding: 16px;
 	}
 }
 </style>

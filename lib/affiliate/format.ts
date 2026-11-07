@@ -1,14 +1,14 @@
 import { Marked } from "marked";
+import { sentence } from "../portal/format";
 import { AffiliateApiError } from "./http";
 import type { Amount, ReferralStatus, VoidReason, WithdrawalStatus } from "./types";
 
-/** An API amount (AmountDto, in naira — major units) for display: ₦12,500,
- *  or ₦12,500.50 when there are kobo. Money sent TO the API is in kobo. */
+/** An API amount (AmountDto, in naira — major units) for display, always to
+ *  the kobo: ₦12,500.00, ₦12,500.50. Money sent TO the API is in kobo. */
 export function money(a: Amount | null | undefined): string {
 	if (!a) return "—";
-	const whole = Number.isInteger(a.amount);
 	return `${a.symbol}${a.amount.toLocaleString("en-NG", {
-		minimumFractionDigits: whole ? 0 : 2,
+		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	})}`;
 }
@@ -67,8 +67,8 @@ const FRIENDLY: Record<string, string> = {
 
 /** Readable text for a failure. */
 export function describe(e: unknown): string {
-	if (e instanceof AffiliateApiError) return FRIENDLY[e.code] ?? (e.info.message || e.code);
-	return e instanceof Error ? e.message : "Something went wrong.";
+	if (e instanceof AffiliateApiError) return FRIENDLY[e.code] ?? sentence(e.info.message || e.code);
+	return e instanceof Error ? sentence(e.message) : "Something went wrong.";
 }
 
 export type Tone = "ok" | "warn" | "bad" | "brand" | "";
@@ -91,11 +91,11 @@ export function voidReason(r: VoidReason | null): string {
 	if (!r) return "";
 	if (typeof r === "object") return r.admin;
 	return {
-		"area-inactive": "area not active",
-		"program-paused": "program paused",
-		cancelled: "registration cancelled",
-		banned: "store banned",
-		"no-reward": "no reward set",
+		"area-inactive": "Area not active",
+		"program-paused": "Program paused",
+		cancelled: "Registration cancelled",
+		banned: "Store banned",
+		"no-reward": "No reward set",
 	}[r];
 }
 
@@ -130,6 +130,11 @@ const md = new Marked({
 	gfm: true,
 	renderer: {
 		html: ({ text }) => escapeHtml(text),
+		// The page has its own h1: the terms' headings start two levels down.
+		heading({ tokens, depth }) {
+			const level = Math.min(depth + 2, 6);
+			return `<h${level}>${this.parser.parseInline(tokens)}</h${level}>\n`;
+		},
 		link({ href, title, tokens }) {
 			const text = this.parser.parseInline(tokens);
 			if (!/^(https?:|mailto:|\/|#)/i.test(href)) return text;

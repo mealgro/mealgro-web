@@ -48,6 +48,14 @@ function toLogin(why?: SignedOutReason) {
 		location.pathname.startsWith(p),
 	);
 	if (onAuthPage) return;
+	if (why === "expired") {
+		try {
+			// The sign-in page says why they are back there, once.
+			sessionStorage.setItem("mg.affiliate.ended", "1");
+		} catch {
+			// Storage blocked: they just land on sign-in.
+		}
+	}
 	location.assign(why === "banned" ? `${LOGIN}?closed=1` : LOGIN);
 }
 
