@@ -8,8 +8,16 @@ const phone = ref("");
 const password = ref("");
 const busy = ref(false);
 const error = ref("");
+/** Sent here because the session ended (see lib/portal/session.ts): said once. */
+const ended = ref(false);
 
 onMounted(async () => {
+	try {
+		ended.value = sessionStorage.getItem("mg.portal.ended") === "1";
+		sessionStorage.removeItem("mg.portal.ended");
+	} catch {
+		// Storage blocked: the message is simply not shown.
+	}
 	if (await session.restore()) location.replace("/account");
 });
 
@@ -41,14 +49,15 @@ async function submit() {
 				<h1>Sign in to your store</h1>
 				<p class="p-muted">Use the phone number and password you use in the Mealgro app.</p>
 			</div>
+			<div v-if="ended && !error" class="p-alert p-alert--info" role="status">Your session ended. Sign in again.</div>
 			<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
 			<label class="p-field">
 				<span>Phone number</span>
-				<input v-model="phone" class="p-input" type="tel" inputmode="tel" autocomplete="username" placeholder="+234 901 234 5678" required />
+				<input v-model="phone" class="p-input" type="tel" inputmode="tel" autocomplete="username" maxlength="20" placeholder="+234 901 234 5678" required />
 			</label>
 			<label class="p-field">
 				<span>Password</span>
-				<input v-model="password" class="p-input" type="password" autocomplete="current-password" required />
+				<input v-model="password" class="p-input" type="password" autocomplete="current-password" maxlength="128" required />
 			</label>
 			<button class="p-btn p-btn--primary p-btn--block" :disabled="busy || !phone || !password">
 				{{ busy ? "Signing in…" : "Sign in" }}

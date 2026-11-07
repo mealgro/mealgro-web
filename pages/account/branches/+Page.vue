@@ -24,7 +24,9 @@ async function load() {
 		error.value = describe(e);
 	}
 }
-onMounted(load);
+onMounted(() => {
+	if (session.can("view-store")) load();
+});
 
 // A menu going to another market's branch copies in the background: keep
 // asking until it has ended, so "Copying" doesn't outlive the copy.
@@ -112,10 +114,10 @@ async function open() {
 // ── names ─────────────────────────────────────────────────────────────────
 async function relabel(b: Branch) {
 	const ask = await confirmAction({
-		title: "Rename this branch",
-		message: `What follows "${brand.value?.name}" for this branch?`,
+		title: "Rename this branch?",
+		message: `Customers see it as “${brand.value?.name} (${b.branch_label})”. What should follow “${brand.value?.name}”?`,
 		confirmText: "Rename",
-		input: { label: "Branch name", value: b.branch_label, required: true },
+		input: { label: "Branch name", value: b.branch_label, required: true, maxLength: 40 },
 	});
 	const label = ask?.value;
 	if (!label || label === b.branch_label) return;
@@ -129,10 +131,10 @@ async function relabel(b: Branch) {
 }
 async function renameBrand() {
 	const ask = await confirmAction({
-		title: "Rename your business",
-		message: "Every branch follows the new name.",
+		title: "Rename your business?",
+		message: "Every branch follows the new name, and customers see it straight away.",
 		confirmText: "Rename",
-		input: { label: "Your business name", value: brand.value?.name, required: true },
+		input: { label: "Your business name", value: brand.value?.name, required: true, maxLength: 80 },
 	});
 	const name = ask?.value;
 	if (!name || name === brand.value?.name) return;
@@ -150,7 +152,7 @@ const tone = (s: Branch["status"]) =>
 </script>
 
 <template>
-	<PortalShell title="Branches">
+	<PortalShell title="Branches" need="view-store">
 		<template #actions>
 			<button v-if="canManage" class="p-btn" @click="renameBrand">Rename business</button>
 			<button v-if="canManage" class="p-btn p-btn--primary" @click="startOpening">Open a branch</button>
@@ -171,15 +173,13 @@ const tone = (s: Branch["status"]) =>
 			</HeroPanel>
 			<div class="p-grid list">
 				<article v-for="(b, i) in brand.branches" :key="b.id" class="card-box branch arrive" :style="{ '--i': i + 1 }" :class="{ here: b.id === session.store.value?.id }">
-					<div class="p-row p-between branch-top">
-						<div class="branch-name">
-							<h3>{{ b.display_name }}</h3>
-							<p class="p-muted">{{ b.address || [b.city, b.state].filter(Boolean).join(", ") }}</p>
-						</div>
-						<div class="p-badge-row">
-							<span v-if="b.is_base" class="p-badge p-badge--brand">Main</span>
-							<span class="p-badge" :class="`p-badge--${tone(b.status)}`">{{ titleCase(b.status) }}</span>
-						</div>
+					<div class="p-badge-row">
+						<span v-if="b.is_base" class="p-badge p-badge--brand">Main</span>
+						<span class="p-badge" :class="`p-badge--${tone(b.status)}`">{{ titleCase(b.status) }}</span>
+					</div>
+					<div class="branch-name">
+						<h3>{{ b.display_name }}</h3>
+						<p class="p-muted">{{ b.address || [b.city, b.state].filter(Boolean).join(", ") }}</p>
 					</div>
 					<p v-if="b.status === 'inactive'" class="p-muted p-small">Waiting for Mealgro to approve it before it can take orders.</p>
 					<p v-if="b.menu_copy === 'copying'" class="p-muted p-small" role="status">Copying your menu… prices are being converted to this branch's currency. We'll tell you when it's done.</p>
@@ -226,7 +226,7 @@ const tone = (s: Branch["status"]) =>
 					</small>
 				</label>
 				<label class="p-field"><span>Street address</span>
-					<input v-model="form.address" class="p-input" placeholder="12 Example Street" />
+					<input v-model="form.address" class="p-input" maxlength="200" placeholder="12 Example Street" />
 				</label>
 				<label class="p-field"><span>Branch name</span>
 					<input v-model="form.label" class="p-input" maxlength="40" required />
@@ -273,13 +273,11 @@ const tone = (s: Branch["status"]) =>
 .branch.here {
 	border: 2px solid var(--brand);
 }
-.branch-top {
-	align-items: flex-start;
-	flex-wrap: wrap;
-}
 .branch-name {
 	min-width: 0;
-	flex: 1 1 160px;
+}
+.branch-name h3 {
+	overflow-wrap: anywhere;
 }
 .branch-actions {
 	margin-top: auto;

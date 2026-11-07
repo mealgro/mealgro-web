@@ -5,9 +5,14 @@ import { session } from "../../lib/portal/session";
 import { toasts } from "../../lib/portal/toast";
 import type { Capability } from "../../lib/portal/types";
 
-defineProps<{ title: string }>();
+const props = defineProps<{
+	title: string;
+	/** What the page needs: a person without it sees "no access", not the page. */
+	need?: Capability;
+}>();
 
 const ready = ref(false);
+const bootError = ref("");
 
 type Item = RailItem & { need?: Capability };
 const items: Item[] = [
@@ -22,12 +27,22 @@ const items: Item[] = [
 const visible = computed(() => items.filter((i) => !i.need || session.can(i.need)));
 const active = (href: string, path: string) => (href === "/account" ? path === href : path.startsWith(href));
 
+const denied = computed(() => ready.value && !!props.need && !session.can(props.need));
+
 const user = session.user;
 const store = session.store;
 const stores = session.stores;
 
+const reload = () => location.reload();
+const BOOT_MS = 15_000;
 onMounted(async () => {
-	if (!(await session.restore())) {
+	const slow = new Promise<"slow">((r) => setTimeout(() => r("slow"), BOOT_MS));
+	const signedIn = await Promise.race([session.restore(), slow]);
+	if (signedIn === "slow") {
+		bootError.value = "Mealgro is taking too long to answer. Check your connection and try again.";
+		return;
+	}
+	if (!signedIn) {
 		location.replace("/account/login");
 		return;
 	}
@@ -46,6 +61,9 @@ onMounted(async () => {
 		:user-sub="store?.display_name"
 		:toasts="toasts"
 		:loading="!ready"
+		:boot-error="bootError"
+		:denied="denied"
+		@retry="reload"
 		@sign-out="session.signOut()"
 	>
 		<template #rail>

@@ -5,7 +5,7 @@ import PortalShell from "../../../components/portal/PortalShell.vue";
 import TableState from "../../../components/portal/TableState.vue";
 import { branches as branchApi, staff as api } from "../../../lib/portal/api";
 import { confirmAction } from "../../../lib/portal/confirm";
-import { describe, titleCase } from "../../../lib/portal/format";
+import { describe, phone, titleCase } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
 import { toast } from "../../../lib/portal/toast";
 import type { Branch, CapabilityCatalogue, StaffPerson, StaffPlace } from "../../../lib/portal/types";
@@ -20,15 +20,21 @@ const filter = ref("");
 async function load() {
 	error.value = "";
 	try {
-		[people.value, catalogue.value] = await Promise.all([api.people(), api.catalogue()]);
-		branches.value = (await branchApi.list()).branches;
+		// Three independent reads, together.
+		const [p, c, b] = await Promise.all([api.people(), api.catalogue(), branchApi.list()]);
+		people.value = p;
+		catalogue.value = c;
+		branches.value = b.branches;
 	} catch (e) {
 		error.value = describe(e);
 	} finally {
 		loading.value = false;
 	}
 }
-onMounted(load);
+onMounted(() => {
+	if (session.can("manage-staff")) load();
+	else loading.value = false;
+});
 
 const several = computed(() => branches.value.length > 1);
 // Invites can name only branches where you manage staff.
@@ -43,6 +49,10 @@ const shown = computed(() =>
 
 // Owners hold everything and are never edited here.
 const presets = computed(() => catalogue.value?.roles.filter((r) => r.slug !== "owner") ?? []);
+/** A new invite starts with the least access; more is a choice. */
+const leastAccess = computed(() =>
+	[...presets.value].sort((a, b) => a.capabilities.length - b.capabilities.length)[0],
+);
 
 type Form = {
 	by: "username" | "phone" | "email";
@@ -58,7 +68,7 @@ const busy = ref(false);
 const formError = ref("");
 
 function openInvite() {
-	const first = presets.value[0];
+	const first = leastAccess.value;
 	const here = session.store.value?.id;
 	form.value = {
 		by: "email",
@@ -132,7 +142,11 @@ async function remove(person: StaffPerson, place: StaffPlace) {
 	const where = several.value ? ` from ${place.display_name}` : "";
 	const ok = await confirmAction({
 		title: person.pending ? `Cancel the invite for ${name}${where}?` : `Remove ${name}${where}?`,
+		message: person.pending
+			? "They can't join with this invite any more."
+			: `Their access${where ? ` to ${place.display_name}` : ""} ends now and they are signed out of ${where ? place.display_name : "this business"}.`,
 		confirmText: person.pending ? "Cancel invite" : "Remove",
+		cancelText: person.pending ? "Keep invite" : "Keep access",
 		destructive: true,
 	});
 	if (!ok) return;
@@ -147,8 +161,19 @@ async function remove(person: StaffPerson, place: StaffPlace) {
 }
 
 const label = (p: StaffPerson) =>
-	p.name || p.username || p.email || p.phone || (p.pending ? "Invited person" : "Team member");
-const contact = (p: StaffPerson) => (p.username ? `@${p.username}` : p.email || p.phone || "");
+	p.name ||
+	p.email ||
+	phone(p.phone) ||
+	(p.username && !generated(p.username) ? p.username : "") ||
+	(p.pending ? "Invited person" : "Team member");
+/** A generated username ("alice_okafor_01a1b0b1") says nothing to a person. */
+const generated = (u: string) => /_[0-9a-f]{8}$/.test(u);
+const contact = (p: StaffPerson) => {
+	const line = [p.email, phone(p.phone), p.username && !generated(p.username) ? `@${p.username}` : ""]
+		.filter(Boolean)
+		.find((c) => c !== label(p));
+	return line ?? "";
+};
 const isYou = (p: StaffPerson) => !!p.user && p.user === session.user.value?.id;
 const roleLabel = (place: StaffPlace) =>
 	catalogue.value?.roles.find((r) => r.slug === place.role)?.display_name ?? titleCase(place.role);
@@ -156,7 +181,7 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 </script>
 
 <template>
-	<PortalShell title="Staff">
+	<PortalShell title="Staff" need="manage-staff">
 		<template #actions>
 			<select v-if="several" v-model="filter" class="p-input p-input--auto" aria-label="Show branch">
 				<option value="">All branches</option>
@@ -220,6 +245,7 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 							class="p-input"
 							:type="form.by === 'email' ? 'email' : form.by === 'phone' ? 'tel' : 'text'"
 							:placeholder="placeholder[form.by]"
+							:maxlength="form.by === 'email' ? 254 : form.by === 'phone' ? 20 : 40"
 							required
 						/>
 						<small v-if="form.by === 'email'">

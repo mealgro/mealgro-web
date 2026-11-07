@@ -68,7 +68,14 @@ function endSession() {
 
 setSignedOutHandler(() => {
 	endSession();
-	if (!location.pathname.startsWith("/account/login")) location.assign("/account/login");
+	if (location.pathname.startsWith("/account/login")) return;
+	try {
+		// The sign-in page says why they are back there, once.
+		sessionStorage.setItem("mg.portal.ended", "1");
+	} catch {
+		// Storage blocked: they just land on sign-in.
+	}
+	location.assign("/account/login");
 });
 
 export const session = {

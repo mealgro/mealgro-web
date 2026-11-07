@@ -73,7 +73,7 @@ async function addAndContinue() {
 			<label class="p-field">
 				<span>Billing email for {{ session.store.value?.display_name }}</span>
 				<div class="email-row">
-					<input v-model="email" class="p-input" type="email" placeholder="billing@yourbusiness.com" required @change="check" />
+					<input v-model="email" class="p-input" type="email" maxlength="254" placeholder="billing@yourbusiness.com" required @change="check" />
 					<button class="p-btn" :disabled="checking || !email.trim()">{{ checking ? "Checking…" : "Check" }}</button>
 				</div>
 			</label>

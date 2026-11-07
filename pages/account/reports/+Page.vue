@@ -5,7 +5,7 @@ import PortalShell from "../../../components/portal/PortalShell.vue";
 import StatTile from "../../../components/portal/StatTile.vue";
 import StateBlock from "../../../components/portal/StateBlock.vue";
 import { reports, type ReportQuery } from "../../../lib/portal/api";
-import { describe } from "../../../lib/portal/format";
+import { describe, formatMoney } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
 import { toast } from "../../../lib/portal/toast";
 import type { Report } from "../../../lib/portal/types";
@@ -25,15 +25,30 @@ const loading = ref(false);
 const error = ref("");
 const exporting = ref<"" | "csv" | "xlsx">("");
 
+/** The range as a sentence in the one date format (9 Oct 2026). */
+const dayOnly = (s: string) =>
+	new Date(`${s}T12:00:00`).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+/** A range that can't be asked for says why, instead of quietly showing ₦0. */
+const rangeError = computed(() => {
+	if (!q.value.from || !q.value.to) return "Choose both a start and an end date.";
+	if (q.value.from > q.value.to) return "The start date is after the end date.";
+	return "";
+});
+const rangeText = computed(() => (rangeError.value ? "" : `${dayOnly(q.value.from)} to ${dayOnly(q.value.to)}`));
+
+let seq = 0;
 async function load() {
+	if (rangeError.value || !session.can("view-finances")) return;
+	const mine = ++seq;
 	loading.value = true;
 	error.value = "";
 	try {
-		report.value = await reports.get(q.value);
+		const r = await reports.get(q.value);
+		if (mine === seq) report.value = r;
 	} catch (e) {
-		error.value = describe(e);
+		if (mine === seq) error.value = describe(e);
 	} finally {
-		loading.value = false;
+		if (mine === seq) loading.value = false;
 	}
 }
 // The session loads with the page shell; a business with several branches
@@ -59,13 +74,13 @@ async function download(format: "csv" | "xlsx") {
 		a.click();
 		setTimeout(() => URL.revokeObjectURL(url), 1000);
 	} catch (e) {
-		toast(describe(e), "bad");
+		toast(describe(e), "bad", () => download(format));
 	} finally {
 		exporting.value = "";
 	}
 }
 
-const money = (n: number) => `${report.value?.symbol ?? ""}${n.toLocaleString("en-NG")}`;
+const money = (n: number) => formatMoney(n, report.value?.symbol ?? "");
 const peak = computed(() => Math.max(1, ...(report.value?.series ?? []).map((p) => p.gross_sales)));
 const periodLabel = (iso: string) =>
 	new Date(iso).toLocaleDateString("en-NG", {
@@ -76,7 +91,7 @@ const periodLabel = (iso: string) =>
 </script>
 
 <template>
-	<PortalShell title="Reports">
+	<PortalShell title="Reports" need="view-finances">
 		<template #actions>
 			<button class="p-btn" :disabled="!!exporting" @click="download('csv')">{{ exporting === "csv" ? "Exporting…" : "Export CSV" }}</button>
 			<button class="p-btn" :disabled="!!exporting" @click="download('xlsx')">{{ exporting === "xlsx" ? "Exporting…" : "Export Excel" }}</button>
@@ -87,8 +102,8 @@ const periodLabel = (iso: string) =>
 				<button :aria-pressed="q.scope === 'brand'" @click="q.scope = 'brand'">All branches</button>
 				<button :aria-pressed="q.scope === 'branch'" @click="q.scope = 'branch'">{{ session.store.value?.branch_label || "This branch" }}</button>
 			</div>
-			<label class="p-field"><span>From</span><input v-model="q.from" class="p-input" type="date" :max="q.to" /></label>
-			<label class="p-field"><span>To</span><input v-model="q.to" class="p-input" type="date" :min="q.from" /></label>
+			<label class="p-field"><span>From</span><input v-model="q.from" class="p-input" type="date" :max="q.to" lang="en-NG" /></label>
+			<label class="p-field"><span>To</span><input v-model="q.to" class="p-input" type="date" :min="q.from" lang="en-NG" /></label>
 			<label class="p-field"><span>Group by</span>
 				<select v-model="q.group" class="p-input">
 					<option value="day">Day</option><option value="week">Week</option><option value="month">Month</option>
@@ -96,7 +111,8 @@ const periodLabel = (iso: string) =>
 			</label>
 		</section>
 
-		<StateBlock v-if="error || (loading && !report)" class="card-box" :loading="!error" :error="error" :lines="4" @retry="load" />
+		<p v-if="rangeError" class="p-alert p-alert--warn" role="alert">{{ rangeError }}</p>
+		<StateBlock v-else-if="error || (loading && !report)" class="card-box" :loading="!error" :error="error" :lines="4" @retry="load" />
 		<template v-else-if="report">
 			<p v-if="report.scope === 'brand' && report.branches.length < session.stores.value.length" class="p-alert p-alert--warn">
 				This total covers {{ report.branches.length }} of your {{ session.stores.value.length }} branches — the ones where you can see finances.
@@ -109,7 +125,7 @@ const periodLabel = (iso: string) =>
 					shape="ci"
 					color="var(--cat-2)"
 					:title="money(report.totals.gross_sales)"
-					:lead="`${q.from} to ${q.to}`"
+					:lead="rangeText"
 				/>
 				<div class="stats-tiles">
 					<StatTile :order="1" :tone="1" shape="sq" label="Your earnings" :value="money(report.totals.earnings)" />
@@ -140,7 +156,7 @@ const periodLabel = (iso: string) =>
 
 			<div class="two-col">
 				<section class="card-box arrive" style="--i: 6" aria-labelledby="rp-sales">
-					<h3 id="rp-sales" class="chart-h"><span class="sh sh-sq" style="--c: var(--cat-1)" />Sales over time</h3>
+					<h3 id="rp-sales" class="chart-h"><span class="sh sh-ci" style="--c: var(--cat-2)" />Gross sales over time</h3>
 					<StateBlock :empty="!report.series.length" empty-text="No sales in this period.">
 						<ul class="bars" role="list">
 							<li v-for="p in report.series" :key="p.period">
@@ -232,7 +248,7 @@ const periodLabel = (iso: string) =>
 .bar span {
 	display: block;
 	height: 100%;
-	background: var(--cat-1);
+	background: var(--cat-2);
 	border-radius: 9999px;
 }
 .amt {

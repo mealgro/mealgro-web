@@ -41,6 +41,10 @@ async function load() {
 	}
 }
 onMounted(async () => {
+	if (!session.can("manage-store")) {
+		loading.value = false;
+		return;
+	}
 	// Paystack sends the vendor back here with the payment's reference.
 	const params = new URLSearchParams(location.search);
 	const reference = params.get("reference") ?? params.get("trxref");
@@ -73,14 +77,29 @@ async function confirmPayment() {
 }
 
 async function choose(p: PlanDetails) {
+	if (busy.value) return;
+	const cur = current.value;
+	const paidUntil = cur?.expires_at ? ` to ${day(cur.expires_at)}` : "";
 	if (p.amount) {
+		// A lower paid plan is a downgrade: say what it costs before the checkout.
+		if (cur && rank[p.plan] < rank[cur.plan]) {
+			const ok = await confirmAction({
+				title: `Switch to ${p.title}?`,
+				message: `This is a downgrade. You lose ${currentTitle.value}'s benefits, and the time already paid for${paidUntil} isn't refunded.`,
+				confirmText: `Continue with ${p.title}`,
+				cancelText: "Keep my plan",
+				destructive: true,
+			});
+			if (!ok) return;
+		}
 		billing.value = p; // pays once the billing email is settled
 		return;
 	}
 	const ok = await confirmAction({
 		title: "Move to Starter?",
-		message: "You'll lose the paid plan's benefits when you confirm.",
+		message: `Starter starts now. You lose ${currentTitle.value}'s benefits straight away, and the time already paid for${paidUntil} is forfeited, with no refund.`,
 		confirmText: "Move to Starter",
+		cancelText: "Keep my plan",
 		destructive: true,
 	});
 	if (!ok) return;
@@ -88,6 +107,7 @@ async function choose(p: PlanDetails) {
 }
 
 async function change(p: PlanDetails, billingEmail?: string) {
+	if (busy.value) return;
 	billing.value = null;
 	busy.value = true;
 	try {
@@ -105,16 +125,18 @@ async function change(p: PlanDetails, billingEmail?: string) {
 }
 
 async function updateCard() {
+	if (busy.value) return;
 	// Opened before the request so the browser treats it as the click's window.
+	// A blocked pop-up (no window) is not "no card": the page itself goes there.
 	const tab = window.open("", "_blank");
 	busy.value = true;
 	try {
 		const res = await api.cardLink();
-		if (res && tab) tab.location.href = res.link;
-		else {
+		if (!res) {
 			tab?.close();
 			toast("No card renews this plan. Pay for it with a card instead.", "bad");
-		}
+		} else if (tab) tab.location.href = res.link;
+		else location.assign(res.link);
 	} catch (e) {
 		tab?.close();
 		toast(describe(e), "bad");
@@ -124,7 +146,7 @@ async function updateCard() {
 }
 
 async function stopRenewal() {
-	if (!current.value) return;
+	if (!current.value || busy.value) return;
 	const ok = await confirmAction({
 		title: "Stop renewing?",
 		message: `${currentTitle.value} stays active until ${day(current.value.expires_at)}, then this branch moves to Starter.`,
@@ -158,7 +180,7 @@ const PLAN_COLORS = ["var(--cat-1)", "var(--cat-2)", "var(--cat-3)"];
 </script>
 
 <template>
-	<PortalShell title="Subscription">
+	<PortalShell title="Subscription" need="manage-store">
 		<div v-if="confirming" class="p-alert p-alert--warn" role="status">
 			<template v-if="pending">
 				Your bank is still processing the payment. This usually takes a moment.
