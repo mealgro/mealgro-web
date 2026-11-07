@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import AuthLayout from "../../../components/portal/AuthLayout.vue";
+import HomeLink from "../../../components/portal/HomeLink.vue";
 import { describe } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
 
@@ -43,7 +44,7 @@ async function submit() {
 
 <template>
 	<AuthLayout area="Vendor portal" headline="Your store, at a glance." tagline="Orders, branches, staff and reports in one place, on your phone or your desk.">
-		<template #top><a class="link" href="/">mealgro.com</a></template>
+		<template #top><HomeLink /></template>
 		<form class="p-stack" @submit.prevent="submit">
 			<div>
 				<h1>Sign in to your store</h1>
