@@ -2,7 +2,9 @@
 import { onMounted, ref } from "vue";
 import OrderDetail from "../../components/portal/OrderDetail.vue";
 import OrdersTable from "../../components/portal/OrdersTable.vue";
+import HeroPanel from "../../components/portal/HeroPanel.vue";
 import PortalShell from "../../components/portal/PortalShell.vue";
+import StatTile from "../../components/portal/StatTile.vue";
 import { orders, store as storeApi, subscription } from "../../lib/portal/api";
 import { day, describe, titleCase } from "../../lib/portal/format";
 import { session } from "../../lib/portal/session";
@@ -17,9 +19,11 @@ const sub = ref<Subscription | null>(null);
 const planTitles = ref<Record<string, string>>({});
 const open = ref<Order | null>(null);
 const error = ref("");
+const loading = ref(true);
 const toggling = ref(false);
 
 async function load() {
+	error.value = "";
 	const jobs: Promise<void>[] = [];
 	if (session.can("view-store"))
 		jobs.push(storeApi.details().then((d) => void (details.value = d)));
@@ -39,6 +43,7 @@ async function load() {
 	const results = await Promise.allSettled(jobs);
 	const failed = results.find((r) => r.status === "rejected") as PromiseRejectedResult | undefined;
 	if (failed) error.value = describe(failed.reason);
+	loading.value = false;
 }
 onMounted(load);
 
@@ -57,66 +62,67 @@ async function setOnline(value: boolean) {
 </script>
 
 <template>
-	<PortalShell :title="store?.display_name ?? 'Overview'">
-		<div v-if="store && store.status !== 'active'" class="p-alert p-mb" role="alert">
+	<PortalShell title="Overview">
+		<div v-if="store && store.status !== 'active'" class="p-alert" role="alert">
 			Your store is {{ store.status }}, so some actions are unavailable. Contact Mealgro support if you think this is a mistake.
 		</div>
-		<div v-if="error" class="p-alert p-alert--warn p-mb">{{ error }}</div>
+		<div v-if="error" class="p-alert p-alert--warn" role="alert">
+			{{ error }}
+			<button class="p-btn p-btn--sm" type="button" @click="load">Retry</button>
+		</div>
 
-		<div class="p-stack">
-			<section v-if="details" class="p-hero arrive" aria-labelledby="st-h">
-				<div>
-					<span class="p-hero-h"><span class="sh sh-ci" :style="{ '--c': details.is_online ? 'var(--cat-4)' : 'var(--cat-2)' }" />Store status</span>
-					<h2 id="st-h">{{ details.is_online ? "Online — taking orders" : "Offline" }}</h2>
-					<p class="p-muted">{{ details.is_open ? "Within business hours" : "Outside business hours" }}</p>
-				</div>
-				<button
-					v-if="session.can('manage-store') && store?.status === 'active'"
-					class="p-btn"
-					:class="{ 'p-btn--primary': !details.is_online }"
-					:disabled="toggling"
-					@click="setOnline(!details.is_online)"
-				>
-					{{ details.is_online ? "Go offline" : "Go online" }}
-				</button>
-			</section>
+		<h2 class="ov-name disp arrive">{{ store?.display_name ?? "Your store" }}</h2>
 
-			<div class="p-grid tiles">
-				<template v-if="overview">
-					<section class="p-tile tone-1 arrive" style="--i: 1" aria-label="Orders">
-						<span class="p-tile-h"><span class="sh sh-sq" />Orders</span>
-						<strong>{{ overview.total_orders.toLocaleString() }}</strong>
-					</section>
-					<section class="p-tile tone-4 arrive" style="--i: 2" aria-label="Customers">
-						<span class="p-tile-h"><span class="sh sh-di" />Customers</span>
-						<strong>{{ overview.total_customers.toLocaleString() }}</strong>
-					</section>
-					<section class="p-tile p-card arrive" style="--i: 3" aria-label="Cancellations">
-						<span class="p-tile-h"><span class="sh sh-tr" :style="{ '--c': 'var(--bad)' }" />Cancellations</span>
-						<strong>{{ overview.total_cancellation.toLocaleString() }}</strong>
-					</section>
+		<div class="ov-grid">
+			<HeroPanel
+				v-if="details"
+				class="ov-hero"
+				eyebrow="Store status"
+				shape="ci"
+				:color="details.is_online ? 'var(--cat-4)' : 'var(--cat-2)'"
+				:title="details.is_online ? 'Online — taking orders' : 'Offline'"
+				:lead="details.is_open ? 'Within business hours' : 'Outside business hours'"
+			>
+				<template v-if="session.can('manage-store') && store?.status === 'active'" #aside>
+					<button class="p-btn" :class="{ 'p-btn--primary': !details.is_online }" :disabled="toggling" @click="setOnline(!details.is_online)">
+						{{ details.is_online ? "Go offline" : "Go online" }}
+					</button>
 				</template>
-				<section v-if="sub" class="p-tile tone-2 arrive" style="--i: 4" aria-label="Plan">
-					<span class="p-tile-h"><span class="sh sh-cd" />Plan</span>
-					<strong>{{ planTitles[sub.plan] ?? titleCase(sub.plan) }}</strong>
-					<small>
-						<template v-if="sub.status === 'paused'">Payment due</template>
-						<template v-else-if="sub.plan !== 'starter'">{{ sub.renews ? "Renews" : "Ends" }} {{ day(sub.expires_at) }}</template>
-						<template v-else>Free plan</template>
-						· <a href="/account/subscription">Manage</a>
-					</small>
-				</section>
+			</HeroPanel>
+			<div v-else-if="loading" class="p-skeleton p-skeleton--block ov-hero" aria-hidden="true" />
+
+			<div class="ov-tiles">
+				<template v-if="overview">
+					<StatTile :order="1" :tone="1" shape="sq" label="Orders" :value="overview.total_orders.toLocaleString()" />
+					<StatTile :order="2" :tone="2" shape="ci" label="Customers" :value="overview.total_customers.toLocaleString()" />
+					<StatTile :order="3" :tone="5" shape="tr" label="Cancellations" :value="overview.total_cancellation.toLocaleString()" />
+				</template>
+				<template v-else-if="loading && session.can('view-orders')">
+					<div v-for="i in 3" :key="i" class="p-skeleton p-skeleton--block" aria-hidden="true" />
+				</template>
+				<StatTile
+					v-if="sub"
+					:order="4"
+					:tone="3"
+					shape="cd"
+					label="Plan"
+					:value="planTitles[sub.plan] ?? titleCase(sub.plan)"
+					:sub="sub.status === 'paused' ? 'Payment due' : sub.plan !== 'starter' ? `${sub.renews ? 'Renews' : 'Ends'} ${day(sub.expires_at)}` : 'Free plan'"
+				>
+					<a class="manage" href="/account/subscription">Manage plan →</a>
+				</StatTile>
 			</div>
 		</div>
 
-		<section v-if="session.can('view-orders')" class="p-mt arrive" style="--i: 5">
-			<div class="p-row p-between p-mb-sm">
-				<h2>Recent orders</h2>
-				<a href="/account/orders">View all</a>
+		<section v-if="session.can('view-orders')" class="card-box card-box--flush arrive" style="--i: 5" aria-labelledby="ov-recent">
+			<div class="card-h ov-recent-h">
+				<div>
+					<h3 id="ov-recent">Recent orders</h3>
+					<p>The latest orders on this branch</p>
+				</div>
+				<a class="link" href="/account/orders">View all</a>
 			</div>
-			<div class="p-card p-card--flush">
-				<OrdersTable :orders="recent" empty="No orders yet." @open="open = $event" />
-			</div>
+			<OrdersTable :orders="recent" :loading="loading" empty="No orders yet." @open="open = $event" />
 		</section>
 
 		<OrderDetail v-if="open" :order="open" @close="open = null" @changed="load" />
@@ -124,18 +130,48 @@ async function setOnline(value: boolean) {
 </template>
 
 <style scoped>
-.tiles {
-	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
-.p-tile strong {
+.ov-name {
+	font-size: clamp(32px, 5vw, 48px);
+	line-height: 1;
+	letter-spacing: -0.04em;
 	overflow-wrap: anywhere;
 }
-.tiles > :last-child:nth-child(odd) {
-	grid-column: 1 / -1;
+.ov-grid {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: minmax(0, 1fr);
 }
-.p-tile.tone-2 small a {
-	color: inherit;
+.ov-tiles {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ov-hero {
+	min-height: 144px;
+}
+.manage {
 	font-weight: 700;
-	text-decoration: underline;
+	font-size: 13px;
+	text-underline-offset: 3px;
+	margin-top: 2px;
+}
+.ov-recent-h {
+	padding: 24px 24px 12px;
+}
+@media (min-width: 1280px) {
+	.ov-grid {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+	.ov-hero {
+		grid-column: span 2;
+	}
+	.ov-tiles {
+		grid-column: span 3;
+	}
+}
+@media (max-width: 559px) {
+	.ov-tiles {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
 </style>

@@ -52,16 +52,17 @@ onBeforeUnmount(() => clearInterval(timer));
 			</div>
 		</template>
 
-		<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
-		<div class="p-card p-card--flush">
-			<p v-if="loading" class="p-muted p-pad">Loading orders…</p>
+		<div v-if="error && list.length" class="p-alert" role="alert">{{ error }}</div>
+		<section class="card-box card-box--flush arrive" :aria-label="tab === 'live' ? 'Recent orders' : 'Order history'">
 			<OrdersTable
-				v-else
 				:orders="list"
+				:loading="loading"
+				:error="error"
 				:empty="tab === 'live' ? 'No recent orders yet.' : 'No orders in this month.'"
 				@open="open = $event"
+				@retry="load()"
 			/>
-		</div>
+		</section>
 
 		<OrderDetail v-if="open" :order="open" @close="open = null" @changed="load(true)" />
 	</PortalShell>

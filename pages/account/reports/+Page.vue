@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import HeroPanel from "../../../components/portal/HeroPanel.vue";
 import PortalShell from "../../../components/portal/PortalShell.vue";
+import StatTile from "../../../components/portal/StatTile.vue";
+import StateBlock from "../../../components/portal/StateBlock.vue";
 import { reports, type ReportQuery } from "../../../lib/portal/api";
 import { describe } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
@@ -79,7 +82,7 @@ const periodLabel = (iso: string) =>
 			<button class="p-btn" :disabled="!!exporting" @click="download('xlsx')">{{ exporting === "xlsx" ? "Exporting…" : "Export Excel" }}</button>
 		</template>
 
-		<div class="p-card filters">
+		<section class="card-box filters arrive" aria-label="Report period">
 			<div v-if="several" class="p-tabs" role="group" aria-label="Report scope">
 				<button :aria-pressed="q.scope === 'brand'" @click="q.scope = 'brand'">All branches</button>
 				<button :aria-pressed="q.scope === 'branch'" @click="q.scope = 'branch'">{{ session.store.value?.branch_label || "This branch" }}</button>
@@ -91,75 +94,77 @@ const periodLabel = (iso: string) =>
 					<option value="day">Day</option><option value="week">Week</option><option value="month">Month</option>
 				</select>
 			</label>
-		</div>
+		</section>
 
-		<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
-		<p v-else-if="loading && !report" class="p-muted">Loading…</p>
+		<StateBlock v-if="error || (loading && !report)" class="card-box" :loading="!error" :error="error" :lines="4" @retry="load" />
 		<template v-else-if="report">
 			<p v-if="report.scope === 'brand' && report.branches.length < session.stores.value.length" class="p-alert p-alert--warn">
 				This total covers {{ report.branches.length }} of your {{ session.stores.value.length }} branches — the ones where you can see finances.
 			</p>
-			<div class="p-grid stats">
-				<section class="p-tile p-hero-tile arrive" style="--i: 0" aria-label="Gross sales">
-					<span class="p-tile-h"><span class="sh sh-ci" :style="{ '--c': 'var(--cat-2)' }" />Gross sales</span>
-					<strong>{{ money(report.totals.gross_sales) }}</strong>
-				</section>
-				<section class="p-tile tone-1 arrive" style="--i: 1" aria-label="Your earnings">
-					<span class="p-tile-h"><span class="sh sh-sq" />Your earnings</span>
-					<strong>{{ money(report.totals.earnings) }}</strong>
-				</section>
-				<section class="p-tile tone-4 arrive" style="--i: 2" aria-label="Completed orders">
-					<span class="p-tile-h"><span class="sh sh-di" />Completed</span>
-					<strong>{{ report.totals.completed.toLocaleString() }}</strong>
-					<small>of {{ report.totals.orders.toLocaleString() }} orders</small>
-				</section>
-				<section class="p-tile tone-2 arrive" style="--i: 3" aria-label="Average order">
-					<span class="p-tile-h"><span class="sh sh-cd" />Average order</span>
-					<strong>{{ money(report.totals.average_order) }}</strong>
-				</section>
-				<section class="p-tile p-card arrive" style="--i: 4" aria-label="Cancelled or rejected">
-					<span class="p-tile-h"><span class="sh sh-tr" :style="{ '--c': 'var(--bad)' }" />Cancelled or rejected</span>
-					<strong>{{ report.totals.cancelled.toLocaleString() }}</strong>
-				</section>
+			<div class="stats">
+				<HeroPanel
+					class="stats-hero"
+					numeric
+					eyebrow="Gross sales"
+					shape="ci"
+					color="var(--cat-2)"
+					:title="money(report.totals.gross_sales)"
+					:lead="`${q.from} to ${q.to}`"
+				/>
+				<div class="stats-tiles">
+					<StatTile :order="1" :tone="1" shape="sq" label="Your earnings" :value="money(report.totals.earnings)" />
+					<StatTile :order="2" :tone="4" shape="di" label="Completed" :value="report.totals.completed.toLocaleString()" :sub="`of ${report.totals.orders.toLocaleString()} orders`" />
+					<StatTile :order="3" :tone="3" shape="cd" label="Average order" :value="money(report.totals.average_order)" />
+					<StatTile :order="4" :tone="5" shape="tr" label="Cancelled or rejected" :value="report.totals.cancelled.toLocaleString()" />
+				</div>
 			</div>
 
-			<section v-if="report.scope === 'brand' && report.branches.length > 1" class="p-card block">
-				<h2>By branch</h2>
+			<section v-if="report.scope === 'brand' && report.branches.length > 1" class="card-box card-box--flush arrive" style="--i: 5" aria-labelledby="rp-branch">
+				<div class="card-h pad"><h3 id="rp-branch">By branch</h3></div>
 				<div class="p-scroll">
 					<table class="p-table">
-						<thead><tr><th>Branch</th><th>Orders</th><th>Completed</th><th>Cancelled</th><th>Gross sales</th><th>Earnings</th></tr></thead>
+						<thead><tr><th>Branch</th><th class="num">Orders</th><th class="num">Completed</th><th class="num">Cancelled</th><th class="num">Gross sales</th><th class="num">Earnings</th></tr></thead>
 						<tbody>
 							<tr v-for="b in report.branches" :key="b.store">
-								<td><strong>{{ b.display_name }}</strong></td>
-								<td>{{ b.totals.orders }}</td><td>{{ b.totals.completed }}</td><td>{{ b.totals.cancelled }}</td>
-								<td>{{ money(b.totals.gross_sales) }}</td><td>{{ money(b.totals.earnings) }}</td>
+								<td data-primary><strong>{{ b.display_name }}</strong></td>
+								<td class="num" data-label="Orders">{{ b.totals.orders }}</td>
+								<td class="num" data-label="Completed">{{ b.totals.completed }}</td>
+								<td class="num" data-label="Cancelled">{{ b.totals.cancelled }}</td>
+								<td class="num" data-label="Gross sales">{{ money(b.totals.gross_sales) }}</td>
+								<td class="num" data-label="Earnings">{{ money(b.totals.earnings) }}</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 			</section>
 
-			<div class="p-grid two-col">
-				<section class="p-card block">
-					<h2>Sales over time</h2>
-					<p v-if="!report.series.length" class="p-muted">No sales in this period.</p>
-					<ul v-else class="bars" role="list">
-						<li v-for="p in report.series" :key="p.period">
-							<span class="when">{{ periodLabel(p.period) }}</span>
-							<span class="bar" :aria-label="money(p.gross_sales)"><span class="grow-x" :style="{ width: `${(p.gross_sales / peak) * 100}%` }" /></span>
-							<span class="amt">{{ money(p.gross_sales) }}</span>
-						</li>
-					</ul>
+			<div class="two-col">
+				<section class="card-box arrive" style="--i: 6" aria-labelledby="rp-sales">
+					<h3 id="rp-sales" class="chart-h"><span class="sh sh-sq" style="--c: var(--cat-1)" />Sales over time</h3>
+					<StateBlock :empty="!report.series.length" empty-text="No sales in this period.">
+						<ul class="bars" role="list">
+							<li v-for="p in report.series" :key="p.period">
+								<span class="when">{{ periodLabel(p.period) }}</span>
+								<span class="bar" :aria-label="money(p.gross_sales)"><span class="grow-x" :style="{ width: `${(p.gross_sales / peak) * 100}%` }" /></span>
+								<span class="amt">{{ money(p.gross_sales) }}</span>
+							</li>
+						</ul>
+					</StateBlock>
 				</section>
-				<section class="p-card block">
-					<h2>Top items</h2>
-					<p v-if="!report.top_items.length" class="p-muted">Nothing sold in this period.</p>
-					<table v-else class="p-table">
-						<thead><tr><th>Item</th><th>Sold</th><th>Sales</th></tr></thead>
-						<tbody>
-							<tr v-for="i in report.top_items" :key="i.name"><td>{{ i.name }}</td><td>{{ i.quantity }}</td><td>{{ money(i.sales) }}</td></tr>
-						</tbody>
-					</table>
+				<section class="card-box card-box--flush arrive" style="--i: 7" aria-labelledby="rp-items">
+					<div class="card-h pad"><h3 id="rp-items">Top items</h3></div>
+					<StateBlock :empty="!report.top_items.length" empty-text="Nothing sold in this period.">
+						<table class="p-table">
+							<thead><tr><th>Item</th><th class="num">Sold</th><th class="num">Sales</th></tr></thead>
+							<tbody>
+								<tr v-for="i in report.top_items" :key="i.name">
+									<td data-primary>{{ i.name }}</td>
+									<td class="num" data-label="Sold">{{ i.quantity }}</td>
+									<td class="num" data-label="Sales">{{ money(i.sales) }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</StateBlock>
 				</section>
 			</div>
 		</template>
@@ -172,62 +177,41 @@ const periodLabel = (iso: string) =>
 	flex-wrap: wrap;
 	align-items: flex-end;
 	gap: 14px;
-	margin-bottom: 16px;
 }
 .filters .p-field {
 	min-width: 140px;
+	flex: 1 1 140px;
+	max-width: 220px;
 }
 .stats {
-	grid-template-columns: repeat(6, minmax(0, 1fr));
-	margin: 14px 0;
+	display: grid;
+	gap: 20px;
+	grid-template-columns: minmax(0, 1fr);
 }
-.stats > .p-tile {
-	grid-column: span 2;
-	min-width: 0;
+.stats-tiles {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.stats > .p-tile:nth-child(-n + 2) {
-	grid-column: span 3;
-}
-.stats > .p-tile strong {
-	font-size: clamp(30px, 3.6vw, 48px);
-	overflow-wrap: anywhere;
-}
-@media (max-width: 720px) {
-	.stats {
-		grid-template-columns: 1fr;
-	}
-	.stats > .p-tile,
-	.stats > .p-tile:nth-child(-n + 2) {
-		grid-column: auto;
-	}
-}
-.p-hero-tile {
-	background: #17130f;
-	color: #ffffff;
-}
-:root[data-theme="dark"] .p-hero-tile {
-	background: var(--surface);
-	color: var(--ink);
-}
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) .p-hero-tile {
-		background: var(--surface);
-		color: var(--ink);
-	}
-}
-.block {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	margin-bottom: 14px;
+.pad {
+	padding: 24px 24px 12px;
 }
 .two-col {
-	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+	align-items: start;
+}
+.chart-h {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 16px;
 }
 .bars {
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 8px;
 }
 .bars li {
 	display: grid;
@@ -241,17 +225,36 @@ const periodLabel = (iso: string) =>
 }
 .bar {
 	height: 12px;
-	background: var(--line);
-	border-radius: 999px;
+	background: var(--bg);
+	border-radius: 9999px;
 	overflow: hidden;
 }
 .bar span {
 	display: block;
 	height: 100%;
-	background: var(--brand);
-	border-radius: 999px;
+	background: var(--cat-1);
+	border-radius: 9999px;
 }
 .amt {
 	font-variant-numeric: tabular-nums;
+}
+@media (min-width: 1280px) {
+	.stats {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+	.stats-hero {
+		grid-column: span 2;
+	}
+	.stats-tiles {
+		grid-column: span 3;
+	}
+}
+@media (max-width: 559px) {
+	.stats-tiles {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.filters .p-field {
+		max-width: none;
+	}
 }
 </style>

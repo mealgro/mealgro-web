@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import "../../../components/portal/portal.css";
+import AuthLayout from "../../../components/portal/AuthLayout.vue";
 import { describe } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
-import logoImage from "../../../assets/logo.svg";
 
 const phone = ref("");
 const password = ref("");
@@ -35,12 +34,9 @@ async function submit() {
 </script>
 
 <template>
-	<div class="portal wrap">
-		<form class="p-card box" @submit.prevent="submit">
-			<a href="/" class="p-brand">
-				<img :src="logoImage" alt="Mealgro" />
-				<small>Vendor portal</small>
-			</a>
+	<AuthLayout area="Vendor portal" headline="Your store, at a glance." tagline="Orders, branches, staff and reports in one place, on your phone or your desk.">
+		<template #top><a class="link" href="/">mealgro.com</a></template>
+		<form class="p-stack" @submit.prevent="submit">
 			<div>
 				<h1>Sign in to your store</h1>
 				<p class="p-muted">Use the phone number and password you use in the Mealgro app.</p>
@@ -54,31 +50,12 @@ async function submit() {
 				<span>Password</span>
 				<input v-model="password" class="p-input" type="password" autocomplete="current-password" required />
 			</label>
-			<button class="p-btn p-btn--primary" :disabled="busy || !phone || !password">
+			<button class="p-btn p-btn--primary p-btn--block" :disabled="busy || !phone || !password">
 				{{ busy ? "Signing in…" : "Sign in" }}
 			</button>
-			<p class="p-muted small">
+			<p class="p-muted p-small">
 				Signing in here doesn't sign you out of the app. Forgot your password? Reset it in the app.
 			</p>
 		</form>
-	</div>
+	</AuthLayout>
 </template>
-
-<style scoped>
-.wrap {
-	display: grid;
-	place-items: center;
-	padding: 24px 16px;
-}
-.box {
-	width: 100%;
-	max-width: 400px;
-	display: flex;
-	flex-direction: column;
-	gap: 22px;
-	padding: 36px 32px;
-}
-.small {
-	font-size: 12px;
-}
-</style>

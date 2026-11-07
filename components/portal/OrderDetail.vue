@@ -63,8 +63,8 @@ async function act(status: "accepted" | "rejected" | "ready" | "cancelled") {
 
 <template>
 	<Modal :title="`Order ${order.display_id}`" wide @close="emit('close')">
-		<div class="p-stack">
-			<div class="p-row p-between">
+		<div class="p-stack-sm">
+			<div class="p-row p-between p-wrap">
 				<span class="p-badge" :class="`p-badge--${statusTone(order.status)}`">{{ titleCase(order.status) }}</span>
 				<span class="p-muted">{{ dateTime(order.created_at) }}</span>
 			</div>
@@ -72,13 +72,13 @@ async function act(status: "accepted" | "rejected" | "ready" | "cancelled") {
 
 			<div class="p-grid cols">
 				<div>
-					<h2>Customer</h2>
-					<p>{{ order.contact.full_name }}</p>
+					<h3><span class="sh sh-ci" style="--c: var(--cat-2)" /> Customer</h3>
+					<p class="who">{{ order.contact.full_name }}</p>
 					<p class="p-muted">{{ order.contact.phone }}</p>
 				</div>
 				<div>
-					<h2>{{ order.delivery_fulfillment === "pickup" ? "Pickup" : "Delivery" }}</h2>
-					<p>{{ order.address }}</p>
+					<h3><span class="sh sh-sq" style="--c: var(--cat-1)" /> {{ order.delivery_fulfillment === "pickup" ? "Pickup" : "Delivery" }}</h3>
+					<p class="who">{{ order.address }}</p>
 					<p v-if="order.rider" class="p-muted">Rider: {{ order.rider.full_name }} · {{ order.rider.phone }}</p>
 				</div>
 			</div>
@@ -86,14 +86,14 @@ async function act(status: "accepted" | "rejected" | "ready" | "cancelled") {
 			<ul class="items">
 				<li v-for="it in order.items" :key="it.slug + it.name" class="p-row p-between">
 					<span>{{ it.quantity }} × {{ it.name }}</span>
-					<span>{{ money(it.price) }}</span>
+					<span class="amt">{{ money(it.price) }}</span>
 				</li>
 			</ul>
 			<div class="totals">
-				<div class="p-row p-between"><span class="p-muted">Subtotal</span><span>{{ money(order.sub_total) }}</span></div>
-				<div class="p-row p-between"><span class="p-muted">Delivery</span><span>{{ money(order.delivery_fee) }}</span></div>
-				<div class="p-row p-between"><span class="p-muted">Order total (excl. service charge)</span><strong>{{ money(order.total_amount) }}</strong></div>
-				<div class="p-row p-between"><span class="p-muted">Your earning</span><strong>{{ money(order.vendor_earning) }}</strong></div>
+				<div class="p-row p-between"><span class="p-muted">Subtotal</span><span class="amt">{{ money(order.sub_total) }}</span></div>
+				<div class="p-row p-between"><span class="p-muted">Delivery</span><span class="amt">{{ money(order.delivery_fee) }}</span></div>
+				<div class="p-row p-between"><span class="p-muted">Order total (excl. service charge)</span><strong class="amt">{{ money(order.total_amount) }}</strong></div>
+				<div class="p-row p-between earn"><span>Your earning</span><strong class="disp">{{ money(order.vendor_earning) }}</strong></div>
 			</div>
 			<p v-if="order.store_message">“{{ order.store_message }}”</p>
 			<p v-if="order.cancelled_reason" class="p-alert">Reason: {{ order.cancelled_reason }}</p>
@@ -142,18 +142,44 @@ async function act(status: "accepted" | "rejected" | "ready" | "cancelled") {
 .cols {
 	grid-template-columns: 1fr 1fr;
 }
+.cols h3 {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 15px;
+	margin-bottom: 4px;
+}
+.who {
+	font-weight: 600;
+}
 .items {
 	border-top: 1px solid var(--line);
 	border-bottom: 1px solid var(--line);
-	padding: 10px 0;
+	padding: 12px 0;
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 8px;
 }
 .totals {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 6px;
+	padding: 16px 18px;
+	border-radius: 1.25rem;
+	background: var(--bg);
+}
+.amt {
+	font-variant-numeric: tabular-nums;
+}
+.earn {
+	margin-top: 6px;
+	padding-top: 10px;
+	border-top: 1px solid var(--line);
+	font-weight: 700;
+}
+.earn strong {
+	font-size: 24px;
+	letter-spacing: -0.03em;
 }
 @media (max-width: 520px) {
 	.cols {

@@ -2,7 +2,9 @@
 import { computed, onMounted, ref } from "vue";
 import Modal from "../../../components/portal/Modal.vue";
 import PortalShell from "../../../components/portal/PortalShell.vue";
+import TableState from "../../../components/portal/TableState.vue";
 import { branches as branchApi, staff as api } from "../../../lib/portal/api";
+import { confirmAction } from "../../../lib/portal/confirm";
 import { describe, titleCase } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
 import { toast } from "../../../lib/portal/toast";
@@ -16,6 +18,7 @@ const error = ref("");
 const filter = ref("");
 
 async function load() {
+	error.value = "";
 	try {
 		[people.value, catalogue.value] = await Promise.all([api.people(), api.catalogue()]);
 		branches.value = (await branchApi.list()).branches;
@@ -127,7 +130,12 @@ async function submit() {
 async function remove(person: StaffPerson, place: StaffPlace) {
 	const name = label(person);
 	const where = several.value ? ` from ${place.display_name}` : "";
-	if (!confirm(person.pending ? `Cancel the invite for ${name}${where}?` : `Remove ${name}${where}?`)) return;
+	const ok = await confirmAction({
+		title: person.pending ? `Cancel the invite for ${name}${where}?` : `Remove ${name}${where}?`,
+		confirmText: person.pending ? "Cancel invite" : "Remove",
+		destructive: true,
+	});
+	if (!ok) return;
 	try {
 		if (place.invite) await api.cancelInvite(place.store, place.invite);
 		else if (person.user) await api.remove(place.store, person.user);
@@ -157,39 +165,39 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 			<button class="p-btn p-btn--primary" :disabled="!catalogue || !invitable.length" @click="openInvite">Invite staff</button>
 		</template>
 
-		<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
-		<p v-else-if="loading" class="p-muted">Loading…</p>
-		<div v-else class="p-card p-card--flush">
+		<section class="card-box card-box--flush arrive" aria-label="Your team">
 			<div class="p-scroll">
 				<table class="p-table">
 					<thead><tr><th>Person</th><th>{{ several ? "Works at" : "Role" }}</th></tr></thead>
 					<tbody>
-						<tr v-for="p in shown" :key="p.user ?? p.email ?? p.phone ?? label(p)">
-							<td class="who">
-								<strong>{{ label(p) }}</strong><span v-if="isYou(p)" class="p-muted"> (you)</span>
-								<p class="p-muted">{{ contact(p) }}</p>
-								<span v-if="p.pending" class="p-badge p-badge--warn">Invited</span>
-							</td>
-							<td>
-								<ul class="places">
-									<li v-for="place in p.branches" :key="place.store" class="place">
-										<div>
-											<strong v-if="several">{{ place.branch_label || place.display_name }}</strong>
-											<span class="p-badge" :class="place.role === 'owner' ? 'p-badge--brand' : ''">{{ roleLabel(place) }}</span>
-										</div>
-										<div v-if="place.role !== 'owner'" class="p-row actions">
-											<button v-if="!p.pending" class="p-btn p-btn--sm" @click="openEdit(p, place)">Edit</button>
-											<button class="p-btn p-btn--sm p-btn--danger" @click="remove(p, place)">{{ p.pending ? "Cancel" : "Remove" }}</button>
-										</div>
-									</li>
-								</ul>
-							</td>
-						</tr>
-						<tr v-if="!shown.length"><td colspan="2" class="p-muted">Nobody here yet.</td></tr>
+						<template v-if="!loading && !error && shown.length">
+							<tr v-for="p in shown" :key="p.user ?? p.email ?? p.phone ?? label(p)">
+								<td class="who" data-primary>
+									<strong>{{ label(p) }}</strong><span v-if="isYou(p)" class="p-muted"> (you)</span>
+									<p class="p-muted">{{ contact(p) }}</p>
+									<span v-if="p.pending" class="p-badge p-badge--warn">Invited</span>
+								</td>
+								<td data-wide>
+									<ul class="places">
+										<li v-for="place in p.branches" :key="place.store" class="place">
+											<div class="place-name">
+												<strong v-if="several">{{ place.branch_label || place.display_name }}</strong>
+												<span class="p-badge" :class="place.role === 'owner' ? 'p-badge--brand' : ''">{{ roleLabel(place) }}</span>
+											</div>
+											<div v-if="place.role !== 'owner'" class="p-row actions">
+												<button v-if="!p.pending" class="p-btn p-btn--sm" @click="openEdit(p, place)">Edit</button>
+												<button class="p-btn p-btn--sm p-btn--danger" @click="remove(p, place)">{{ p.pending ? "Cancel" : "Remove" }}</button>
+											</div>
+										</li>
+									</ul>
+								</td>
+							</tr>
+						</template>
+						<TableState v-else :loading="loading" :error="error" :colspan="2" empty-text="Nobody here yet." @retry="load" />
 					</tbody>
 				</table>
 			</div>
-		</div>
+		</section>
 
 		<Modal
 			v-if="form && catalogue"
@@ -197,7 +205,7 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 			wide
 			@close="form = null"
 		>
-			<form id="staff-form" class="p-stack" @submit.prevent="submit">
+			<form id="staff-form" class="p-stack-sm" @submit.prevent="submit">
 				<div v-if="formError" class="p-alert" role="alert">{{ formError }}</div>
 				<template v-if="!form.target">
 					<div class="p-tabs" role="group" aria-label="Find by">
@@ -214,18 +222,18 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 							:placeholder="placeholder[form.by]"
 							required
 						/>
-						<small v-if="form.by === 'email'" class="p-muted">
+						<small v-if="form.by === 'email'">
 							No Mealgro account with this email? We'll email them, and they join once they sign up and confirm it.
 						</small>
-						<small v-else-if="form.by === 'phone'" class="p-muted">
+						<small v-else-if="form.by === 'phone'">
 							No account with this number? They join once they sign up and verify it.
 						</small>
 					</label>
-					<fieldset v-if="several" class="grid-box">
-						<legend class="p-muted">Branches</legend>
-						<label v-for="b in invitable" :key="b.id" class="check">
+					<fieldset v-if="several" class="p-fieldset grid-box">
+						<legend>Branches</legend>
+						<label v-for="b in invitable" :key="b.id" class="p-check">
 							<input type="checkbox" :checked="form.stores.has(b.id)" @change="toggle(form.stores, b.id)" />
-							{{ b.display_name }}
+							<span>{{ b.display_name }}</span>
 						</label>
 					</fieldset>
 				</template>
@@ -237,16 +245,16 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 						<option value="custom">Custom</option>
 					</select>
 				</label>
-				<fieldset class="grid-box">
-					<legend class="p-muted">Permissions</legend>
-					<label v-for="c in catalogue.capabilities.filter((c) => c.slug !== 'manage-branches')" :key="c.slug" class="check">
+				<fieldset class="p-fieldset grid-box">
+					<legend>Permissions</legend>
+					<label v-for="c in catalogue.capabilities.filter((c) => c.slug !== 'manage-branches')" :key="c.slug" class="p-check">
 						<input type="checkbox" :checked="form.caps.has(c.slug)" @change="toggleCap(c.slug)" />
-						{{ titleCase(c.slug) }}
+						<span>{{ titleCase(c.slug) }}</span>
 					</label>
 				</fieldset>
 			</form>
 			<template #footer>
-				<button class="p-btn" type="button" @click="form = null">Cancel</button>
+				<button class="p-btn p-btn--ghost" type="button" @click="form = null">Cancel</button>
 				<button
 					class="p-btn p-btn--primary"
 					form="staff-form"
@@ -267,7 +275,7 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 .places {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+	gap: 10px;
 }
 .place {
 	display: flex;
@@ -276,25 +284,19 @@ const placeholder = { username: "their Mealgro username", phone: "+234 …", ema
 	gap: 12px;
 	flex-wrap: wrap;
 }
-.place strong {
-	margin-right: 8px;
+.place-name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
 }
 .actions {
 	gap: 6px;
 }
 .grid-box {
-	border: 1px solid var(--line);
-	border-radius: 10px;
-	padding: 12px;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 8px;
-}
-.check {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	cursor: pointer;
+	gap: 4px 16px;
 }
 @media (max-width: 520px) {
 	.grid-box {

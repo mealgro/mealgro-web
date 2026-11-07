@@ -65,14 +65,14 @@ async function addAndContinue() {
 
 <template>
 	<Modal :title="`Billing for ${plan.title}`" @close="emit('close')">
-		<form class="p-stack" @submit.prevent="check">
+		<form class="p-stack-sm" @submit.prevent="check">
 			<p>
 				Each branch is billed to its own email. Paystack sends receipts and renewal notices there. Anyone who
 				manages this plan in Mealgro can still change the card or stop renewal.
 			</p>
 			<label class="p-field">
 				<span>Billing email for {{ session.store.value?.display_name }}</span>
-				<div class="p-row">
+				<div class="email-row">
 					<input v-model="email" class="p-input" type="email" placeholder="billing@yourbusiness.com" required @change="check" />
 					<button class="p-btn" :disabled="checking || !email.trim()">{{ checking ? "Checking…" : "Check" }}</button>
 				</div>
@@ -89,7 +89,7 @@ async function addAndContinue() {
 				<p v-else-if="contact.invited" class="p-alert p-alert--warn">
 					{{ contact.email }} has been invited to your team and hasn't joined yet. Billing emails will still reach it.
 				</p>
-				<div v-else class="p-stack outside">
+				<div v-else class="p-stack-sm">
 					<p class="p-alert p-alert--warn">
 						Nobody in your business uses {{ contact.email }}. Billing emails will go to that inbox.
 					</p>
@@ -106,7 +106,7 @@ async function addAndContinue() {
 			</template>
 		</form>
 		<template #footer>
-			<button class="p-btn" type="button" @click="emit('close')">Cancel</button>
+			<button class="p-btn p-btn--ghost" type="button" @click="emit('close')">Cancel</button>
 			<template v-if="ready && contact && !contact.member && !contact.invited && canInvite && presets.length">
 				<button class="p-btn" :disabled="busy" @click="emit('confirmed', contact.email)">Continue without adding</button>
 				<button class="p-btn p-btn--primary" :disabled="busy" @click="addAndContinue">
@@ -121,7 +121,12 @@ async function addAndContinue() {
 </template>
 
 <style scoped>
-.outside {
+.email-row {
+	display: flex;
 	gap: 10px;
+	flex-wrap: wrap;
+}
+.email-row .p-input {
+	flex: 1 1 220px;
 }
 </style>
