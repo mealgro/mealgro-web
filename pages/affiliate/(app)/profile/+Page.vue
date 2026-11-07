@@ -77,7 +77,7 @@ async function save() {
 						v-model="form.full_name"
 						class="p-input"
 						autocomplete="name"
-						maxlength="80"
+						maxlength="50"
 						:disabled="locked"
 						:aria-invalid="bad === 'full_name'"
 						required

@@ -117,7 +117,7 @@ async function relabel(b: Branch) {
 		title: "Rename this branch?",
 		message: `Customers see it as “${brand.value?.name} (${b.branch_label})”. What should follow “${brand.value?.name}”?`,
 		confirmText: "Rename",
-		input: { label: "Branch name", value: b.branch_label, required: true, maxLength: 40 },
+		input: { label: "Branch name", value: b.branch_label, required: true, maxLength: 50 },
 	});
 	const label = ask?.value;
 	if (!label || label === b.branch_label) return;
@@ -134,7 +134,7 @@ async function renameBrand() {
 		title: "Rename your business?",
 		message: "Every branch follows the new name, and customers see it straight away.",
 		confirmText: "Rename",
-		input: { label: "Your business name", value: brand.value?.name, required: true, maxLength: 80 },
+		input: { label: "Your business name", value: brand.value?.name, required: true, maxLength: 50 },
 	});
 	const name = ask?.value;
 	if (!name || name === brand.value?.name) return;
@@ -229,7 +229,7 @@ const tone = (s: Branch["status"]) =>
 					<input v-model="form.address" class="p-input" maxlength="200" placeholder="12 Example Street" />
 				</label>
 				<label class="p-field"><span>Branch name</span>
-					<input v-model="form.label" class="p-input" maxlength="40" required />
+					<input v-model="form.label" class="p-input" maxlength="50" required />
 					<small>Customers see “{{ brand?.name }} ({{ form.label || "…" }})”.</small>
 				</label>
 				<label class="p-check">

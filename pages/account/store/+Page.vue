@@ -43,7 +43,7 @@ const readOnlyWhy = computed(() => {
 	return "You can see these settings but not change them. Ask an owner or manager for “manage store” access.";
 });
 
-const MAX_PREP = 180;
+const MAX_PREP = 120;
 const prepOk = computed(() => {
 	const { min, max } = prep.value;
 	return [min, max].every((n) => Number.isInteger(n) && n >= 1 && n <= MAX_PREP) && min <= max;
@@ -103,7 +103,7 @@ async function save(what: string, fn: () => Promise<unknown>) {
 				<form class="card-box p-stack-sm arrive" style="--i: 1" @submit.prevent="save('contact', () => storeSettings.contact(contact.full_name, contact.phone))">
 					<h2>Contact person</h2>
 					<div class="p-grid two">
-						<label class="p-field"><span>Full name</span><input v-model="contact.full_name" class="p-input" maxlength="80" :disabled="!canEdit" required /></label>
+						<label class="p-field"><span>Full name</span><input v-model="contact.full_name" class="p-input" maxlength="50" :disabled="!canEdit" required /></label>
 						<label class="p-field"><span>Phone</span><input v-model="contact.phone" class="p-input" type="tel" maxlength="20" :disabled="!canEdit" required /></label>
 					</div>
 					<div v-if="canEdit"><button class="p-btn p-btn--primary" :disabled="saving === 'contact'">Save</button></div>

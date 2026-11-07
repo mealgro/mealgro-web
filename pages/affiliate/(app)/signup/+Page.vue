@@ -122,7 +122,7 @@ const done = () => location.assign(HOME);
 						v-model="form.full_name"
 						class="p-input"
 						autocomplete="name"
-						maxlength="80"
+						maxlength="50"
 						:aria-invalid="bad === 'full_name'"
 						required
 					/>
