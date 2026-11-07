@@ -1,0 +1,116 @@
+/* Design tokens for the signed-in areas (vendor portal /account and affiliate
+   area /affiliate): the v2 visual system of the admin console, copied from
+   mealgro-admin/brand.md. This is the ONLY file in the portals that holds a
+   colour value; everything else uses these variables or color-mix() of them.
+
+   Scoped to `.portal`, so the marketing site keeps its own palette. Dark is
+   written twice, as the admin does: once for the chosen theme
+   (`data-theme="dark"`) and once for the OS (`prefers-color-scheme`) until a
+   theme is chosen. */
+.portal {
+	/* Surfaces and text (base-100/200/300, base-content) */
+	--surface: #ffffff;
+	--bg: #f1f0f5;
+	--line: #e2e0ec;
+	--ink: #12121c;
+	--muted: color-mix(in srgb, var(--ink) 70%, var(--surface));
+	/* Cobalt: primary buttons, focus, active states, links */
+	--brand: #2f3bff;
+	--on-brand: #ffffff;
+	--brand-soft: color-mix(in srgb, var(--brand) 10%, var(--surface));
+	/* Status: jade, sun, vermilion, cobalt. Each fill has its own text colour. */
+	--ok: #0a7b55;
+	--on-ok: #ffffff;
+	--warn: #ffc52e;
+	--on-warn: #12121c;
+	--bad: #c8301a;
+	--on-bad: #ffffff;
+	--info: #2f3bff;
+	--on-info: #ffffff;
+	/* Category colours, one shape each: square, circle, card, diamond, triangle */
+	--cat-1: #2f3bff;
+	--cat-2: #ff5c8a;
+	--cat-3: #ffc52e;
+	--cat-4: #19b98a;
+	--cat-5: #12121c;
+	--on-1: #ffffff;
+	--on-2: #12121c;
+	--on-3: #12121c;
+	--on-4: #12121c;
+	--on-5: #ffffff;
+	/* The hero panel: ink in the day, a card in the night */
+	--hero: #12121c;
+	--on-hero: #ffffff;
+	/* The ink rail, in both themes */
+	--rail: #12121c;
+	--on-rail: #ffffff;
+	/* Scrim behind drawers and dialogs */
+	--scrim: color-mix(in srgb, var(--rail) 55%, transparent);
+	--ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-theme="dark"] .portal {
+	--surface: #1b1b29;
+	--bg: #12121c;
+	--line: #2d2d42;
+	--ink: #f1f0f5;
+	--brand: #7b85ff;
+	--on-brand: #0e0e18;
+	--ok: #3dd6a0;
+	--on-ok: #0a1f18;
+	--warn: #ffc52e;
+	--on-warn: #12121c;
+	--bad: #ff7a63;
+	--on-bad: #2a0d07;
+	--info: #8a93ff;
+	--on-info: #0e0e18;
+	--cat-1: #7b85ff;
+	--cat-4: #3dd6a0;
+	--cat-5: #f1f0f5;
+	--on-1: #0e0e18;
+	--on-5: #12121c;
+	--hero: #1b1b29;
+	--on-hero: #f1f0f5;
+	--rail: #0a0a12;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .portal {
+		--surface: #1b1b29;
+		--bg: #12121c;
+		--line: #2d2d42;
+		--ink: #f1f0f5;
+		--brand: #7b85ff;
+		--on-brand: #0e0e18;
+		--ok: #3dd6a0;
+		--on-ok: #0a1f18;
+		--warn: #ffc52e;
+		--on-warn: #12121c;
+		--bad: #ff7a63;
+		--on-bad: #2a0d07;
+		--info: #8a93ff;
+		--on-info: #0e0e18;
+		--cat-1: #7b85ff;
+		--cat-4: #3dd6a0;
+		--cat-5: #f1f0f5;
+		--on-1: #0e0e18;
+		--on-5: #12121c;
+		--hero: #1b1b29;
+		--on-hero: #f1f0f5;
+		--rail: #0a0a12;
+	}
+}
+
+/* The page canvas behind the portal (the root element cannot read the
+   variables above, which are scoped to `.portal`). */
+:root:has(.portal) {
+	--portal-canvas: #f1f0f5;
+}
+:root[data-theme="dark"]:has(.portal) {
+	--portal-canvas: #12121c;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]):has(.portal) {
+		--portal-canvas: #12121c;
+	}
+}

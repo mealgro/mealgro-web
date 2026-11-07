@@ -1,91 +1,33 @@
+/* The signed-in areas (vendor portal /account, affiliate area /affiliate):
+   one stylesheet, the v2 visual system of the admin console (see brand.md).
+   Every colour is a token from ./tokens.css; nothing here holds a hex value.
+   Scoped to `.portal`, so the marketing site is not touched. */
 @import "@fontsource-variable/bricolage-grotesque/wght.css";
 @import "@fontsource-variable/instrument-sans/wght.css";
+@import "./tokens.css";
 
-/* v2 visual system (the same as the admin console and the affiliate area), in
-   the Mealgro colour profile: brand red, yellow and ink on paper. Each kind of
-   thing owns a colour AND a shape; see brand.md. */
+/* ── Base ─────────────────────────────────────────────────────────────────── */
 .portal {
-	--bg: #f6f6f6;
-	--surface: #ffffff;
-	--ink: #17130f;
-	--muted: #5f574f;
-	--line: #e8e2dc;
-	--brand: #d62300;
-	--brand-deep: #b81d00;
-	--brand-ink: #ffffff;
-	--brand-soft: #fdece8;
-	--ok: #17803d;
-	--ok-soft: #e4f5ea;
-	--warn: #8a4400;
-	--warn-soft: #fdf1dc;
-	--bad: #b42318;
-	--bad-soft: #fde8e6;
-	--cat-1: #d62300;
-	--cat-2: #ffe100;
-	--cat-3: #17130f;
-	--cat-4: #19b98a;
-	--on-1: #ffffff;
-	--on-3: #ffffff;
-	--ease: cubic-bezier(0.16, 1, 0.3, 1);
+	--font-display: "Bricolage Grotesque Variable", "Instrument Sans Variable", system-ui, sans-serif;
 	background: var(--bg);
 	color: var(--ink);
 	min-height: 100vh;
 	font-family: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 	font-size: 15px;
 	line-height: 1.45;
+	-webkit-text-size-adjust: 100%;
 }
-:root[data-theme="dark"] .portal {
-	--bg: #14100d;
-	--surface: #1e1915;
-	--ink: #f6f1ec;
-	--muted: #bdb3a9;
-	--line: #352c26;
-	--brand: #ff5a3c;
-	--brand-deep: #ff7a5f;
-	--brand-ink: #1a0804;
-	--brand-soft: #3a1b12;
-	--ok: #3dd6a0;
-	--ok-soft: #123b2f;
-	--warn: #ffc866;
-	--warn-soft: #3a2c0c;
-	--bad: #ff8a7a;
-	--bad-soft: #3d1a14;
-	--cat-1: #ff5a3c;
-	--cat-3: #f6f1ec;
-	--on-1: #1a0804;
-	--on-3: #14100d;
+/* The page behind the portal follows the theme (the marketing site never sets
+   a theme, so only pages that hold a portal are affected). */
+:root:has(.portal) {
+	background: var(--portal-canvas);
+	color-scheme: light dark;
 }
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) .portal {
-		--bg: #14100d;
-		--surface: #1e1915;
-		--ink: #f6f1ec;
-		--muted: #bdb3a9;
-		--line: #352c26;
-		--brand: #ff5a3c;
-		--brand-deep: #ff7a5f;
-		--brand-ink: #1a0804;
-		--brand-soft: #3a1b12;
-		--ok: #3dd6a0;
-		--ok-soft: #123b2f;
-		--warn: #ffc866;
-		--warn-soft: #3a2c0c;
-		--bad: #ff8a7a;
-		--bad-soft: #3d1a14;
-		--cat-1: #ff5a3c;
-		--cat-3: #f6f1ec;
-		--on-1: #1a0804;
-		--on-3: #14100d;
-	}
+:root[data-theme="light"]:has(.portal) {
+	color-scheme: light;
 }
-:root[data-theme="dark"] {
+:root[data-theme="dark"]:has(.portal) {
 	color-scheme: dark;
-	background: #14100d;
-}
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) {
-		color-scheme: dark;
-	}
 }
 .portal *,
 .portal *::before,
@@ -101,280 +43,122 @@
 .portal h3,
 .portal p {
 	margin: 0;
-	letter-spacing: normal;
-	font-weight: 600;
-	color: var(--ink);
+	color: inherit;
 }
-.portal h1 {
-	font-size: 22px;
-	line-height: 1.2;
+.portal p {
+	line-height: 1.55;
 }
-.portal h2 {
-	font-size: 15px;
-}
-.portal ul {
+.portal ul,
+.portal ol,
+.portal dl,
+.portal dd {
 	list-style: none;
 	padding: 0;
 	margin: 0;
 }
-.portal p {
-	font-weight: 400;
-	line-height: 1.55;
+.portal h1,
+.portal h2,
+.portal h3,
+.portal .disp {
+	font-family: var(--font-display);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
 }
-/* A heading, then its lead-in, then the content: room between each. */
+.portal h1 {
+	font-size: clamp(30px, 4vw, 44px);
+	line-height: 1;
+	letter-spacing: -0.04em;
+}
+.portal h2 {
+	font-size: 20px;
+	line-height: 1.15;
+}
+.portal h3 {
+	font-size: 18px;
+	line-height: 1.2;
+}
 .portal h1 + p,
-.portal h2 + p {
+.portal h2 + p,
+.portal h3 + p {
 	margin-top: 6px;
 }
-
-/* The Mealgro logo with the area's name under it (sidebar, sign-in). */
-.p-brand {
-	display: inline-flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 2px;
-	text-decoration: none;
-}
-.p-brand img {
-	display: block;
-	width: 72px;
-	height: auto;
-}
-.p-brand small {
-	font-size: 12px;
+.portal .p-muted {
 	color: var(--muted);
 }
+.portal .p-small {
+	font-size: 13px;
+}
+.portal :focus-visible {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+.portal .sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+/* A text link: cobalt, underlined, reads as a link without colour alone. */
+.portal .link,
+.portal .p-alert a,
+.portal .p-md a {
+	color: var(--brand);
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	background: none;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 600;
+}
+.portal .link:hover {
+	text-decoration-thickness: 2px;
+}
 
-.p-card {
-	background: var(--surface);
-	border: 1px solid var(--line);
-	border-radius: 16px;
-	padding: 24px;
-}
-.p-muted {
-	color: var(--muted);
-}
-.p-row {
+/* ── Layout helpers ───────────────────────────────────────────────────────── */
+.portal .p-row {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 }
-.p-between {
+.portal .p-between {
 	justify-content: space-between;
 }
-.p-stack {
+.portal .p-wrap {
+	flex-wrap: wrap;
+}
+.portal .p-stack {
 	display: flex;
 	flex-direction: column;
-	gap: 18px;
+	gap: 20px;
 }
-.p-grid {
+.portal .p-stack-sm {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.portal .p-grid {
 	display: grid;
 	gap: 20px;
 }
-.p-page-head {
+/* Page actions sit in a row above the content, right-aligned, wrapping. */
+.portal .p-toolbar {
 	display: flex;
-	align-items: flex-end;
-	justify-content: space-between;
-	gap: 16px;
-	margin-bottom: 28px;
+	align-items: center;
+	justify-content: flex-end;
 	flex-wrap: wrap;
+	gap: 10px;
 }
-
-.p-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	height: 42px;
-	padding: 0 20px;
-	border-radius: 12px;
-	border: 1px solid var(--line);
-	background: var(--surface);
-	color: var(--ink);
-	font-weight: 600;
-	font-size: 14px;
-	cursor: pointer;
-	text-decoration: none;
-	transition: background 0.12s, border-color 0.12s, opacity 0.12s;
-}
-.p-btn:hover:not(:disabled) {
-	border-color: #cfc7bf;
-	background: #fbf9f7;
-}
-.p-btn:disabled {
-	opacity: 0.55;
-	cursor: not-allowed;
-}
-.p-btn:focus-visible,
-.p-input:focus-visible,
-.p-nav a:focus-visible {
-	outline: 2px solid var(--brand);
-	outline-offset: 2px;
-}
-.p-btn--primary {
-	background: var(--brand);
-	border-color: var(--brand);
-	color: var(--brand-ink);
-}
-.p-btn--primary:hover:not(:disabled) {
-	background: #bd1f00;
-	border-color: #bd1f00;
-}
-.p-btn--danger {
-	color: var(--bad);
-}
-.p-btn--sm {
-	height: 32px;
-	padding: 0 14px;
-	font-size: 13px;
-}
-
-.p-field {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-.p-field > span {
-	font-size: 13px;
-	font-weight: 600;
-	line-height: 1.3;
-}
-.p-input {
-	height: 44px;
-	padding: 0 14px;
-	border: 1px solid var(--line);
-	border-radius: 12px;
-	background: #fff;
-	color: var(--ink);
-	font-size: 14px;
-	width: 100%;
-}
-.p-input:focus {
-	border-color: var(--brand);
-	outline: none;
-}
-
-.p-badge {
-	display: inline-flex;
-	align-items: center;
-	height: 22px;
-	padding: 0 9px;
-	border-radius: 999px;
-	font-size: 12px;
-	font-weight: 600;
-	background: #efeae5;
-	color: var(--muted);
-	white-space: nowrap;
-}
-.p-badge--ok {
-	background: var(--ok-soft);
-	color: var(--ok);
-}
-.p-badge--warn {
-	background: var(--warn-soft);
-	color: var(--warn);
-}
-.p-badge--bad {
-	background: var(--bad-soft);
-	color: var(--bad);
-}
-.p-badge--brand {
-	background: var(--brand-soft);
-	color: var(--brand);
-}
-
-.p-alert {
-	padding: 14px 18px;
-	border-radius: 12px;
-	font-size: 13px;
-	line-height: 1.5;
-	background: var(--bad-soft);
-	color: var(--bad);
-}
-.p-alert--warn {
-	background: var(--warn-soft);
-	color: var(--warn);
-}
-.p-alert--ok {
-	background: var(--ok-soft);
-	color: var(--ok);
-}
-
-.p-table {
-	width: 100%;
-	border-collapse: collapse;
-}
-.p-table th {
-	text-align: left;
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--muted);
-	padding: 12px 16px;
-	border-bottom: 1px solid var(--line);
-	white-space: nowrap;
-}
-.p-table td {
-	padding: 16px;
-	border-bottom: 1px solid var(--line);
-	vertical-align: middle;
-}
-.p-table tr:last-child td {
-	border-bottom: 0;
-}
-.p-table tbody tr.is-clickable {
-	cursor: pointer;
-}
-.p-table tbody tr.is-clickable:hover {
-	background: #fbf9f7;
-}
-.p-scroll {
-	overflow-x: auto;
-}
-
-.p-stat strong {
-	display: block;
-	font-size: 26px;
-	line-height: 1.1;
-	font-weight: 700;
-}
-.p-stat span {
-	color: var(--muted);
-	font-size: 13px;
-}
-
-.p-tabs {
-	display: inline-flex;
-	padding: 3px;
-	background: #efeae5;
-	border-radius: 10px;
-	gap: 2px;
-}
-.p-tabs button {
-	height: 30px;
-	padding: 0 14px;
-	border: 0;
-	border-radius: 8px;
-	background: transparent;
-	font-weight: 600;
-	color: var(--muted);
-	cursor: pointer;
-}
-.p-tabs button[aria-pressed="true"] {
-	background: #fff;
-	color: var(--ink);
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-}
-
-/* Modifiers and spacing for page layout, instead of inline styles. Scoped
-   under .portal so they win over the element resets at the top. */
-.portal .p-card--flush {
-	padding: 6px;
-}
-.portal .p-pad {
-	padding: 18px;
-}
-.portal .p-input--auto {
-	width: auto;
+.portal .p-toolbar:empty {
+	display: none;
 }
 .portal .p-mt-xs {
 	margin-top: 6px;
@@ -394,254 +178,486 @@
 .portal .p-ml-sm {
 	margin-left: 8px;
 }
+.portal .p-pad {
+	padding: 18px;
+}
 
-/* ── v2 components: pills, big rounded cards, display type, shapes, tones ── */
-.portal h1,
-.portal h2,
-.portal h3,
-.portal .disp {
-	font-family: "Bricolage Grotesque Variable", "Instrument Sans Variable", system-ui, sans-serif;
-	font-weight: 800;
-	letter-spacing: -0.03em;
-}
-.portal h1 {
-	font-size: clamp(30px, 4vw, 44px);
-	line-height: 1;
-	letter-spacing: -0.04em;
-}
-.portal h2 {
-	font-size: 22px;
-}
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+.portal .card-box,
 .portal .p-card {
-	border-radius: 28px;
-	padding: 24px 26px;
-	border-color: transparent;
+	background: var(--surface);
+	border: 1px solid color-mix(in srgb, var(--line) 50%, transparent);
+	border-radius: 1.75rem;
+	padding: 24px;
 }
-.portal .p-btn,
-.portal .p-tabs,
-.portal .p-tabs button {
-	border-radius: 999px;
+.portal .card-box--flush,
+.portal .p-card--flush {
+	padding: 0;
+	overflow: hidden;
 }
+.portal .card-h {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+.portal .card-h p {
+	font-size: 14px;
+	color: var(--muted);
+}
+
+/* ── Buttons: pills. Primary is cobalt; the rest are ink outlines ─────────── */
 .portal .p-btn {
-	border-width: 2px;
-	border-color: var(--ink);
-	transition: transform 0.12s var(--ease), background 0.12s, opacity 0.12s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 40px;
+	padding: 0 20px;
+	border-radius: 1.5rem;
+	border: 2px solid var(--ink);
+	background: transparent;
+	color: var(--ink);
+	font-weight: 600;
+	font-size: 14px;
+	line-height: 1;
+	white-space: nowrap;
+	cursor: pointer;
+	text-decoration: none;
+	transition:
+		transform 0.12s var(--ease),
+		background 0.12s,
+		opacity 0.12s;
 }
-.portal .p-btn:hover:not(:disabled) {
-	background: color-mix(in srgb, var(--ink) 8%, var(--surface));
-	border-color: var(--ink);
+.portal .p-btn:hover:not(:disabled, [aria-disabled="true"]) {
+	background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 .portal .p-btn:active:not(:disabled) {
 	transform: scale(0.97);
 }
+.portal .p-btn:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
 .portal .p-btn--primary {
 	background: var(--brand);
 	border-color: var(--brand);
-	color: var(--brand-ink);
+	color: var(--on-brand);
 }
 .portal .p-btn--primary:hover:not(:disabled) {
-	background: var(--brand-deep);
-	border-color: var(--brand-deep);
+	background: color-mix(in srgb, var(--brand) 86%, var(--ink));
+	border-color: color-mix(in srgb, var(--brand) 86%, var(--ink));
 }
 .portal .p-btn--danger {
+	color: var(--bad);
 	border-color: var(--bad);
 }
+.portal .p-btn--danger.p-btn--fill {
+	background: var(--bad);
+	color: var(--on-bad);
+}
+.portal .p-btn--ghost {
+	border-color: transparent;
+}
+.portal .p-btn--sm {
+	min-height: 32px;
+	padding: 0 14px;
+	font-size: 13px;
+}
+.portal .p-btn--block {
+	width: 100%;
+}
+.portal .p-btn.p-btn--icon {
+	padding: 0;
+	width: 44px;
+	min-width: 44px;
+	min-height: 44px;
+}
+.portal .p-btn svg {
+	flex: none;
+}
+
+/* ── Fields: pill inputs, label over field ────────────────────────────────── */
+.portal .p-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+}
+.portal .p-field > span {
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+.portal .p-field small,
+.portal .p-hint {
+	color: var(--muted);
+	font-size: 12px;
+	line-height: 1.4;
+}
+.portal .p-field .err {
+	color: var(--bad);
+	font-weight: 600;
+}
 .portal .p-input {
-	border-radius: 16px;
-	border-width: 2px;
-	border-color: color-mix(in srgb, var(--ink) 25%, var(--line));
+	height: 44px;
+	padding: 0 18px;
+	border: 2px solid color-mix(in srgb, var(--ink) 25%, var(--line));
+	border-radius: 1.5rem;
 	background: var(--surface);
+	color: var(--ink);
+	font-size: 15px;
+	width: 100%;
+	min-width: 0;
 }
-.portal .p-badge,
-.portal .p-alert {
-	border-radius: 999px;
+.portal textarea.p-input {
+	height: auto;
+	padding: 12px 18px;
+	border-radius: 1.25rem;
 }
-.portal .p-alert {
-	padding: 10px 18px;
+.portal select.p-input {
+	appearance: auto;
+	padding-right: 12px;
 }
+.portal .p-input[type="date"] {
+	padding: 0 12px 0 16px;
+}
+.portal .p-input::placeholder {
+	color: color-mix(in srgb, var(--ink) 55%, var(--surface));
+}
+.portal .p-input:focus {
+	border-color: var(--brand);
+	outline: 2px solid color-mix(in srgb, var(--brand) 30%, transparent);
+	outline-offset: 0;
+}
+.portal .p-input:disabled,
+.portal .p-input[readonly] {
+	background: var(--bg);
+	cursor: not-allowed;
+}
+.portal .p-input[aria-invalid="true"] {
+	border-color: var(--bad);
+}
+.portal .p-input--auto {
+	width: auto;
+}
+.portal .p-check {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	font-size: 14px;
+	line-height: 1.5;
+	cursor: pointer;
+}
+.portal .p-check input {
+	width: 20px;
+	height: 20px;
+	margin: 1px 0 0;
+	accent-color: var(--brand);
+	flex: none;
+}
+.portal fieldset.p-fieldset {
+	border: 2px solid var(--line);
+	border-radius: 1.5rem;
+	padding: 16px 18px;
+	margin: 0;
+	min-width: 0;
+}
+.portal fieldset.p-fieldset legend {
+	padding: 0 6px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--muted);
+}
+/* The 6-digit code. */
+.portal .p-otp {
+	height: 56px;
+	font-size: 26px;
+	letter-spacing: 0.5em;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	padding-left: calc(18px + 0.5em);
+}
+
+/* ── Badges: solid fill, text in its own colour, and a shape ──────────────── */
 .portal .p-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	height: 26px;
 	padding: 0 12px 0 10px;
-	gap: 6px;
+	border-radius: 9999px;
+	font-size: 12px;
 	font-weight: 700;
+	white-space: nowrap;
+	background: color-mix(in srgb, var(--ink) 9%, var(--surface));
+	color: var(--ink);
 }
-/* Status badges carry a shape as well as a colour: ok a dot, warning a
-   ring, bad a square. */
+.portal .p-badge--ok {
+	background: var(--ok);
+	color: var(--on-ok);
+}
+.portal .p-badge--warn {
+	background: var(--warn);
+	color: var(--on-warn);
+}
+.portal .p-badge--bad {
+	background: var(--bad);
+	color: var(--on-bad);
+}
+.portal .p-badge--brand,
+.portal .p-badge--info {
+	background: var(--info);
+	color: var(--on-info);
+}
+/* ok: a dot, warning: a ring, bad: a square, info: a diamond. */
 .portal .p-badge--ok::before,
 .portal .p-badge--warn::before,
 .portal .p-badge--bad::before,
-.portal .p-badge--brand::before {
+.portal .p-badge--brand::before,
+.portal .p-badge--info::before {
 	content: "";
-	width: 8px;
-	height: 8px;
+	flex: none;
+	width: 0.55em;
+	height: 0.55em;
 	background: currentColor;
 	border-radius: 50%;
 }
 .portal .p-badge--warn::before {
 	background: transparent;
-	border: 2px solid currentColor;
+	border: 0.15em solid currentColor;
 }
 .portal .p-badge--bad::before {
-	border-radius: 2px;
+	border-radius: 0.1em;
 }
-.portal .p-badge--brand::before {
-	border-radius: 1px;
+.portal .p-badge--brand::before,
+.portal .p-badge--info::before {
+	border-radius: 0.05em;
 	transform: rotate(45deg) scale(0.9);
 }
+.portal .p-badge-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+/* ── Alerts: a soft tint, text in the status colour, a shape up front ─────── */
+.portal .p-alert {
+	--a: var(--bad);
+	position: relative;
+	padding: 14px 20px 14px 46px;
+	border-radius: 1.5rem;
+	font-size: 14px;
+	line-height: 1.5;
+	background: color-mix(in srgb, var(--a) 12%, var(--surface));
+	color: color-mix(in srgb, var(--a) 80%, var(--ink));
+}
+.portal .p-alert::before {
+	content: "";
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	width: 10px;
+	height: 10px;
+	background: currentColor;
+	border-radius: 2px;
+}
+.portal .p-alert--warn {
+	--a: var(--warn);
+	color: var(--ink);
+	background: color-mix(in srgb, var(--warn) 28%, var(--surface));
+}
+.portal .p-alert--warn::before {
+	box-sizing: border-box;
+	background: transparent;
+	border: 3px solid currentColor;
+	border-radius: 50%;
+}
+.portal .p-alert--ok {
+	--a: var(--ok);
+}
+.portal .p-alert--ok::before {
+	border-radius: 50%;
+}
+.portal .p-alert--info {
+	--a: var(--info);
+}
+.portal .p-alert--info::before {
+	transform: rotate(45deg) scale(0.9);
+	border-radius: 1px;
+}
+.portal .p-alert .p-btn {
+	margin-left: 10px;
+	vertical-align: middle;
+}
+
+/* ── Tables: a card, with a quiet uppercase header; one card per row on phones */
+.portal .p-scroll {
+	overflow-x: auto;
+}
+.portal .p-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
 .portal .p-table th {
+	text-align: left;
+	font-size: 11px;
+	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
-	font-size: 11px;
+	color: var(--muted);
+	background: var(--bg);
+	padding: 12px 20px;
+	white-space: nowrap;
 }
-.portal .p-stat strong {
-	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
-	font-weight: 800;
-	letter-spacing: -0.03em;
+.portal .p-table td {
+	padding: 14px 20px;
+	border-bottom: 1px solid var(--bg);
+	vertical-align: middle;
+}
+.portal .p-table tbody tr:last-child td {
+	border-bottom: 0;
+}
+.portal .p-table .num {
+	text-align: right;
+	white-space: nowrap;
 	font-variant-numeric: tabular-nums;
 }
-/* The one bold panel on a page, and coloured tiles for the headline numbers. */
-.portal .p-hero {
-	position: relative;
-	overflow: hidden;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 20px;
-	flex-wrap: wrap;
-	padding: 30px 32px;
-	border-radius: 32px;
-	background: #17130f;
-	color: #ffffff;
+.portal .p-table tbody tr.is-clickable {
+	cursor: pointer;
 }
-:root[data-theme="dark"] .portal .p-hero {
+.portal .p-table tbody tr:hover {
+	background: color-mix(in srgb, var(--bg) 40%, transparent);
+}
+.portal .p-table tbody tr.is-clickable:focus-visible {
+	outline-offset: -3px;
+}
+.portal .p-table tr.p-table-state:hover {
+	background: none;
+}
+.portal .row-in {
+	animation: p-row-in 1.4s var(--ease) both;
+}
+@keyframes p-row-in {
+	0% {
+		opacity: 0;
+		transform: translateY(-14px);
+		background: color-mix(in srgb, var(--cat-3) 35%, transparent);
+	}
+	60% {
+		background: color-mix(in srgb, var(--cat-3) 35%, transparent);
+	}
+	100% {
+		opacity: 1;
+		transform: none;
+		background: transparent;
+	}
+}
+@media (max-width: 639px) {
+	.portal .p-table:not(.table-scroll),
+	.portal .p-table:not(.table-scroll) > tbody {
+		display: block;
+		width: 100%;
+	}
+	.portal .p-table:not(.table-scroll) > thead {
+		display: none;
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 0.5rem 1rem;
+		padding: 16px;
+		border-bottom: 0.5rem solid var(--bg);
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr:last-child {
+		border-bottom: 0;
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr > td {
+		display: block;
+		min-width: 0;
+		padding: 0;
+		border: 0;
+		text-align: left;
+		overflow-wrap: anywhere;
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr > td[data-label]::before {
+		content: attr(data-label);
+		display: block;
+		margin-bottom: 2px;
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--muted);
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr > td:is([data-primary], [data-actions], [data-full], [data-wide]) {
+		grid-column: 1 / -1;
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr > td[data-actions] {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 8px;
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr > td[data-full] {
+		text-align: center;
+	}
+	.portal .p-table:not(.table-scroll) > tbody > tr > td.num {
+		text-align: left;
+	}
+}
+
+/* ── Tabs: a pill track with a raised active pill ─────────────────────────── */
+.portal .p-tabs {
+	display: inline-flex;
+	padding: 4px;
+	background: color-mix(in srgb, var(--ink) 8%, var(--bg));
+	border-radius: 1.5rem;
+	gap: 2px;
+	max-width: 100%;
+}
+.portal .p-tabs button {
+	min-height: 32px;
+	padding: 0 16px;
+	border: 0;
+	border-radius: 1.25rem;
+	background: transparent;
+	font-weight: 600;
+	font-size: 14px;
+	color: var(--muted);
+	cursor: pointer;
+	white-space: nowrap;
+	transition: transform 0.12s var(--ease);
+}
+.portal .p-tabs button:active {
+	transform: scale(0.97);
+}
+.portal .p-tabs button[aria-pressed="true"] {
 	background: var(--surface);
 	color: var(--ink);
 }
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) .portal .p-hero {
-		background: var(--surface);
-		color: var(--ink);
+@media (max-width: 639px) {
+	.portal .p-tabs {
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.portal .p-tabs::-webkit-scrollbar {
+		display: none;
+	}
+	.portal .p-tabs button {
+		flex: none;
 	}
 }
-.portal .p-hero h2,
-.portal .p-hero p,
-.portal .p-hero .p-muted {
-	color: inherit;
-}
-.portal .p-hero .p-muted {
-	opacity: 0.72;
-}
-.portal .p-hero::after {
-	content: "";
-	position: absolute;
-	right: -70px;
-	top: -80px;
-	width: 220px;
-	height: 220px;
-	border-radius: 50%;
-	border: 30px solid currentColor;
-	opacity: 0.06;
-	pointer-events: none;
-}
-.portal .p-hero .p-btn {
-	background: transparent;
-	border-color: currentColor;
-	color: inherit;
-}
-.portal .p-hero .p-btn--primary {
-	background: var(--cat-2);
-	border-color: var(--cat-2);
-	color: #17130f;
-}
-.portal .p-hero-h {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	font-weight: 700;
-	font-size: 14px;
-	opacity: 0.8;
-}
-.portal .p-hero h2 {
-	font-size: clamp(26px, 3.4vw, 40px);
-	line-height: 1.05;
-	margin: 6px 0;
-}
-.portal .p-tile {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	padding: 22px 24px;
-	border-radius: 28px;
-	text-decoration: none;
-	color: inherit;
-	transition: transform 0.3s var(--ease);
-}
-a.p-tile:hover {
-	transform: translateY(-3px);
-}
-.portal .p-tile-h {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	font-weight: 700;
-	font-size: 15px;
-}
-.portal .p-tile strong {
-	font-family: "Bricolage Grotesque Variable", system-ui, sans-serif;
-	font-weight: 800;
-	letter-spacing: -0.03em;
-	font-variant-numeric: tabular-nums;
-	font-size: clamp(34px, 4.6vw, 52px);
-	line-height: 0.95;
-	color: inherit;
-}
-.portal .p-tile small {
-	font-size: 13px;
-	opacity: 0.8;
-}
-.portal .p-tile.p-card {
-	border: 0;
-}
-.portal .p-section-h {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-}
-.portal .grow-x {
-	transform-origin: left;
-	animation: p-grow-x 1s var(--ease) both;
-}
-@keyframes p-grow-x {
-	from {
-		transform: scaleX(0);
-	}
-}
-.portal .p-card h2 {
-	font-size: 19px;
-}
-@media (prefers-reduced-motion: reduce) {
-	.portal * {
-		animation-duration: 0.01ms !important;
-		transition-duration: 0.01ms !important;
-	}
-}
-.portal .arrive {
-	animation: p-arrive 0.5s var(--ease) both;
-	animation-delay: calc(var(--i, 0) * 60ms);
-}
-@keyframes p-arrive {
-	from {
-		opacity: 0;
-		transform: translateY(16px);
-	}
-}
-/* Shapes: square, circle, card, diamond. Size and colour come from --c. */
+
+/* ── Shapes: every colour comes with one, so none rests on colour alone ───── */
 .portal .sh {
 	display: inline-block;
 	flex: none;
 	width: 14px;
 	height: 14px;
-	background: var(--c, currentColor);
+	background: var(--c, var(--cat-1));
 }
 .portal .sh-sq {
 	border-radius: 3px;
@@ -658,14 +674,130 @@ a.p-tile:hover {
 	border-radius: 2px;
 	transform: rotate(45deg) scale(0.82);
 }
-/* Coloured tiles that read in both themes. */
+.portal .sh-tr {
+	clip-path: polygon(50% 6%, 96% 92%, 4% 92%);
+}
+
+/* ── Hero panel and tiles ─────────────────────────────────────────────────── */
+.portal .p-hero {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px 28px;
+	flex-wrap: wrap;
+	padding: 28px;
+	border-radius: 2rem;
+	background: var(--hero);
+	color: var(--on-hero);
+}
+.portal .p-hero::after {
+	content: "";
+	position: absolute;
+	right: -64px;
+	top: -64px;
+	width: 192px;
+	height: 192px;
+	border-radius: 50%;
+	border: 28px solid currentColor;
+	opacity: 0.06;
+	pointer-events: none;
+}
+.portal .p-hero > * {
+	position: relative;
+	z-index: 1;
+}
+.portal .p-hero p,
+.portal .p-hero .p-muted {
+	color: inherit;
+	opacity: 0.74;
+}
+.portal .p-hero .p-btn {
+	border-color: currentColor;
+	color: inherit;
+}
+.portal .p-hero .p-btn--primary {
+	background: var(--cat-3);
+	border-color: var(--cat-3);
+	color: var(--on-3);
+}
+.portal .p-hero .p-btn--primary:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--cat-3) 88%, var(--ink));
+	border-color: color-mix(in srgb, var(--cat-3) 88%, var(--ink));
+}
+.portal .p-hero :focus-visible {
+	outline-color: var(--cat-3);
+}
+.portal .p-hero-h {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 700;
+	font-size: 14px;
+	opacity: 0.86;
+}
+.portal .p-hero h2 {
+	font-size: clamp(26px, 3.4vw, 40px);
+	line-height: 1.05;
+	margin: 6px 0;
+}
+.portal .p-tile {
+	container-type: inline-size;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+	padding: 24px;
+	border-radius: 1.75rem;
+	text-decoration: none;
+	color: inherit;
+}
+.portal a.p-tile:hover {
+	transform: translateY(-3px);
+}
+.portal a.p-tile {
+	transition: transform 0.3s var(--ease);
+}
+.portal .p-tile-h {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 700;
+	font-size: 15px;
+}
+.portal .p-tile strong {
+	font-family: var(--font-display);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+	/* As big as the tile allows for this many characters (--n, set by StatTile). */
+	font-size: clamp(26px, calc(100cqw / (var(--n, 6) * 0.62)), 56px);
+	line-height: 0.95;
+	color: inherit;
+	overflow-wrap: break-word;
+}
+.portal .p-tile small {
+	font-size: 13px;
+	opacity: 0.85;
+}
+.portal .p-tile small a {
+	font-weight: 700;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+.portal .tone-0 {
+	background: var(--surface);
+	color: var(--ink);
+	border: 1px solid color-mix(in srgb, var(--line) 50%, transparent);
+}
 .portal .tone-1 {
 	background: var(--cat-1);
 	color: var(--on-1);
 }
 .portal .tone-2 {
 	background: var(--cat-2);
-	color: #17130f;
+	color: var(--on-2);
 }
 .portal .tone-3 {
 	background: var(--cat-3);
@@ -673,11 +805,281 @@ a.p-tile:hover {
 }
 .portal .tone-4 {
 	background: var(--cat-4);
-	color: #17130f;
+	color: var(--on-4);
+}
+.portal .tone-5 {
+	background: var(--cat-5);
+	color: var(--on-5);
+}
+.portal .tone-1,
+.portal .tone-2,
+.portal .tone-3,
+.portal .tone-4,
+.portal .tone-5 {
+	--c: currentColor;
+}
+/* A pill that reads on any tone. */
+.portal .pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 26px;
+	padding: 0 12px;
+	border-radius: 9999px;
+	font-size: 12px;
+	font-weight: 700;
+	background: color-mix(in srgb, currentColor 16%, transparent);
+	white-space: nowrap;
+}
+.portal .p-big {
+	font-family: var(--font-display);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+	line-height: 0.95;
+	font-size: clamp(34px, 4.6vw, 52px);
 }
 
+/* ── Label / value pairs ──────────────────────────────────────────────────── */
+.portal .kv {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px 24px;
+	font-size: 14px;
+}
+.portal .kv dt {
+	font-size: 12px;
+	color: var(--muted);
+}
+.portal .kv dd {
+	margin-top: 2px;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+/* ── Lists (notices, withdrawals, history) ────────────────────────────────── */
+.portal .p-list > li {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 16px;
+	padding: 16px 0;
+	border-bottom: 1px solid var(--bg);
+}
+.portal .p-list > li:first-child {
+	padding-top: 4px;
+}
+.portal .p-list > li:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+.portal .p-list .sub {
+	color: var(--muted);
+	font-size: 12px;
+}
+
+/* ── States: loading, empty, error ────────────────────────────────────────── */
+.portal .p-skeleton {
+	display: block;
+	border-radius: 9999px;
+	height: 14px;
+	background: color-mix(in srgb, var(--ink) 9%, var(--surface));
+	animation: p-pulse 1.6s ease-in-out infinite;
+}
+.portal .p-skeleton--block {
+	height: 112px;
+	border-radius: 1.75rem;
+}
+@keyframes p-pulse {
+	50% {
+		opacity: 0.5;
+	}
+}
+.portal .p-state {
+	padding: 40px 20px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	color: var(--muted);
+}
+.portal .p-state svg {
+	width: 32px;
+	height: 32px;
+	opacity: 0.6;
+}
+.portal .p-state .hint {
+	font-size: 13px;
+}
+.portal .p-state--error {
+	color: var(--bad);
+}
+
+/* ── Rendered Markdown (the affiliate terms) ──────────────────────────────── */
+.portal .p-md {
+	max-height: 320px;
+	overflow-y: auto;
+	padding: 18px 22px;
+	border: 2px solid var(--line);
+	border-radius: 1.5rem;
+	background: var(--bg);
+	font-size: 14px;
+	line-height: 1.6;
+}
+.portal .p-md h1,
+.portal .p-md h2,
+.portal .p-md h3 {
+	font-size: 16px;
+	line-height: 1.25;
+	letter-spacing: -0.02em;
+	margin: 20px 0 8px;
+}
+.portal .p-md > :first-child {
+	margin-top: 0;
+}
+.portal .p-md p,
+.portal .p-md ul,
+.portal .p-md ol {
+	margin: 0 0 14px;
+}
+.portal .p-md ul,
+.portal .p-md ol {
+	padding-left: 22px;
+}
+.portal .p-md ul {
+	list-style: disc;
+}
+.portal .p-md ol {
+	list-style: decimal;
+}
+
+/* ── Dialogs: a floating card over a scrim; a bottom sheet on phones ──────── */
+.portal.p-modal-back {
+	position: fixed;
+	inset: 0;
+	z-index: 90;
+	min-height: 0;
+	background: var(--scrim);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+}
+.portal .p-modal {
+	background: var(--surface);
+	color: var(--ink);
+	border-radius: 1.5rem;
+	width: 100%;
+	max-width: 460px;
+	max-height: calc(100dvh - 32px);
+	display: flex;
+	flex-direction: column;
+	outline: none;
+	box-shadow: 0 24px 64px color-mix(in srgb, var(--rail) 40%, transparent);
+	animation: p-arrive 0.3s var(--ease) both;
+}
+.portal .p-modal--wide {
+	max-width: 640px;
+}
+.portal .p-modal--sm {
+	max-width: 384px;
+}
+.portal .p-modal-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 20px 24px 8px;
+}
+.portal .p-modal-body {
+	padding: 8px 24px 20px;
+	overflow-y: auto;
+}
+.portal .p-modal-foot {
+	padding: 4px 24px 24px;
+	display: flex;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+@media (max-width: 639px) {
+	.portal.p-modal-back {
+		align-items: flex-end;
+		padding: 0;
+	}
+	.portal .p-modal {
+		max-width: none;
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+		max-height: 92dvh;
+	}
+	.portal .p-modal-foot {
+		flex-direction: column-reverse;
+	}
+	.portal .p-modal-foot .p-btn {
+		width: 100%;
+	}
+}
+
+/* ── Motion: arrive, never decorate ───────────────────────────────────────── */
+.portal .arrive {
+	animation: p-arrive 0.5s var(--ease) both;
+	animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes p-arrive {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+}
+.portal .grow-x {
+	transform-origin: left;
+	animation: p-grow-x 1s var(--ease) both;
+}
+@keyframes p-grow-x {
+	from {
+		transform: scaleX(0);
+	}
+}
 @media (prefers-reduced-motion: reduce) {
-	.portal * {
-		transition: none !important;
+	.portal *,
+	.portal *::before,
+	.portal *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+/* ── Phones: 44px touch targets ───────────────────────────────────────────── */
+@media (max-width: 639px) {
+	.portal .p-btn {
+		min-height: 44px;
+	}
+	.portal .p-btn--sm {
+		min-height: 44px;
+		padding: 0 16px;
+	}
+	.portal .p-input {
+		height: 48px;
+		font-size: 16px; /* stops iOS zooming into the field */
+	}
+	.portal .p-tabs button {
+		min-height: 44px;
+	}
+	.portal .p-check {
+		min-height: 44px;
+		align-items: center;
+	}
+	.portal .p-card,
+	.portal .card-box {
+		padding: 20px;
+	}
+	.portal .p-hero {
+		padding: 24px 20px;
+	}
+	.portal .p-toolbar {
+		justify-content: flex-start;
 	}
 }

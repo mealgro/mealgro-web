@@ -15,68 +15,25 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
 
 <template>
 	<Teleport to="body">
-		<div class="portal modal-back" @mousedown.self="emit('close')">
+		<div class="portal p-modal-back" @mousedown.self="emit('close')">
 			<div
 				ref="panel"
-				class="modal"
-				:class="{ 'modal--wide': wide }"
+				class="p-modal"
+				:class="{ 'p-modal--wide': wide }"
 				role="dialog"
 				aria-modal="true"
 				:aria-label="title"
 				tabindex="-1"
 			>
-				<div class="p-row p-between modal-head">
+				<div class="p-modal-head">
 					<h2>{{ title }}</h2>
-					<button class="p-btn p-btn--sm" type="button" aria-label="Close" @click="emit('close')">
-						✕
+					<button class="p-btn p-btn--sm p-btn--ghost p-btn--icon" type="button" aria-label="Close" @click="emit('close')">
+						<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
 					</button>
 				</div>
-				<div class="modal-body"><slot /></div>
-				<div v-if="$slots.footer" class="modal-foot"><slot name="footer" /></div>
+				<div class="p-modal-body"><slot /></div>
+				<div v-if="$slots.footer" class="p-modal-foot"><slot name="footer" /></div>
 			</div>
 		</div>
 	</Teleport>
 </template>
-
-<style scoped>
-.modal-back {
-	position: fixed;
-	inset: 0;
-	z-index: 60;
-	min-height: 0 !important;
-	background: rgba(23, 19, 15, 0.45);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 16px;
-}
-.modal {
-	background: #fff;
-	border-radius: 16px;
-	width: 100%;
-	max-width: 460px;
-	max-height: calc(100vh - 32px);
-	display: flex;
-	flex-direction: column;
-	outline: none;
-	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-}
-.modal--wide {
-	max-width: 640px;
-}
-.modal-head {
-	padding: 16px 18px;
-	border-bottom: 1px solid var(--line);
-}
-.modal-body {
-	padding: 18px;
-	overflow-y: auto;
-}
-.modal-foot {
-	padding: 14px 18px;
-	border-top: 1px solid var(--line);
-	display: flex;
-	justify-content: flex-end;
-	gap: 10px;
-}
-</style>
