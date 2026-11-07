@@ -1072,8 +1072,8 @@
 		min-height: 44px;
 		align-items: center;
 	}
-	.portal .p-card,
-	.portal .card-box {
+	.portal .p-card:not(.p-card--flush),
+	.portal .card-box:not(.card-box--flush) {
 		padding: 20px;
 	}
 	.portal .p-hero {

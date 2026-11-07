@@ -157,6 +157,11 @@ withDefaults(
 	gap: 16px;
 	font-size: 14px;
 }
+.au-top-slot :deep(a) {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+}
 .au-card {
 	margin: auto 0;
 	width: 100%;

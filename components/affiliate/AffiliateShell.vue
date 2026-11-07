@@ -98,6 +98,9 @@ onMounted(async () => {
 	overflow-wrap: anywhere;
 }
 .more {
+	display: flex;
+	align-items: center;
+	min-height: 44px;
 	font-size: 13px;
 	font-weight: 600;
 	padding: 0 16px;
