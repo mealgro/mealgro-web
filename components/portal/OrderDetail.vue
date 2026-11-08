@@ -64,16 +64,6 @@ const dueHint = computed(() => {
 	return "Your rider hasn't delivered it yet. Cancel it if it can't get there.";
 });
 
-/** Handing the order to Mealgro's riders takes the delivery fee out of the
- *  order: the core then reports the total and the earning without it. Say so
- *  before the choice is made (the figures above still include the fee). */
-const mealgroEarning = computed(() => {
-	const o = order.value;
-	const fee = o.delivery_fee?.amount ?? 0;
-	if (!needsRider.value || o.delivery_fulfillment === "mealgro" || fee <= 0) return "";
-	return money({ ...o.vendor_earning, amount: Math.max(0, o.vendor_earning.amount - fee) });
-});
-
 /** Why "Mark ready" can't be pressed yet, in words. */
 const readyHint = computed(() => {
 	if (!needsRider.value || carrier.value) return "";
@@ -239,7 +229,7 @@ const extend = () =>
 			</ul>
 			<div class="totals">
 				<div class="p-row p-between"><span class="p-muted">Subtotal</span><span class="amt">{{ money(order.sub_total) }}</span></div>
-				<div class="p-row p-between"><span class="p-muted">Delivery</span><span class="amt">{{ money(order.delivery_fee) }}</span></div>
+				<div v-if="order.delivery_fulfillment === 'vendor'" class="p-row p-between"><span class="p-muted">Delivery</span><span class="amt">{{ money(order.delivery_fee) }}</span></div>
 				<div class="p-row p-between"><span class="p-muted">Order total (excl. service charge)</span><strong class="amt">{{ money(order.total_amount) }}</strong></div>
 				<div class="p-row p-between earn"><span>Your earning</span><strong class="disp">{{ money(order.vendor_earning) }}</strong></div>
 			</div>
@@ -257,7 +247,7 @@ const extend = () =>
 					<legend>Who delivers this order?</legend>
 					<label class="p-check">
 						<input v-model="carrier" type="radio" name="carrier" value="mealgro" />
-						<span><strong>Mealgro riders</strong><small class="p-hint">When a rider arrives, check their phone shows this order's number, then confirm pickup.</small><small v-if="mealgroEarning" class="p-hint">The delivery fee goes to the rider, so your earning becomes {{ mealgroEarning }}.</small></span>
+						<span><strong>Mealgro riders</strong><small class="p-hint">When a rider arrives, check their phone shows this order's number, then confirm pickup.</small></span>
 					</label>
 					<p v-if="ridersState === 'loading'" class="p-muted p-small">Loading your riders…</p>
 					<p v-else-if="ridersState === 'failed'" class="p-alert p-alert--warn">
