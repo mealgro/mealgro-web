@@ -4,10 +4,10 @@
 // only when the sign-in page asks for them and a client id is configured. The
 // ids are public (`PUBLIC_ENV__…`); nothing secret is held in the browser. The
 // API does the verifying: it gets the provider's identity token and answers as
-// it does the mobile app (`POST /auth/provider/{google|apple}`, then
-// `POST /auth/link-provider` when the email already belongs to an account).
+// it does the mobile app (`POST /auth/provider/{google|apple}`). The portal
+// finds an account by the identity alone, never by an email, and makes none.
 import { anonymous, PortalError } from "./http";
-import type { AuthResponse, LinkOffer, SocialOutcome } from "./types";
+import type { AuthResponse } from "./types";
 
 const clean = (v: unknown): string | null => (typeof v === "string" && v.trim() ? v.trim() : null);
 
@@ -242,15 +242,7 @@ export const signInWithProvider = (
 		first_name?: string;
 		last_name?: string;
 	},
-) => anonymous<SocialOutcome>("POST", `/auth/provider/${provider}`, body);
-
-export const linkProvider = (linkToken: string) =>
-	anonymous<AuthResponse & { claimed: boolean }>("POST", "/auth/link-provider", {
-		link_token: linkToken,
-	});
-
-export const isLinkOffer = (o: SocialOutcome): o is { code: "LinkRequired"; link: LinkOffer } =>
-	"link" in o;
+) => anonymous<AuthResponse>("POST", `/auth/provider/${provider}`, body);
 
 /** What went wrong, in words for the person, and whether to point them to
  *  support. */
@@ -272,11 +264,7 @@ export function socialFailure(e: unknown, provider: Provider): SocialFailure {
 		case "LoginErrorInvalidIdentityToken":
 			return said(`${name} couldn't confirm it's you. Please try again.`);
 		case "SocialAccountNotFound":
-			return said(
-				`No Mealgro account uses this ${name} account. Sign in with your phone number and password, or use the ${name} account whose email is on your Mealgro account.`,
-			);
-		case "LinkErrorLinkExpired":
-			return said(`That took too long. Choose ${name} again.`);
+			return said("Account not found.");
 		default:
 			if (e.httpStatus === 429) return said("Too many attempts. Wait a minute and try again.");
 			if (e.httpStatus >= 500) return said("Mealgro had a problem. Please try again in a moment.");

@@ -52,27 +52,6 @@ export type TokenPair = { access_token: string; refresh_token: string };
 
 export type AuthResponse = TokenPair & { user: SessionUser; code: string };
 
-/** An account already holds the email a Google or Apple sign-in vouched for.
- *  Nobody is signed in until its owner says it is theirs. */
-export type LinkOffer = {
-	link_token: string;
-	email: string;
-	account: {
-		name: string | null;
-		masked_email: string | null;
-		masked_phone: string | null;
-		/** `password`, `google`, `apple` */
-		sign_in_methods: string[];
-	};
-	/** Seconds. */
-	expires_in: number;
-};
-
-/** What `POST /auth/provider/{google|apple}` answers: a sign-in, or an offer. */
-export type SocialOutcome =
-	| (AuthResponse & { claimed: boolean })
-	| { code: "LinkRequired"; link: LinkOffer };
-
 export type OrderStatus =
 	| "pending"
 	| "accepted"

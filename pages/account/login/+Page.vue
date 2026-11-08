@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import AuthLayout from "../../../components/portal/AuthLayout.vue";
 import HomeLink from "../../../components/portal/HomeLink.vue";
 import SocialSignIn from "../../../components/portal/SocialSignIn.vue";
@@ -8,14 +8,12 @@ import { session } from "../../../lib/portal/session";
 import {
 	appleClientId,
 	googleClientId,
-	isLinkOffer,
-	linkProvider,
 	providerLabel,
 	signInWithProvider,
 	socialFailure,
 	type Provider,
 } from "../../../lib/portal/social";
-import type { AuthResponse, LinkOffer } from "../../../lib/portal/types";
+import type { AuthResponse } from "../../../lib/portal/types";
 
 const phone = ref("");
 const password = ref("");
@@ -42,22 +40,12 @@ onMounted(async () => {
 
 /** Which provider's sign-in the API is checking. */
 const social = ref<Provider | null>(null);
-/** An account already holds the provider's email: its owner is asked. */
-const linking = ref<{ offer: LinkOffer; provider: Provider } | null>(null);
-const linkBusy = ref(false);
 /** Signed in; the browser is on its way to the portal. */
 const leaving = ref(false);
-const linkHeading = ref<HTMLElement | null>(null);
-const working = computed(() => busy.value || !!social.value || linkBusy.value || leaving.value);
+const working = computed(() => busy.value || !!social.value || leaving.value);
 
 const via =
 	googleClientId && appleClientId ? "Google or Apple" : googleClientId ? "Google" : "Apple";
-
-const methodLabel: Record<string, string> = {
-	password: "Password",
-	google: "Google",
-	apple: "Apple",
-};
 
 function clearMessages() {
 	error.value = "";
@@ -71,13 +59,13 @@ function fail(e: unknown, provider: Provider) {
 	blocked.value = f.support;
 }
 
-/** Into the portal, or — a Mealgro account that works at no store — out again
- *  with the reason. */
-async function enter(res: AuthResponse, provider: Provider) {
+/** Into the portal. The API already answers "not found" for an account that
+ *  works at no store; this is only for one that got through anyway. */
+async function enter(res: AuthResponse) {
 	const user = session.adopt(res);
 	if (!user.stores?.length) {
 		await session.discard();
-		error.value = `This ${providerLabel[provider]} account${user.email ? ` (${user.email})` : ""} isn't connected to a store. Sign in with the account your store uses, or ask its owner to add you as staff.`;
+		error.value = "Account not found.";
 		return;
 	}
 	leaving.value = true;
@@ -105,13 +93,7 @@ async function onCredential(
 						last_name: p.lastName,
 					},
 		);
-		if (isLinkOffer(out)) {
-			linking.value = { offer: out.link, provider: p.provider };
-			await nextTick();
-			linkHeading.value?.focus();
-			return;
-		}
-		await enter(out, p.provider);
+		await enter(out);
 	} catch (e) {
 		fail(e, p.provider);
 	} finally {
@@ -123,30 +105,6 @@ function onProblem(text: string, tone: "error" | "info") {
 	clearMessages();
 	if (tone === "info") notice.value = text;
 	else error.value = text;
-}
-
-async function confirmLink() {
-	const l = linking.value;
-	if (!l || working.value) return;
-	linkBusy.value = true;
-	clearMessages();
-	try {
-		await enter(await linkProvider(l.offer.link_token), l.provider);
-		linking.value = null;
-	} catch (e) {
-		// Expired, refused or failed: the offer is spent either way.
-		linking.value = null;
-		fail(e, l.provider);
-	} finally {
-		linkBusy.value = false;
-	}
-}
-
-function cancelLink() {
-	if (linkBusy.value) return;
-	// Nothing was made or linked: the token is simply dropped.
-	linking.value = null;
-	clearMessages();
 }
 
 async function submit() {
@@ -172,7 +130,7 @@ async function submit() {
 <template>
 	<AuthLayout area="Vendor portal" headline="Your store, at a glance." tagline="Orders, branches, staff and reports in one place, on your phone or your desk.">
 		<template #top><HomeLink /></template>
-		<form v-if="!linking" class="p-stack" @submit.prevent="submit">
+		<form class="p-stack" @submit.prevent="submit">
 			<div>
 				<h1>Sign in to your store</h1>
 				<p v-if="googleClientId || appleClientId" class="p-muted">Use the phone number and password you use in the Mealgro app, or continue with {{ via }}.</p>
@@ -200,32 +158,8 @@ async function submit() {
 			</div>
 			<SocialSignIn :busy="working" @credential="onCredential" @problem="onProblem" />
 			<p class="p-muted p-small">
-				Signing in here doesn't sign you out of the app. Forgot your password? Reset it in the app.
+				New to Mealgro? Create your account in the Mealgro app. Signing in here doesn't sign you out of the app. Forgot your password? Reset it in the app.
 			</p>
 		</form>
-		<div v-else class="p-stack" role="group" aria-labelledby="link-title">
-			<div>
-				<h1 id="link-title" ref="linkHeading" tabindex="-1">Link this account?</h1>
-				<p class="p-muted">An account with {{ linking.offer.email || "this email" }} already exists. Is it yours?</p>
-			</div>
-			<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
-			<div class="p-link-hint">
-				<strong v-if="linking.offer.account.name">{{ linking.offer.account.name }}</strong>
-				<span v-if="linking.offer.account.masked_email">{{ linking.offer.account.masked_email }}</span>
-				<span v-if="linking.offer.account.masked_phone">{{ linking.offer.account.masked_phone }}</span>
-				<span v-if="linking.offer.account.sign_in_methods.length" class="p-muted">
-					Signs in with {{ linking.offer.account.sign_in_methods.map((m) => methodLabel[m] ?? m).join(", ") }}
-				</span>
-			</div>
-			<p class="p-muted p-small">
-				Linking lets you sign in to this account with {{ providerLabel[linking.provider] }}. It signs the account out on its other devices, the app included.
-			</p>
-			<div class="p-stack-sm">
-				<button type="button" class="p-btn p-btn--primary p-btn--block" :disabled="working" @click="confirmLink">
-					{{ linkBusy || leaving ? "Signing in…" : "Link and sign in" }}
-				</button>
-				<button type="button" class="p-btn p-btn--ghost p-btn--block" :disabled="working" @click="cancelLink">Cancel</button>
-			</div>
-		</div>
 	</AuthLayout>
 </template>

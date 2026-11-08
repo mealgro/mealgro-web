@@ -342,23 +342,6 @@
 .portal .p-btn--apple:hover:not(:disabled) {
 	background: color-mix(in srgb, var(--ink) 86%, var(--surface));
 }
-/* The account a Google or Apple sign-in found, to be recognised and confirmed. */
-.portal .p-link-hint {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	padding: 16px 20px;
-	border-radius: 1.5rem;
-	background: var(--bg);
-	font-size: 14px;
-}
-.portal .p-link-hint strong {
-	font-family: var(--font-display);
-	font-weight: 800;
-	letter-spacing: -0.02em;
-	font-size: 16px;
-}
-
 /* ── Fields: pill inputs, label over field ────────────────────────────────── */
 .portal .p-field {
 	display: flex;
