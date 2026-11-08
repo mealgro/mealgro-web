@@ -7,9 +7,12 @@ import { store as api, storeSettings } from "../../../lib/portal/api";
 import { describe, titleCase } from "../../../lib/portal/format";
 import { session } from "../../../lib/portal/session";
 import { toast } from "../../../lib/portal/toast";
-import type { StoreSettings } from "../../../lib/portal/types";
+import type { StoreDetails, StoreSettings } from "../../../lib/portal/types";
 
 const data = ref<StoreSettings | null>(null);
+/** What "view store" alone can read: the core serves the settings to "manage
+ *  store" only, so everyone else gets the store's name and status. */
+const summary = ref<StoreDetails | null>(null);
 const error = ref("");
 const saving = ref("");
 
@@ -22,6 +25,10 @@ const type = ref<"online" | "physical" | "both">("online");
 async function load() {
 	error.value = "";
 	try {
+		if (!session.can("manage-store")) {
+			summary.value = await api.details();
+			return;
+		}
 		const s = await api.settings();
 		data.value = s;
 		contact.value = { full_name: s.contact?.full_name ?? "", phone: s.contact?.phone ?? "" };
@@ -74,8 +81,20 @@ async function save(what: string, fn: () => Promise<unknown>) {
 
 <template>
 	<PortalShell title="Store" need="view-store">
-		<StateBlock v-if="error || !data" class="card-box" :loading="!error && !data" :error="error" :lines="4" @retry="load" />
-		<div v-else class="p-stack">
+		<StateBlock v-if="error || (!data && !summary)" class="card-box" :loading="!error && !data && !summary" :error="error" :lines="4" @retry="load" />
+		<div v-else-if="!data && summary" class="p-stack">
+			<HeroPanel eyebrow="Your store" shape="sq" color="var(--cat-1)" :title="summary.name">
+				<div class="hero-line">
+					<span class="p-badge" :class="summary.status === 'active' ? 'p-badge--ok' : summary.status === 'inactive' ? 'p-badge--warn' : 'p-badge--bad'">{{ titleCase(summary.status) }}</span>
+					<span class="p-badge" :class="summary.is_online ? 'p-badge--ok' : 'p-badge--warn'">{{ summary.is_online ? "Online" : "Offline" }}</span>
+					<span class="p-badge" :class="summary.is_open ? 'p-badge--ok' : 'p-badge--warn'">{{ summary.is_open ? "Open now" : "Closed now" }}</span>
+				</div>
+			</HeroPanel>
+			<p class="p-alert p-alert--info" role="note">
+				You can see this store's status here. Its business details and settings are for people with “manage store” access. Ask an owner or manager.
+			</p>
+		</div>
+		<div v-else-if="data" class="p-stack">
 			<HeroPanel eyebrow="Your business" shape="sq" color="var(--cat-1)" :title="data.business_name">
 				<div class="hero-line">
 					<span>{{ data.email }}</span>
