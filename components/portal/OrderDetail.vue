@@ -41,6 +41,8 @@ const choices = computed(() => {
 	return [...new Set([...[10, 15, 30].filter((m) => m <= minutesLeft.value), minutesLeft.value])];
 });
 const canCancelNow = computed(() => order.value.can_cancel !== false);
+/** The overdue panel carries its own Cancel; the footer doesn't repeat it. */
+const cancelInFooter = computed(() => canCancelNow.value && !(overdue.value && order.value.can_cancel));
 
 const dueHint = computed(() => {
 	const o = order.value;
@@ -60,6 +62,16 @@ const dueHint = computed(() => {
 		return "A rider is on this order, so it can't be cancelled from here. Mealgro is following up.";
 	}
 	return "Your rider hasn't delivered it yet. Cancel it if it can't get there.";
+});
+
+/** Handing the order to Mealgro's riders takes the delivery fee out of the
+ *  order: the core then reports the total and the earning without it. Say so
+ *  before the choice is made (the figures above still include the fee). */
+const mealgroEarning = computed(() => {
+	const o = order.value;
+	const fee = o.delivery_fee?.amount ?? 0;
+	if (!needsRider.value || o.delivery_fulfillment === "mealgro" || fee <= 0) return "";
+	return money({ ...o.vendor_earning, amount: Math.max(0, o.vendor_earning.amount - fee) });
 });
 
 /** Why "Mark ready" can't be pressed yet, in words. */
@@ -245,7 +257,7 @@ const extend = () =>
 					<legend>Who delivers this order?</legend>
 					<label class="p-check">
 						<input v-model="carrier" type="radio" name="carrier" value="mealgro" />
-						<span><strong>Mealgro riders</strong><small class="p-hint">When a rider arrives, check their phone shows this order's number, then confirm pickup.</small></span>
+						<span><strong>Mealgro riders</strong><small class="p-hint">When a rider arrives, check their phone shows this order's number, then confirm pickup.</small><small v-if="mealgroEarning" class="p-hint">The delivery fee goes to the rider, so your earning becomes {{ mealgroEarning }}.</small></span>
 					</label>
 					<p v-if="ridersState === 'loading'" class="p-muted p-small">Loading your riders…</p>
 					<p v-else-if="ridersState === 'failed'" class="p-alert p-alert--warn">
@@ -273,13 +285,13 @@ const extend = () =>
 				<button class="p-btn p-btn--primary" :disabled="busy" @click="accept">Accept order</button>
 			</template>
 			<template v-else-if="order.status === 'accepted'">
-				<button v-if="canCancelNow" class="p-btn p-btn--danger foot-apart" :disabled="busy" @click="leave('cancelled')">Cancel order</button>
+				<button v-if="cancelInFooter" class="p-btn p-btn--danger foot-apart" :disabled="busy" @click="leave('cancelled')">Cancel order</button>
 				<button class="p-btn p-btn--primary" :disabled="busy || !!readyHint" @click="ready">
 					Mark ready
 				</button>
 			</template>
 			<template v-else-if="order.status === 'ready'">
-				<button v-if="canCancelNow" class="p-btn p-btn--danger" :disabled="busy" @click="leave('cancelled')">Cancel order</button>
+				<button v-if="cancelInFooter" class="p-btn p-btn--danger" :disabled="busy" @click="leave('cancelled')">Cancel order</button>
 			</template>
 		</template>
 	</Modal>
