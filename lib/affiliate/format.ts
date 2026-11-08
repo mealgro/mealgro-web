@@ -63,6 +63,7 @@ const FRIENDLY: Record<string, string> = {
 	AffiliateErrorWithdrawalInProgress:
 		"You already have a withdrawal in progress. Wait for it to finish, or cancel it if it's still pending.",
 	AffiliateErrorWithdrawalNotCancellable: "Only a pending withdrawal can be cancelled.",
+	TooManyRequests: "Too many attempts. Wait a minute, then try again.",
 };
 
 /** Readable text for a failure. */

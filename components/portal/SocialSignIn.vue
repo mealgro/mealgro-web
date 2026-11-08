@@ -116,7 +116,7 @@ function continueWithApple() {
 <template>
 	<div v-if="google || apple" class="p-social-wrap">
 		<div class="p-or" aria-hidden="true"><span>or</span></div>
-		<div class="p-social" :inert="busy ? '' : undefined" :aria-busy="busy">
+		<div class="p-social" :inert="busy || undefined" :aria-busy="busy">
 			<div v-if="google" class="p-social-google" :class="{ 'is-hidden': googleState === 'failed' }">
 				<div ref="googleEl" class="p-social-google-slot" />
 			</div>

@@ -44,6 +44,8 @@ export const titleCase = (slug: string) =>
 export function describe(e: unknown): string {
 	if (e && typeof e === "object" && "info" in e) {
 		const info = (e as { info: { message?: string; name: string } }).info;
+		// The core's "try again later" doesn't say when; a minute is what it waits.
+		if (info.name === "TooManyRequests") return "Too many attempts. Wait a minute, then try again.";
 		return sentence(info.message || info.name);
 	}
 	return e instanceof Error ? sentence(e.message) : "Something went wrong.";
