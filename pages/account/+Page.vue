@@ -32,7 +32,7 @@ async function load() {
 	if (session.can("view-orders")) {
 		jobs.push(storeApi.overview().then((o) => void (overview.value = o)));
 		jobs.push(
-			Promise.all([orders.recent(), orders.attention().catch(() => [] as Order[])]).then(([today, late]) => {
+			Promise.all([orders.today(), orders.attention().catch(() => [] as Order[])]).then(([today, late]) => {
 				attention.value = late.length;
 				const ids = new Set(late.map((o) => o.id));
 				// Late orders first, then today's, six in all.

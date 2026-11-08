@@ -10,7 +10,10 @@ import { session } from "../../../lib/portal/session";
 import { toast } from "../../../lib/portal/toast";
 import type { Report } from "../../../lib/portal/types";
 
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+/** A date as the viewer's calendar has it (toISOString would give the UTC day,
+ *  yesterday for the first hour of a Nigerian morning). */
+const iso = (d: Date) =>
+	`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const today = new Date();
 
 const several = computed(() => session.stores.value.length > 1);

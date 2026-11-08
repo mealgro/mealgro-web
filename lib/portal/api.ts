@@ -1,4 +1,4 @@
-import { api, qs } from "./http";
+import { api, getCurrentStore, qs } from "./http";
 import type {
 	CapabilityCatalogue,
 	Order,
@@ -17,8 +17,45 @@ import type {
 	SubscriptionPlan,
 } from "./types";
 
+/** The core's "today" list starts at midnight UTC, which is 1:00 am in Nigeria.
+ *  The first hours of a local day are only in the month's history, so they are
+ *  fetched from there, kept a few minutes, and dropped when an order changes. */
+const EARLY_TTL_MS = 5 * 60_000;
+let early: { key: string; at: number; rows: Order[] } | null = null;
+
+async function earlierToday(start: Date): Promise<Order[]> {
+	const utcMidnight = Date.UTC(
+		new Date().getUTCFullYear(),
+		new Date().getUTCMonth(),
+		new Date().getUTCDate(),
+	);
+	// Nothing to fetch when the local day begins after midnight UTC (west of it).
+	if (start.getTime() >= utcMidnight) return [];
+	const first = new Date(start);
+	// The API answers for the current year only: a day that began last year is
+	// out of reach, and its first hours stay missing.
+	if (first.getUTCFullYear() !== new Date().getUTCFullYear()) return [];
+	const key = `${getCurrentStore() ?? ""}|${start.getTime()}`;
+	if (early && early.key === key && Date.now() - early.at < EARLY_TTL_MS) return early.rows;
+	const rows = await orders.history(first.getUTCMonth() + 1);
+	early = { key, at: Date.now(), rows };
+	return rows;
+}
+
 export const orders = {
 	recent: () => api<Order[]>("GET", "/vendor/orders"),
+	/** Orders placed since midnight where the viewer is, not midnight UTC. */
+	today: async (): Promise<Order[]> => {
+		const start = new Date();
+		start.setHours(0, 0, 0, 0);
+		const [now, before] = await Promise.all([orders.recent(), earlierToday(start)]);
+		const seen = new Set<string>();
+		return [...now, ...before].filter((o) => {
+			if (seen.has(o.id) || new Date(o.created_at).getTime() < start.getTime()) return false;
+			seen.add(o.id);
+			return true;
+		});
+	},
 	/** Orders past their delivery time and waiting on the store, from any day
 	 *  (today's list does not hold yesterday's late order). */
 	attention: () => api<Order[]>("GET", "/vendor/orders/attention"),
@@ -31,8 +68,10 @@ export const orders = {
 		),
 	get: (id: string) => api<Order>("GET", `/vendor/orders/${id}`),
 	/** Adds minutes to an accepted order's delivery time. */
-	extend: (id: string, minutes: number) =>
-		api<unknown>("POST", `/vendor/orders/${id}/extend`, { minutes }),
+	extend: (id: string, minutes: number) => {
+		early = null;
+		return api<unknown>("POST", `/vendor/orders/${id}/extend`, { minutes });
+	},
 	setStatus: (
 		id: string,
 		body: {
@@ -43,7 +82,10 @@ export const orders = {
 			rider?: string;
 			delivery_fullfilment?: string;
 		},
-	) => api<unknown>("PUT", `/vendor/orders/${id}`, body),
+	) => {
+		early = null;
+		return api<unknown>("PUT", `/vendor/orders/${id}`, body);
+	},
 };
 
 export const store = {

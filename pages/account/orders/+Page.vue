@@ -34,7 +34,7 @@ async function load(quiet = false) {
 		let rows: Order[];
 		if (tab.value === "live") {
 			// Today's orders, plus any late one from an earlier day.
-			const [today, late] = await Promise.all([api.recent(), api.attention().catch(() => [] as Order[])]);
+			const [today, late] = await Promise.all([api.today(), api.attention().catch(() => [] as Order[])]);
 			const ids = new Set(today.map((o) => o.id));
 			rows = [...today, ...late.filter((o) => !ids.has(o.id))];
 		} else rows = await api.history(month.value);

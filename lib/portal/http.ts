@@ -67,6 +67,7 @@ let currentStore: string | null = null;
 export function setCurrentStore(id: string | null) {
 	currentStore = id;
 }
+export const getCurrentStore = () => currentStore;
 
 const REQUEST_TIMEOUT_MS = 30_000;
 
