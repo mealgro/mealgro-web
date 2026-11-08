@@ -15,9 +15,10 @@ const clean = (v: unknown): string | null => (typeof v === "string" && v.trim() 
 export const googleClientId = clean(import.meta.env.PUBLIC_ENV__GOOGLE_CLIENT_ID);
 /** The Sign in with Apple Services ID. Without it there is no Apple button. */
 export const appleClientId = clean(import.meta.env.PUBLIC_ENV__APPLE_CLIENT_ID);
-/** The return URL listed on the Services ID; this page unless told otherwise. */
-const appleRedirect = () =>
-	clean(import.meta.env.PUBLIC_ENV__APPLE_REDIRECT_URI) ?? `${location.origin}/account/login`;
+/** The return URL listed on the Services ID: the API's Apple callback, the
+ *  same one the Android app uses. The API names it again when it exchanges
+ *  Apple's code, and Apple wants the two to match. */
+const APPLE_REDIRECT = "https://api.mealgro.com/v1/auth/apple/callback";
 
 export const socialEnabled = !!(googleClientId || appleClientId);
 
@@ -173,7 +174,7 @@ export async function armApple(): Promise<void> {
 	auth.init({
 		clientId: appleClientId,
 		scope: "name email",
-		redirectURI: appleRedirect(),
+		redirectURI: APPLE_REDIRECT,
 		state,
 		nonce: await sha256Hex(raw),
 		usePopup: true,
