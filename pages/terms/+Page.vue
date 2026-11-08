@@ -524,6 +524,8 @@ const fetchTermsAndConditions = async () => {
 
 34.4 Location data is processed in accordance with our Privacy Policy and applicable data protection law, including the NDPA.
 
+34.5 While a Rider is online or on a delivery, Mealgro's operations and support team can see the Rider's location, and the route of each delivery is kept for 3 months. See Section 12 of our Privacy Policy.
+
 ## 35. Push Notifications
 
 35.1 The Platform may send push notifications, SMS messages, and marketing emails relating to Order status, promotions, account activity, and Platform updates.

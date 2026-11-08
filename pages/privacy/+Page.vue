@@ -129,7 +129,7 @@ import {
 
 const pageTitle = "Privacy Policy";
 const entityName = "Mealgro Logistics Ltd";
-const lastReviewed = "23 July 2026";
+const lastReviewed = "8 November 2026";
 
 const renderedContent = ref("");
 const tocItems = ref<TocItem[]>([]);
@@ -339,6 +339,8 @@ We may use and analyse your information to:
 12.3 Rider performance data (such as delivery times, acceptance rates, and customer ratings) may be collected and used for performance management, incentive calculations, and quality assurance.
 
 12.4 Rider information is retained and processed in accordance with Section 18 (Data Retention) and shared only as necessary to operate the Services, comply with legal obligations, or as described in Section 16 (Data Sharing).
+
+12.5 **Who can see a Rider's location.** While you are online or on a delivery, Mealgro's operations and support team can see your location. The route of each delivery is kept for 3 months and then deleted.
 
 ## 13. Payment Information
 
