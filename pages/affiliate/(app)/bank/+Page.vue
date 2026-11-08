@@ -66,15 +66,29 @@ const matches = (list: Bank[]) => {
 const commercial = computed(() => matches(tidy(directory.value?.commercial ?? [])));
 const microfinance = computed(() => matches(tidy(directory.value?.microfinance ?? [])));
 
-const validNumber = computed(() => /^\d{10}$/.test(number.value));
+// How many digits an account number has in this market: the server's rule,
+// sent with the bank list. Until it loads, only what no bank issues is refused.
+const length = computed(() => directory.value?.account_number_length ?? { min: 6, max: 20 });
+const exactLength = computed(() => length.value.min === length.value.max);
+const numberHint = computed(() =>
+	exactLength.value ? `${length.value.min} digits` : `${length.value.min} to ${length.value.max} digits`,
+);
+const validNumber = computed(() => number.value.length >= length.value.min && number.value.length <= length.value.max);
 let seq = 0;
 
 watch([bankCode, number], async () => {
+	const mine = ++seq;
 	resolved.value = "";
 	resolveError.value = "";
 	formError.value = "";
+	resolving.value = false;
 	if (!bankCode.value || !validNumber.value) return;
-	const mine = ++seq;
+	// Where the length is a range, every digit past the minimum is a complete
+	// number: wait for a pause in typing before asking the bank.
+	if (!exactLength.value) {
+		await new Promise((done) => setTimeout(done, 600));
+		if (mine !== seq) return;
+	}
 	resolving.value = true;
 	try {
 		const { account_name } = await bank.resolve(bankCode.value, number.value);
@@ -87,7 +101,7 @@ watch([bankCode, number], async () => {
 });
 
 function onNumber(e: Event) {
-	number.value = (e.target as HTMLInputElement).value.replace(/\D/g, "").slice(0, 10);
+	number.value = (e.target as HTMLInputElement).value.replace(/\D/g, "").slice(0, length.value.max);
 }
 
 function start() {
@@ -204,8 +218,8 @@ function done() {
 						class="p-input"
 						inputmode="numeric"
 						autocomplete="off"
-						maxlength="10"
-						placeholder="10 digits"
+						:maxlength="length.max"
+						:placeholder="numberHint"
 						aria-describedby="aff-acct-name"
 						:aria-invalid="!!resolveError"
 						required

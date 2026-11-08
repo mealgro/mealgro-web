@@ -109,7 +109,9 @@ export type BankAccount = {
 };
 
 export type Bank = { name: string; code: string };
-export type BankDirectory = { commercial: Bank[]; microfinance: Bank[] };
+/** How many digits an account number has in the affiliate's market (the server's rule). */
+export type AccountNumberLength = { min: number; max: number };
+export type BankDirectory = { commercial: Bank[]; microfinance: Bank[]; account_number_length?: AccountNumberLength };
 
 export type WithdrawalStatus =
 	| "pending"
