@@ -84,12 +84,13 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
 	pointer-events: auto;
 	max-width: 1240px;
 	margin-inline: auto;
-	color: var(--on-stage);
-	background: color-mix(in srgb, var(--stage) 72%, transparent);
+	color: var(--ink);
+	background: color-mix(in srgb, var(--surface) 86%, transparent);
 	backdrop-filter: blur(16px) saturate(1.4);
 	-webkit-backdrop-filter: blur(16px) saturate(1.4);
-	border: 1px solid color-mix(in srgb, var(--on-stage) 14%, transparent);
-	--focus: var(--cat-3);
+	border: 1px solid var(--line);
+	box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--ink) 35%, transparent);
+	--focus: var(--brand);
 }
 .bar {
 	display: flex;
@@ -107,7 +108,6 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
 .logo img {
 	height: 34px;
 	width: auto;
-	filter: brightness(0) invert(1);
 }
 .links {
 	display: flex;
@@ -126,12 +126,12 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
 }
 .links a:hover,
 .sheet a:hover {
-	background: color-mix(in srgb, var(--on-stage) 12%, transparent);
+	background: color-mix(in srgb, var(--ink) 6%, transparent);
 }
 .links a[aria-current="page"],
 .sheet a[aria-current="page"] {
-	background: color-mix(in srgb, var(--on-stage) 16%, transparent);
-	box-shadow: inset 0 -3px 0 var(--cat-3);
+	background: color-mix(in srgb, var(--ink) 7%, transparent);
+	box-shadow: inset 0 -3px 0 var(--brand);
 }
 .end {
 	display: flex;
@@ -163,7 +163,7 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
 	height: 46px;
 	border: 0;
 	border-radius: 50%;
-	background: color-mix(in srgb, var(--on-stage) 12%, transparent);
+	background: color-mix(in srgb, var(--ink) 6%, transparent);
 	color: inherit;
 	cursor: pointer;
 }

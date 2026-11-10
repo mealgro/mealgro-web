@@ -48,7 +48,7 @@ const socials = [
 </script>
 
 <template>
-	<footer class="s-stage foot">
+	<footer class="s-stage s-dark foot">
 		<section id="get-app" class="s-wrap band" aria-labelledby="get-app-h">
 			<div class="band-copy">
 				<h2 id="get-app-h" class="s-h2">
@@ -104,7 +104,6 @@ const socials = [
 
 <style scoped>
 .foot {
-	padding-top: clamp(64px, 9vw, 120px);
 	padding-bottom: 32px;
 	overflow: hidden;
 }
@@ -113,7 +112,7 @@ const socials = [
 	grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
 	align-items: center;
 	gap: 48px;
-	padding-bottom: clamp(56px, 8vw, 104px);
+	padding-block: clamp(56px, 8vw, 96px);
 	border-bottom: 1px solid color-mix(in srgb, var(--on-stage) 14%, transparent);
 }
 .band-copy {
@@ -126,8 +125,8 @@ const socials = [
 	justify-content: center;
 }
 .band-phone .s-phone {
-	--pw: 260px;
-	transform: rotate(4deg);
+	--pw: 270px;
+	transform: rotate(3deg);
 }
 .cols {
 	display: grid;

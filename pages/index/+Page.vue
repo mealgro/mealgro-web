@@ -2,6 +2,8 @@
 import SitePage from "../../components/site/SitePage.vue";
 import FeedStory from "../../components/site/FeedStory.vue";
 import FeedClip from "../../components/site/FeedClip.vue";
+import CravingsSection from "../../components/site/CravingsSection.vue";
+import CraveSection from "../../components/site/CraveSection.vue";
 
 const steps = [
 	{
@@ -53,6 +55,8 @@ const faqs = [
 <template>
 	<SitePage>
 		<FeedStory />
+		<CravingsSection />
+		<CraveSection />
 
 		<section id="how" class="s-section" aria-labelledby="how-h">
 			<div class="s-wrap">
@@ -86,7 +90,7 @@ const faqs = [
 					</p>
 				</div>
 				<div class="doors">
-					<a class="door photo" href="/vendors">
+					<a class="door photo s-dark" href="/vendors">
 						<img src="/media/photo/vendor_2.webp" alt="" loading="lazy" decoding="async" width="1000" height="1000" />
 						<div class="door-body">
 							<span class="sh sh-sq" style="--c: var(--cat-1)" aria-hidden="true" />
@@ -95,7 +99,7 @@ const faqs = [
 							<span class="door-cta">Become a vendor</span>
 						</div>
 					</a>
-					<a class="door photo" href="/riders">
+					<a class="door photo s-dark" href="/riders">
 						<img src="/media/photo/rider_deliver.webp" alt="" loading="lazy" decoding="async" width="1000" height="1000" />
 						<div class="door-body">
 							<span class="sh sh-cd" style="--c: var(--cat-3)" aria-hidden="true" />

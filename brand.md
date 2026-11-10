@@ -346,19 +346,23 @@ the ellipsis character, money via `lib/*/format.ts`.
 `/`, `/vendors`, `/riders`, `/affiliate` (the public page), `/about`,
 `/contact`, `/terms`, `/privacy`, `/account-deletion`, `/status` and the error
 page. They use the
-admin's v2 system, like the portals, plus an ink **stage** for video sections.
+admin's v2 system, like the portals, on white with a light grey **stage**
+(`#F6F6F6`, the old hero's background) for the opening bands. Only the
+footer's download band is dark (`.s-dark`).
 **Light only** (owner, Nov 2026): no dark theme and no day/night toggle on these
 pages, whatever the device or a stored `mg.theme` says. The portals keep both.
 
 | What | File |
 | --- | --- |
-| Colours | `components/portal/tokens.css`, scoped to `.portal, .site` (the dark blocks there are `.portal` only). Site-only additions there: `--stage` / `--on-stage` (ink video sections, the same in both themes) and `--app-red` (only inside phone mock-ups, so they look like the customer app) |
+| Colours | `components/portal/tokens.css`, scoped to `.portal, .site` (the dark blocks there are `.portal` only). Site-only additions there: `--stage` / `--on-stage` (light grey bands: `.s-stage`), `--night` / `--on-night` (phone bezels and the dark footer; `.s-stage.s-dark` swaps the stage to them) and `--app-red` (only inside phone mock-ups, so they look like the customer app) |
 | All site CSS (type, buttons, shapes, tiles, steps, phone, FAQ, forms, sign-up block) | `components/site/site.css`, scoped to `.site` |
 | Page frame: header, main, footer, the stylesheet | `components/site/SitePage.vue` (`app="rider"` switches the footer's download band to the rider app). `pages/+Layout.vue` renders only a slot (and starts analytics, not on `/account`) |
-| Header (floating ink bar, Get the app, menu under 980px) | `components/site/SiteHeader.vue`; links in `lib/site/links.ts` (`SITE_LINKS`) |
+| Header (floating white bar with the red logo, Get the app, menu under 980px) | `components/site/SiteHeader.vue`; links in `lib/site/links.ts` (`SITE_LINKS`) |
 | Footer + the `#get-app` download band | `components/site/SiteFooter.vue`; store links in `lib/site/links.ts` (`null` = no listing yet, button hidden) |
-| The home page's opening: one screen, copy beside (or above) the phone, with Pause | `components/site/FeedStory.vue` |
-| The customer app's feed rebuilt in HTML, playing real dish clips: vertical pager of stores, sideways through a store's dishes, and the bookmark (save). A scripted demo loops; visitors can drag and tap, and it resumes after 9 s. Menu, Add to cart and the other rail icons are drawn as in the app but open nothing. Drawn on a 390 × 844 canvas and scaled. Used on the home page, the vendor hero and the footer | `components/site/phone/AppPhone.vue` (+ `PhoneVideo`); stores and dishes in `lib/site/phone.ts` |
+| The home page's opening: one screen, copy beside (or above) the phone, with Pause; the old site's pizza and burgers float around the phone (sized from the phone width, under it, peeking from behind it on phones) | `components/site/FeedStory.vue` |
+| "Satisfy your immediate cravings": food photos cross-fading every 4 s, a segment per photo, Download now (stops for Pause and reduced motion) | `components/site/CravingsSection.vue` |
+| "Find what you crave": Quick Takeouts, Easy Meals, Heavy Loaders cards in sun / rose / mint with their shapes, Explore to `#get-app`; sideways scroller on phones | `components/site/CraveSection.vue` |
+| The customer app's feed rebuilt in HTML, playing real dish clips: vertical pager of stores, sideways through a store's dishes, and the bookmark (save). A scripted demo loops; visitors can drag and tap, and it resumes after 9 s. Menu, Add to cart and the other rail icons are drawn as in the app but open nothing. Drawn on a canvas 390 wide, scaled to the frame's width, with its height taken from the frame (never below 640), so the screen is filled with no crop and no bands at any frame size. Measure the frame with `offsetWidth`/`offsetHeight`, not `getBoundingClientRect` (the footer phone is rotated). Used on the home page, the vendor hero and the footer | `components/site/phone/AppPhone.vue` (+ `PhoneVideo`); stores and dishes in `lib/site/phone.ts` |
 | A lazy, muted, in-view-only video | `components/site/FeedClip.vue`; Pause / reduced motion via `lib/site/media.ts` |
 | Hero for the vendor, rider and affiliate pages (copy + visual) | `components/site/PageHero.vue` |
 | Hero for the text pages (label, title, lead, key/value facts, optional slot) | `components/site/DocHero.vue` |
@@ -379,6 +383,9 @@ marked "PERSONAL USE": check that licence before relying on it.
 The phone's colours are the app's own (`app_color.dart`), declared at the top
 of `AppPhone.vue`: the one place on these pages with hex values outside the
 tokens, so it matches the app it shows.
+`public/media/home/*.webp` are the old home page's assets re-encoded: the floating
+pizza and burgers, the three crave dishes (cut out of the old card SVGs) and
+the five cravings photos.
 Add a clip by encoding it the same way
 (`ffmpeg -an -vf scale=480:-2,fps=24 -crf 28 -movflags +faststart`) and
 referencing its name from `FeedClip`.

@@ -40,7 +40,7 @@
 	--font-display: "Bricolage Grotesque Variable", "Instrument Sans Variable", system-ui, sans-serif;
 	--gutter: clamp(16px, 5vw, 56px);
 	--focus: var(--brand);
-	background: var(--bg);
+	background: var(--surface);
 	color: var(--ink);
 	min-height: 100vh;
 	font-family: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -114,11 +114,16 @@
 	top: 12px;
 }
 
-/* ── Stage: the ink video sections, the same in both themes ───────────────── */
+/* ── Stage: each page's opening band (light grey); `.s-dark` turns a stage
+   section dark, as the footer is ──────────────────────────────────────── */
 .s-stage {
-	--focus: var(--cat-3);
 	background: var(--stage);
 	color: var(--on-stage);
+}
+.s-dark {
+	--stage: var(--night);
+	--on-stage: var(--on-night);
+	--focus: var(--cat-3);
 }
 
 /* ── Layout ───────────────────────────────────────────────────────────────── */
@@ -341,10 +346,10 @@
 	aspect-ratio: 9 / 19.5;
 	border-radius: calc(var(--pw) * 0.15);
 	padding: calc(var(--pw) * 0.03);
-	background: color-mix(in srgb, var(--stage) 86%, var(--on-stage));
+	background: color-mix(in srgb, var(--night) 88%, var(--on-night));
 	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--on-stage) 22%, transparent),
-		0 40px 80px -30px color-mix(in srgb, var(--stage) 70%, transparent);
+		inset 0 0 0 1px color-mix(in srgb, var(--on-night) 18%, transparent),
+		0 40px 80px -30px color-mix(in srgb, var(--night) 55%, transparent);
 }
 .s-phone-screen {
 	position: relative;
@@ -368,7 +373,7 @@
 	width: 30%;
 	height: 22px;
 	border-radius: 999px;
-	background: var(--stage);
+	background: var(--night);
 	transform: translateX(-50%);
 }
 

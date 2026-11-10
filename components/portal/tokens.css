@@ -51,11 +51,14 @@
 	/* Scrim behind drawers and dialogs */
 	--scrim: color-mix(in srgb, var(--rail) 55%, transparent);
 	--ease: cubic-bezier(0.16, 1, 0.3, 1);
-	/* Marketing site only: the video stage is ink in both themes (like the
-	   rail), and the phone mock-ups use the customer app's own red so they
-	   look like the app they show. Never use it for site UI. */
-	--stage: #0a0a12;
-	--on-stage: #f1f0f5;
+	/* Marketing site only. The opening band of each page is light grey
+	   (owner's pick); `--night` is the dark of the footer and of phone bezels.
+	   The phone mock-ups use the customer app's own red so they look like the
+	   app they show. Never use it for site UI. */
+	--stage: #f6f6f6;
+	--on-stage: #12121c;
+	--night: #0a0a12;
+	--on-night: #f1f0f5;
 	--app-red: #d62300;
 }
 
@@ -113,9 +116,11 @@
 
 /* The page canvas behind the portal (the root element cannot read the
    variables above, which are scoped to `.portal`). */
-:root:has(.portal),
-:root:has(.site) {
+:root:has(.portal) {
 	--portal-canvas: #f1f0f5;
+}
+:root:has(.site) {
+	--portal-canvas: #ffffff;
 }
 :root[data-theme="dark"]:has(.portal) {
 	--portal-canvas: #12121c;

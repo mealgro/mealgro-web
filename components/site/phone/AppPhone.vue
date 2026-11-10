@@ -4,7 +4,10 @@
 // store's dishes, and save a dish with the bookmark. Layout, strings and
 // colours follow mealgro-app (feeds/highlight_surface, feed_highlight_widget).
 //
-// Drawn on a 390 × 844 canvas and scaled to fit, so it matches the app at any
+// Drawn 390 px wide and scaled to the screen's width; the drawing's height
+// follows the screen's own shape, so it fills the screen edge to edge with
+// nothing cropped and no bands (everything is laid out from the top or the
+// bottom, as in the app). It matches the app at any size.
 // size. A short scripted demo loops: sideways through a store's dishes, a save
 // now and then, up to the next store. Anyone can take over by swiping or
 // tapping, and the demo resumes after a pause. No demo runs with "reduce
@@ -15,7 +18,8 @@ import { DELIVERY_ADDRESS, STORES, naira } from "../../../lib/site/phone";
 import { reducedMotion, videosPaused } from "../../../lib/site/media";
 
 const W = 390;
-const H = 844;
+/** The drawing's height: the screen's height at the drawing's scale. */
+const H = ref(844);
 const N = STORES.length;
 const mod = (n: number) => ((n % N) + N) % N;
 
@@ -58,7 +62,7 @@ type Touch = { x: number; y: number; dx: number; dy: number; key: number };
 const touch = ref<Touch | null>(null);
 let touchKey = 0;
 function pointAt(el: Element | null | undefined) {
-	if (!el || !canvas.value) return { x: W / 2, y: H / 2 };
+	if (!el || !canvas.value) return { x: W / 2, y: H.value / 2 };
 	const c = canvas.value.getBoundingClientRect();
 	const r = el.getBoundingClientRect();
 	return { x: (r.left + r.width / 2 - c.left) / k.value, y: (r.top + r.height / 2 - c.top) / k.value };
@@ -169,9 +173,13 @@ function onFeedTap(e: MouseEvent) {
 watch(still, () => visible.value && start());
 
 onMounted(() => {
+	// Layout size, not the on-screen box: a tilted phone (the footer's) has a
+	// bigger bounding box than its screen.
 	const fit = () => {
-		const r = root.value?.getBoundingClientRect();
-		if (r && r.width) k.value = Math.min(r.width / W, r.height / H);
+		const el = root.value;
+		if (!el || !el.offsetWidth) return;
+		k.value = el.offsetWidth / W;
+		H.value = Math.max(640, el.offsetHeight / k.value);
 	};
 	fit();
 	ro = new ResizeObserver(fit);
@@ -201,7 +209,7 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 
 <template>
 	<div ref="root" class="ap" @pointerdown="onDown" @pointerup="onUp" @pointercancel="down = null">
-		<div ref="canvas" class="cv" :style="{ transform: `translate(-50%, -50%) scale(${k})` }">
+		<div ref="canvas" class="cv" :style="{ height: `${H}px`, transform: `translate(-50%, -50%) scale(${k})` }">
 			<!-- Stores, one screen each; up for the next -->
 			<section
 				v-for="p in pages"
@@ -366,7 +374,7 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 	left: 50%;
 	top: 50%;
 	width: 390px;
-	height: 844px;
+	height: 844px; /* until measured */
 	transform-origin: center;
 	overflow: hidden;
 	font-family: var(--tommy);
@@ -410,8 +418,8 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 .hpage {
 	position: absolute;
 	top: 0;
+	bottom: 0;
 	width: 390px;
-	height: 844px;
 	overflow: hidden;
 }
 .shade-top,

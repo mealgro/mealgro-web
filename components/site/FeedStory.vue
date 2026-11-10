@@ -22,6 +22,10 @@ import { videosPaused } from "../../lib/site/media";
 				</div>
 			</div>
 			<div class="phone-col">
+				<!-- The old home page's floating food, around the phone now -->
+				<img class="float f-pizza" src="/media/home/float-pizza.webp" alt="" width="520" height="520" />
+				<img class="float f-burger" src="/media/home/float-burger.webp" alt="" width="560" height="560" />
+				<img class="float f-small" src="/media/home/float-burger-small.webp" alt="" width="320" height="320" />
 				<div class="phone" aria-hidden="true">
 					<div class="screen">
 						<AppPhone />
@@ -66,10 +70,43 @@ import { videosPaused } from "../../lib/site/media";
 	max-width: 640px;
 }
 .phone-col {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 16px;
+}
+.float {
+	position: absolute;
+	z-index: 0;
+	height: auto;
+	pointer-events: none;
+	filter: drop-shadow(0 24px 30px color-mix(in srgb, var(--ink) 22%, transparent));
+	animation: float-in 1s var(--ease) both;
+}
+.f-pizza {
+	width: calc(var(--pw) * 0.62);
+	top: 2%;
+	left: calc(var(--pw) * -0.62);
+	animation-delay: 0.25s;
+}
+.f-small {
+	width: calc(var(--pw) * 0.36);
+	bottom: 16%;
+	left: calc(var(--pw) * -0.42);
+	animation-delay: 0.4s;
+}
+.f-burger {
+	width: calc(var(--pw) * 0.66);
+	top: 40%;
+	right: calc(var(--pw) * -0.56);
+	animation-delay: 0.35s;
+}
+@keyframes float-in {
+	from {
+		opacity: 0;
+		transform: translateY(30px) scale(0.9);
+	}
 }
 .phone {
 	position: relative;
@@ -77,10 +114,11 @@ import { videosPaused } from "../../lib/site/media";
 	height: var(--ph);
 	padding: var(--bz);
 	border-radius: calc(var(--pw) * 0.15);
-	background: color-mix(in srgb, var(--stage) 84%, var(--on-stage));
+	z-index: 1;
+	background: color-mix(in srgb, var(--night) 88%, var(--on-night));
 	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--on-stage) 20%, transparent),
-		0 0 140px 10px color-mix(in srgb, var(--cat-1) 36%, transparent);
+		inset 0 0 0 1px color-mix(in srgb, var(--on-night) 18%, transparent),
+		0 40px 90px -30px color-mix(in srgb, var(--night) 55%, transparent);
 	animation: phone-in 0.9s var(--ease) both;
 }
 .screen {
@@ -93,6 +131,8 @@ import { videosPaused } from "../../lib/site/media";
 	isolation: isolate;
 }
 .under {
+	position: relative;
+	z-index: 1;
 	display: flex;
 	align-items: center;
 	gap: 14px;
@@ -158,6 +198,23 @@ import { videosPaused } from "../../lib/site/media";
 	}
 	.copy .s-lead {
 		font-size: 16px;
+	}
+	/* Phones: little room beside the phone, so the food peeks out from
+	   behind its edges instead of sitting off screen. */
+	.f-pizza {
+		width: calc(var(--pw) * 0.4);
+		left: calc(50% - var(--pw) * 0.5 - var(--pw) * 0.2);
+		top: 4%;
+	}
+	.f-small {
+		width: calc(var(--pw) * 0.26);
+		left: calc(50% - var(--pw) * 0.5 - var(--pw) * 0.14);
+		bottom: 22%;
+	}
+	.f-burger {
+		width: calc(var(--pw) * 0.42);
+		right: calc(50% - var(--pw) * 0.5 - var(--pw) * 0.22);
+		top: 46%;
 	}
 }
 </style>
