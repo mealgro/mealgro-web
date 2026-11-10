@@ -4,6 +4,7 @@ import { auth, publicApi } from "../../../../lib/affiliate/api";
 import { describe, errorCode, money } from "../../../../lib/affiliate/format";
 import { HOME, session } from "../../../../lib/affiliate/session";
 import AuthLayout from "../../../../components/portal/AuthLayout.vue";
+import HomeLink from "../../../../components/portal/HomeLink.vue";
 import type { Program, Terms } from "../../../../lib/affiliate/types";
 import CodeStep from "../../../../components/affiliate/CodeStep.vue";
 import PauseBanner from "../../../../components/affiliate/PauseBanner.vue";
@@ -100,7 +101,7 @@ const done = () => location.assign(HOME);
 
 <template>
 	<AuthLayout area="Affiliate program" home-href="/affiliate" headline="Earn for every vendor you bring." tagline="Restaurants and food vendors join Mealgro with your code. We pay you when we approve them." wide>
-		<template #top><a class="link" href="/affiliate/login">Sign in</a></template>
+		<template #top><HomeLink /></template>
 		<div class="p-stack">
 			<PauseBanner v-if="program && !program.active" look="portal" variant="public" :message="program.message" />
 

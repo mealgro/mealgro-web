@@ -4,6 +4,7 @@ import { auth } from "../../../../lib/affiliate/api";
 import { describe, errorCode } from "../../../../lib/affiliate/format";
 import { HOME, session } from "../../../../lib/affiliate/session";
 import AuthLayout from "../../../../components/portal/AuthLayout.vue";
+import HomeLink from "../../../../components/portal/HomeLink.vue";
 import CodeStep from "../../../../components/affiliate/CodeStep.vue";
 
 const step = ref<"email" | "code">("email");
@@ -47,7 +48,7 @@ const done = () => location.assign(HOME);
 
 <template>
 	<AuthLayout area="Affiliate program" home-href="/affiliate" headline="Bring vendors. Get paid." tagline="Share your code with restaurants and food vendors. You earn a reward for every one we approve.">
-		<template #top><a class="link" href="/affiliate/signup">Become an affiliate</a></template>
+		<template #top><HomeLink /></template>
 		<div class="p-stack">
 			<div>
 				<h1>Sign in</h1>
