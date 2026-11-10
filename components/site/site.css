@@ -670,6 +670,161 @@
 	}
 }
 
+/* ── Long-form text (about, legal): rendered from markdown with v-html, so
+   these are plain global selectors under `.s-prose` ─────────────────────── */
+.s-prose {
+	font-size: clamp(16px, 1.5vw, 17.5px);
+	line-height: 1.75;
+	color: var(--ink);
+	max-width: 70ch;
+}
+.s-prose p,
+.s-prose ul,
+.s-prose ol {
+	margin: 0 0 1.1em;
+	color: color-mix(in srgb, var(--ink) 82%, var(--surface));
+}
+.s-prose h2 {
+	font-size: clamp(24px, 2.6vw, 32px);
+	line-height: 1.15;
+	margin: 2.2em 0 0.7em;
+	scroll-margin-top: 104px;
+}
+.s-prose h3 {
+	font-size: 20px;
+	margin: 1.6em 0 0.5em;
+}
+.s-prose > :first-child,
+.s-prose h2:first-child {
+	margin-top: 0;
+}
+.s-prose strong {
+	color: var(--ink);
+	font-weight: 650;
+}
+.s-prose a {
+	color: var(--brand);
+	font-weight: 600;
+	text-decoration: underline;
+	text-decoration-thickness: 1.5px;
+	text-underline-offset: 3px;
+}
+.s-prose ul,
+.s-prose ol {
+	padding-left: 0;
+	list-style: none;
+}
+.s-prose li {
+	position: relative;
+	padding-left: 1.4em;
+	margin-bottom: 0.5em;
+}
+.s-prose ul > li::before {
+	content: "";
+	position: absolute;
+	left: 0.2em;
+	top: 0.68em;
+	width: 7px;
+	height: 7px;
+	border-radius: 2px;
+	background: var(--cat-1);
+}
+.s-prose ol {
+	counter-reset: li;
+}
+.s-prose ol > li {
+	counter-increment: li;
+}
+.s-prose ol > li::before {
+	content: counter(li) ".";
+	position: absolute;
+	left: 0;
+	font-weight: 700;
+	color: var(--brand);
+}
+.s-prose hr {
+	border: 0;
+	height: 1px;
+	background: var(--line);
+	margin: 2.6em 0;
+}
+.s-prose code {
+	padding: 2px 6px;
+	border-radius: 6px;
+	background: var(--bg);
+	font-size: 0.9em;
+}
+/* Legal: the section number beside each heading, clause numbers, contacts */
+.s-prose h2 .chip {
+	display: inline-grid;
+	place-items: center;
+	min-width: 2.1em;
+	height: 2.1em;
+	margin-right: 0.55em;
+	padding: 0 0.4em;
+	border-radius: 0.6em;
+	background: var(--brand-soft);
+	color: var(--brand);
+	font-size: 0.62em;
+	vertical-align: 0.2em;
+	letter-spacing: 0;
+}
+.s-prose .clause-num {
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--brand);
+	white-space: nowrap;
+}
+.s-prose .contact-card {
+	margin: 1em 0 1.4em;
+	padding: 20px 24px;
+	border-radius: 1.5rem;
+	background: var(--brand-soft);
+}
+.s-prose .contact-card p {
+	margin: 0 0 0.4em;
+	color: var(--ink);
+}
+/* About: the closing line of a section, and the values grid */
+.s-prose .pull-quote {
+	margin: 1.4em 0;
+	padding: 4px 0 4px 20px;
+	border-left: 4px solid var(--cat-3);
+	font-family: var(--font-display);
+	font-size: clamp(20px, 2.2vw, 26px);
+	line-height: 1.25;
+	letter-spacing: -0.02em;
+	color: var(--ink);
+}
+.s-prose .pull-quote strong {
+	font-weight: 800;
+}
+.s-prose .values-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 12px;
+	margin: 0 0 1.4em;
+}
+.s-prose .value-card {
+	padding: 20px;
+	border-radius: 1.25rem;
+	background: var(--bg);
+}
+.s-prose .value-card p {
+	margin: 0;
+}
+.s-prose .value-title {
+	font-family: var(--font-display);
+	font-weight: 800;
+	font-size: 19px;
+	color: var(--ink) !important;
+	margin-bottom: 6px !important;
+}
+.s-prose .value-desc {
+	font-size: 15.5px;
+	line-height: 1.55;
+}
+
 /* ── Motion: arrival only, and none when asked ────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 	.site *,

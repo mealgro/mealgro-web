@@ -1,109 +1,27 @@
 <!-- https://vike.dev/Layout -->
 
 <template>
-	<slot v-if="isPortal || isSitePage" />
-	<div v-else id="page-container">
-		<Navigation />
-		<!-- Global Logo -->
-		<a href="/" class="global-logo-link">
-			<img
-				:src="logoImage"
-				alt="MealGro Logo"
-				class="global-logo"
-				:class="{ 'global-logo--red': isRedLogoPage }"
-			/>
-		</a>
-		<div id="page-content" class="page-content-wrapper">
-			<slot />
-		</div>
-	</div>
+	<!-- Every public page brings its own header and footer
+	     (components/site/SitePage.vue); the vendor portal (/account) brings its
+	     own chrome. The signed-in affiliate area doesn't use this layout. -->
+	<slot />
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
 import { usePageContext } from "vike-vue/usePageContext";
-import Navigation from "../components/shared/Navigation.vue";
-import logoImage from "../assets/logo.svg";
 import "../lib/theme";
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
 const pageContext = usePageContext();
-// The vendor portal (/account) is an app, not a page of the marketing site:
-// it brings its own chrome and keeps the browser's zoom.
-const isPortal = computed(
-	() =>
-		pageContext.urlPathname === "/account" ||
-		pageContext.urlPathname.startsWith("/account/"),
-);
-// The rebuilt marketing pages bring their own header and footer
-// (components/site/SitePage.vue). The signed-in affiliate pages under
-// /affiliate/* are not in this list.
-const SITE_PAGES = ["/", "/vendors", "/riders", "/affiliate"];
-const isSitePage = computed(() => SITE_PAGES.includes(pageContext.urlPathname));
-const isRedLogoPage = computed(() => {
-	const path = pageContext.urlPathname;
-	return (
-		// The error page (light background).
-		pageContext.pageId === "/pages/_error" ||
-		path === "/" ||
-		path === "/riders" ||
-		path === "/terms" ||
-		path === "/privacy" ||
-		path === "/about" ||
-		path === "/contact" ||
-		path === "/status"
-	);
-});
-
-// Prevent zoom via keyboard shortcuts (Ctrl/Cmd + Plus/Minus/0)
-const preventZoomKeyboard = (e: KeyboardEvent) => {
-	if (
-		(e.ctrlKey || e.metaKey) &&
-		(e.key === "+" || e.key === "-" || e.key === "=" || e.key === "0")
-	) {
-		e.preventDefault();
-		return false;
-	}
-};
-
-// Prevent zoom via mouse wheel with Ctrl/Cmd
-const preventZoomWheel = (e: WheelEvent) => {
-	if (e.ctrlKey || e.metaKey) {
-		e.preventDefault();
-		return false;
-	}
-};
-
-// Prevent pinch zoom gestures
-const preventZoomTouch = (e: TouchEvent) => {
-	if (e.touches.length > 1) {
-		e.preventDefault();
-		return false;
-	}
-};
+// The vendor portal (/account) is an app, not a page of the public site.
+const isPortal = () =>
+	pageContext.urlPathname === "/account" || pageContext.urlPathname.startsWith("/account/");
 
 onMounted(() => {
-	if (isPortal.value) return;
-	initAnalytics();
-	// The rebuilt pages keep the browser's zoom.
-	if (isSitePage.value) return;
-	document.addEventListener("keydown", preventZoomKeyboard);
-	document.addEventListener("wheel", preventZoomWheel, { passive: false });
-	document.addEventListener("touchstart", preventZoomTouch, {
-		passive: false,
-	});
-	document.addEventListener("touchmove", preventZoomTouch, {
-		passive: false,
-	});
-	document.addEventListener("gesturestart", (e) => e.preventDefault());
-	document.addEventListener("gesturechange", (e) => e.preventDefault());
-	document.addEventListener("gestureend", (e) => e.preventDefault());
-
-});
-
-function initAnalytics() {
+	if (isPortal()) return;
 	const firebaseConfig = {
 		apiKey: "AIzaSyDkL_P3BwyvYc3QJC3uGPajn29LZwBf_wc",
 		authDomain: "mealgro-logistics.firebaseapp.com",
@@ -113,17 +31,7 @@ function initAnalytics() {
 		appId: "1:527667832209:web:e6a0db4c37eabacb80e630",
 		measurementId: "G-SVDWRYGK43",
 	};
-
-	// Initialize Firebase
-	const app = initializeApp(firebaseConfig);
-	getAnalytics(app);
-}
-
-onUnmounted(() => {
-	document.removeEventListener("keydown", preventZoomKeyboard);
-	document.removeEventListener("wheel", preventZoomWheel);
-	document.removeEventListener("touchstart", preventZoomTouch);
-	document.removeEventListener("touchmove", preventZoomTouch);
+	getAnalytics(initializeApp(firebaseConfig));
 });
 </script>
 
@@ -177,68 +85,5 @@ textarea,
 a,
 button {
 	touch-action: auto;
-}
-</style>
-
-<style scoped>
-/* Page Transition Animation */
-#page-container {
-	width: 100%;
-	max-width: 100vw;
-	overflow-x: hidden;
-}
-
-#page-content {
-	opacity: 1;
-	transition: opacity 0.3s ease-in-out;
-	width: 100%;
-	max-width: 100vw;
-	overflow-x: hidden;
-}
-body.page-transition #page-content {
-	opacity: 0;
-}
-
-.page-content-wrapper {
-	position: relative;
-	width: 100%;
-	max-width: 100vw;
-	overflow-x: hidden;
-}
-
-.global-logo-link {
-	position: absolute;
-	left: 20px;
-	top: 20px;
-	z-index: 100;
-	display: block;
-	text-decoration: none;
-	cursor: pointer;
-}
-
-.global-logo {
-	width: 110px;
-	height: 80px;
-	object-fit: contain;
-	filter: brightness(0) invert(1);
-	display: block;
-	pointer-events: none;
-}
-
-@media (min-width: 1400px) {
-	.global-logo-link {
-		left: calc((100vw - 1400px) / 2 + 20px);
-	}
-}
-
-.global-logo--red {
-	filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%)
-		hue-rotate(346deg) brightness(104%) contrast(97%);
-}
-
-@media (max-width: 1024px) {
-	.global-logo-link {
-		display: none;
-	}
 }
 </style>

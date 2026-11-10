@@ -1,66 +1,25 @@
 <template>
-	<div class="about-page">
-		<!-- Mobile/Tablet Header -->
-		<div class="mobile-header">
-			<div class="mobile-logo-container">
-				<a href="/">
-					<img
-						:src="logoImage"
-						alt="Mealgro Logo"
-						class="mobile-logo"
-					/>
-				</a>
+	<SitePage>
+		<DocHero label="About MealGro" :title="heroTitle" :lead="heroSubheadline" />
+		<section class="s-section about">
+			<div class="s-wrap">
+				<article class="s-card sheet">
+					<!-- eslint-disable-next-line vue/no-v-html -- our own markdown, written below -->
+					<div class="s-prose" v-html="renderedContent" />
+				</article>
 			</div>
-			<MobileMenu />
-		</div>
-
-		<main class="doc">
-			<header class="doc-hero">
-				<p class="doc-eyebrow">About MealGro</p>
-				<h1 class="doc-title">{{ heroTitle }}</h1>
-				<p class="doc-subheadline">{{ heroSubheadline }}</p>
-			</header>
-
-			<article class="doc-sheet">
-				<div class="markdown-content" v-html="renderedContent"></div>
-			</article>
-		</main>
-
-		<button
-			v-show="showBackToTop"
-			class="back-to-top"
-			type="button"
-			aria-label="Back to top"
-			@click="scrollToTop"
-		>
-			<svg
-				width="18"
-				height="18"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M12 19V5M12 5L5 12M12 5L19 12"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
-			</svg>
+		</section>
+		<button v-show="showBackToTop" class="to-top" type="button" aria-label="Back to top" @click="scrollToTop">
+			<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
 		</button>
-
-		<div class="footer-spacer"></div>
-		<Footer />
-	</div>
+	</SitePage>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import { marked } from "marked";
-import logoImage from "../../assets/logo.svg";
-import Footer from "../../components/shared/Footer.vue";
-import MobileMenu from "../../components/shared/MobileMenu.vue";
+import SitePage from "../../components/site/SitePage.vue";
+import DocHero from "../../components/site/DocHero.vue";
 
 const heroTitle = "Food, discovered.";
 const heroSubheadline =
@@ -327,247 +286,36 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.about-page {
-	--paper: #f6f6f6;
-	--paper-line: rgba(23, 19, 15, 0.12);
-	--ink: #17130f;
-	--ink-soft: rgba(23, 19, 15, 0.64);
-	--brand-red: #d62300;
-	--brand-red-soft: rgba(214, 35, 0, 0.08);
-	--brand-yellow: #ffe100;
-	--card: #ffffff;
-	--mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas,
-		monospace;
-
-	background: var(--paper);
-	color: var(--ink);
-}
-
-.doc {
-	max-width: 900px;
+.sheet {
+	max-width: 880px;
 	margin: 0 auto;
-	padding: clamp(120px, 14vw, 176px) clamp(20px, 4vw, 40px)
-		clamp(64px, 8vw, 96px);
+	padding: clamp(24px, 5vw, 64px);
 }
-
-/* Hero */
-.doc-hero {
-	max-width: 720px;
-	margin: 0 auto clamp(40px, 6vw, 64px);
-	text-align: center;
+.sheet .s-prose {
+	margin: 0 auto;
 }
-
-.doc-eyebrow {
-	font-family: var(--mono);
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: 0.16em;
-	text-transform: uppercase;
-	color: var(--brand-red);
-	margin: 0 0 16px;
-}
-
-.doc-title {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 800;
-	font-size: clamp(44px, 7vw, 76px);
-	line-height: 1.05;
-	letter-spacing: -0.02em;
-	margin: 0 0 clamp(20px, 3vw, 28px);
-}
-
-.doc-subheadline {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 500;
-	font-size: clamp(18px, 2.2vw, 22px);
-	line-height: 1.6;
-	color: var(--ink-soft);
-	margin: 0;
-}
-
-.doc-sheet {
-	background: var(--card);
-	border-radius: 28px;
-	padding: clamp(32px, 5vw, 64px);
-	box-shadow: 0 24px 60px rgba(23, 19, 15, 0.08);
-}
-
-/* Back to top */
-.back-to-top {
+.to-top {
 	position: fixed;
-	right: clamp(16px, 3vw, 32px);
-	bottom: clamp(16px, 3vw, 32px);
+	right: 20px;
+	bottom: 20px;
+	z-index: 50;
+	display: grid;
+	place-items: center;
 	width: 48px;
 	height: 48px;
+	border: 0;
 	border-radius: 50%;
-	border: none;
-	background: var(--brand-red, #d62300);
-	color: #ffffff;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	background: var(--ink);
+	color: var(--surface);
 	cursor: pointer;
-	box-shadow: 0 10px 24px rgba(214, 35, 0, 0.35);
-	transition: transform 0.15s ease, opacity 0.15s ease;
-	z-index: 50;
 }
-
-.back-to-top:hover {
-	transform: translateY(-2px);
-}
-
-.footer-spacer {
-	background: #000000;
-	height: clamp(60px, 8vw, 100px);
-}
-
-/* Mobile Header */
-.mobile-header {
-	display: none;
-}
-
-:focus-visible {
-	outline: 2px solid var(--brand-red, #d62300);
-	outline-offset: 2px;
-}
-
-@media (max-width: 1024px) {
-	.mobile-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 16px 20px;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 100;
-		width: 100vw;
-		box-sizing: border-box;
-		background: rgba(214, 35, 0, 0.95);
-		backdrop-filter: blur(10px);
+@media (max-width: 560px) {
+	.about {
+		padding-top: 24px;
 	}
-
-	.mobile-logo-container {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		background: white;
-		border-radius: 50px;
-		padding: 8px 16px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	.sheet {
+		padding: 22px 18px;
+		border-radius: 1.5rem;
 	}
-
-	.mobile-logo-container a {
-		display: flex;
-		align-items: center;
-		text-decoration: none;
-		cursor: pointer;
-	}
-
-	.mobile-logo {
-		height: 24px;
-		width: auto;
-		pointer-events: none;
-	}
-
-	.doc {
-		padding-top: clamp(100px, 15vw, 180px);
-	}
-}
-
-
-</style>
-
-<!--
-	Unscoped on purpose: Vue's scoped-CSS attribute is only applied to nodes the
-	compiler sees in this template. Everything below lives inside `v-html`, so a
-	scoped selector such as `.markdown-content h2[data-v-xxx]` would silently
-	never match. These class names are specific to this document body.
--->
-<style>
-.about-page .markdown-content {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 400;
-	font-size: clamp(16px, 1.6vw, 18px);
-	line-height: 1.75;
-	color: var(--ink, #17130f);
-}
-
-.about-page .markdown-content p {
-	margin: 0 0 clamp(18px, 2.5vw, 22px);
-	color: var(--ink-soft, rgba(23, 19, 15, 0.64));
-}
-
-.about-page .markdown-content h2 {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 800;
-	font-size: clamp(26px, 3.4vw, 36px);
-	line-height: 1.25;
-	letter-spacing: -0.01em;
-	color: var(--ink, #17130f);
-	margin: clamp(40px, 6vw, 56px) 0 clamp(18px, 2.5vw, 24px);
-}
-
-.about-page .markdown-content h2:first-child {
-	margin-top: 0;
-}
-
-.about-page .markdown-content strong {
-	color: var(--ink, #17130f);
-	font-weight: 700;
-}
-
-.about-page .markdown-content .pull-quote {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 700;
-	font-size: clamp(22px, 2.8vw, 30px);
-	line-height: 1.35;
-	letter-spacing: -0.01em;
-	color: var(--brand-red, #d62300);
-	border-left: 3px solid var(--brand-red, #d62300);
-	padding-left: clamp(16px, 2.5vw, 24px);
-	margin: clamp(28px, 4vw, 36px) 0;
-}
-
-.about-page .markdown-content .pull-quote strong {
-	color: inherit;
-	font-weight: inherit;
-}
-
-.about-page .markdown-content hr {
-	border: none;
-	border-top: 2px solid var(--brand-red, #d62300);
-	width: 64px;
-	margin: clamp(40px, 6vw, 56px) auto;
-	opacity: 0.4;
-}
-
-.about-page .markdown-content .values-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-	gap: clamp(14px, 2vw, 20px);
-	margin: 0 0 clamp(18px, 2.5vw, 22px);
-}
-
-.about-page .markdown-content .value-card {
-	padding: clamp(18px, 2.5vw, 24px);
-	background: var(--brand-red-soft, rgba(214, 35, 0, 0.08));
-	border-radius: 16px;
-}
-
-.about-page .markdown-content .value-title {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 700;
-	font-size: clamp(17px, 2vw, 19px);
-	color: var(--brand-red, #d62300);
-	margin: 0 0 8px;
-}
-
-.about-page .markdown-content .value-desc {
-	font-size: 0.9em;
-	line-height: 1.6;
-	color: var(--ink-soft, rgba(23, 19, 15, 0.64));
-	margin: 0;
 }
 </style>

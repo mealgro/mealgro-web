@@ -1,29 +1,12 @@
 <template>
-	<div class="contact-page deletion-page">
-		<!-- Mobile/Tablet Header -->
-		<div class="mobile-header">
-			<div class="mobile-logo-container">
-				<a href="/">
-					<img
-						:src="logoImage"
-						alt="Mealgro Logo"
-						class="mobile-logo"
-					/>
-				</a>
-			</div>
-			<MobileMenu />
-		</div>
-
-		<main class="doc">
-			<header class="doc-hero">
-				<p class="doc-eyebrow">Your data</p>
-				<h1 class="doc-title">Delete your Mealgro account</h1>
-				<p class="doc-subheadline">
-					How to delete your account in the Mealgro app or the
-					Mealgro Rider app, by Mealgro Logistics Ltd, what we delete,
-					and what we have to keep.
-				</p>
-			</header>
+	<SitePage>
+		<DocHero
+			label="Your data"
+			title="Delete your Mealgro account"
+			lead="How to delete your account in the Mealgro app or the Mealgro Rider app, by Mealgro Logistics Ltd, what we delete, and what we have to keep."
+		/>
+		<section class="s-section">
+			<div class="s-wrap del">
 
 			<section class="del-section" aria-labelledby="in-app">
 				<h2 id="in-app" class="del-heading">Delete it in the app</h2>
@@ -125,17 +108,14 @@
 				<a class="del-link" :href="`mailto:${supportEmail}`">{{ supportEmail }}</a>
 				or read our <a class="del-link" href="/privacy">Privacy Policy</a>.
 			</p>
-		</main>
-
-		<div class="footer-spacer"></div>
-		<Footer />
-	</div>
+		</div>
+		</section>
+	</SitePage>
 </template>
 
 <script setup lang="ts">
-import Footer from "../../components/shared/Footer.vue";
-import MobileMenu from "../../components/shared/MobileMenu.vue";
-import logoImage from "../../assets/logo.svg";
+import SitePage from "../../components/site/SitePage.vue";
+import DocHero from "../../components/site/DocHero.vue";
 
 interface KeptRecord {
 	data: string;
@@ -178,387 +158,159 @@ const kept: KeptRecord[] = [
 </script>
 
 <style scoped>
-.contact-page {
-	--paper: #f6f6f6;
-	--paper-line: rgba(23, 19, 15, 0.12);
-	--ink: #17130f;
-	--ink-soft: rgba(23, 19, 15, 0.64);
-	--brand-red: #d62300;
-	--brand-red-soft: rgba(214, 35, 0, 0.08);
-	--brand-yellow: #ffe100;
-	--card: #ffffff;
-	--mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas,
-		monospace;
-
-	background: var(--paper);
-	color: var(--ink);
-}
-
-.doc {
-	max-width: 900px;
-	margin: 0 auto;
-	padding: clamp(120px, 14vw, 176px) clamp(20px, 4vw, 40px)
-		clamp(64px, 8vw, 96px);
-}
-
-.doc-hero {
-	max-width: 640px;
-	margin: 0 auto clamp(48px, 6vw, 64px);
-	text-align: center;
-}
-
-.doc-eyebrow {
-	font-family: var(--mono);
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: 0.16em;
-	text-transform: uppercase;
-	color: var(--brand-red);
-	margin: 0 0 16px;
-}
-
-.doc-title {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 800;
-	font-size: clamp(44px, 7vw, 72px);
-	line-height: 1.05;
-	letter-spacing: -0.02em;
-	margin: 0 0 clamp(20px, 3vw, 28px);
-}
-
-.doc-subheadline {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 500;
-	font-size: clamp(18px, 2.2vw, 22px);
-	line-height: 1.6;
-	color: var(--ink-soft);
-	margin: 0;
-}
-
-.contact-grid {
+.del {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	gap: clamp(20px, 3vw, 28px);
-	margin-bottom: clamp(40px, 6vw, 56px);
+	gap: clamp(40px, 6vw, 64px);
+	max-width: 980px;
 }
-
-.contact-card {
-	background: var(--card);
-	border-radius: 24px;
-	padding: clamp(28px, 4vw, 36px);
-	box-shadow: 0 20px 50px rgba(23, 19, 15, 0.07);
-}
-
-.contact-icon {
-	width: 44px;
-	height: 44px;
-	border-radius: 12px;
-	background: var(--brand-red-soft);
-	color: var(--brand-red);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-bottom: clamp(16px, 2.5vw, 20px);
-}
-
-.contact-card-title {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 700;
-	font-size: clamp(20px, 2.4vw, 24px);
-	line-height: 1.3;
-	letter-spacing: -0.01em;
-	color: var(--ink);
-	margin: 0 0 clamp(8px, 1.5vw, 12px);
-}
-
-.contact-card-text {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 400;
-	font-size: clamp(15px, 1.8vw, 16px);
-	line-height: 1.6;
-	color: var(--ink-soft);
-	margin: 0 0 clamp(20px, 3vw, 24px);
-}
-
-.contact-action {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	padding-top: clamp(16px, 2.5vw, 20px);
-	border-top: 1px solid var(--paper-line);
-	flex-wrap: wrap;
-}
-
-.contact-email {
-	font-family: var(--mono);
-	font-size: clamp(14px, 1.6vw, 15px);
-	font-weight: 500;
-	color: var(--ink);
-	text-decoration: none;
-	word-break: break-all;
-}
-
-.contact-email:hover {
-	color: var(--brand-red);
-}
-
-.copy-button {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	flex-shrink: 0;
-	padding: 6px 12px;
-	border-radius: 999px;
-	border: 1px solid var(--brand-red);
-	background: transparent;
-	color: var(--brand-red);
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-size: 12px;
-	font-weight: 600;
-	letter-spacing: 0.02em;
-	cursor: pointer;
-	transition: background 0.15s ease, color 0.15s ease;
-}
-
-.copy-button:hover {
-	background: var(--brand-red-soft);
-}
-
-.copy-button.is-copied {
-	background: var(--brand-red);
-	color: #ffffff;
-}
-
-.contact-note {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 400;
-	font-size: clamp(15px, 1.8vw, 16px);
-	line-height: 1.6;
-	color: var(--ink-soft);
-	text-align: center;
-	max-width: 560px;
-	margin: 0 auto;
-}
-
-.footer-spacer {
-	background: #000000;
-	height: clamp(60px, 8vw, 100px);
-}
-
-/* Mobile Header */
-.mobile-header {
-	display: none;
-}
-
-:focus-visible {
-	outline: 2px solid var(--brand-red, #d62300);
-	outline-offset: 2px;
-}
-
-@media (max-width: 1024px) {
-	.mobile-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 16px 20px;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 100;
-		width: 100vw;
-		box-sizing: border-box;
-		background: rgba(214, 35, 0, 0.95);
-		backdrop-filter: blur(10px);
-	}
-
-	.mobile-logo-container {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		background: white;
-		border-radius: 50px;
-		padding: 8px 16px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	}
-
-	.mobile-logo-container a {
-		display: flex;
-		align-items: center;
-		text-decoration: none;
-		cursor: pointer;
-	}
-
-	.mobile-logo {
-		height: 24px;
-		width: auto;
-		pointer-events: none;
-	}
-
-	.doc {
-		padding-top: clamp(100px, 15vw, 180px);
-	}
-
-	.contact-grid {
-		grid-template-columns: 1fr;
-	}
-}
-
-
-.del-section {
-	margin-bottom: clamp(40px, 6vw, 56px);
-}
-
 .del-heading {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 800;
-	font-size: clamp(24px, 3vw, 32px);
-	line-height: 1.2;
-	letter-spacing: -0.01em;
-	margin: 0 0 clamp(16px, 2.5vw, 20px);
+	font-size: clamp(26px, 3.2vw, 38px);
+	line-height: 1.05;
+	margin-bottom: 18px !important;
 }
-
 .del-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	gap: clamp(20px, 3vw, 28px);
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
 }
-
 .del-card {
-	background: var(--card);
-	border-radius: 24px;
-	padding: clamp(24px, 4vw, 32px);
-	box-shadow: 0 20px 50px rgba(23, 19, 15, 0.07);
+	padding: clamp(22px, 3.5vw, 32px);
+	border-radius: 1.75rem;
+	background: var(--surface);
+	border: 1px solid var(--line);
+	display: grid;
+	gap: 14px;
+	align-content: start;
 }
-
 .del-card-eyebrow {
-	font-family: var(--mono);
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: 0.12em;
-	text-transform: uppercase;
-	color: var(--brand-red);
-	margin: 0 0 14px;
+	font-family: var(--font-display);
+	font-weight: 800;
+	font-size: 20px;
+	letter-spacing: -0.02em;
 }
-
-.del-steps,
-.del-list {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-size: clamp(15px, 1.8vw, 17px);
-	line-height: 1.6;
-	margin: 0;
-	padding-left: 1.3em;
+.del-steps {
+	counter-reset: step;
+	display: grid;
+	gap: 10px;
 }
-
-.del-steps li,
-.del-list li {
-	margin-bottom: 8px;
+.del-steps li {
+	counter-increment: step;
+	position: relative;
+	padding-left: 40px;
+	min-height: 28px;
+	line-height: 1.5;
 }
-
-.del-list {
-	background: var(--card);
-	border-radius: 24px;
-	padding: clamp(24px, 4vw, 32px) clamp(24px, 4vw, 32px)
-		clamp(24px, 4vw, 32px) calc(clamp(24px, 4vw, 32px) + 1.3em);
-	box-shadow: 0 20px 50px rgba(23, 19, 15, 0.07);
+.del-steps li::before {
+	content: counter(step);
+	position: absolute;
+	left: 0;
+	top: -1px;
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 8px;
+	background: var(--brand-soft);
+	color: var(--brand);
+	font-weight: 700;
+	font-size: 14px;
 }
-
-.del-card-note,
+.del-card-note {
+	padding: 12px 16px;
+	border-radius: 1rem;
+	background: color-mix(in srgb, var(--warn) 22%, var(--surface));
+	font-size: 15px;
+}
 .del-text {
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-size: clamp(15px, 1.8vw, 16px);
-	line-height: 1.6;
-	color: var(--ink-soft);
-	margin: 16px 0 0;
+	line-height: 1.65;
+	color: color-mix(in srgb, var(--ink) 82%, var(--surface));
 }
-
-.del-text:first-child {
-	margin-top: 0;
-}
-
-.del-section > .del-text {
-	margin: 0 0 clamp(16px, 2.5vw, 20px);
-}
-
 .del-link {
-	color: var(--brand-red);
+	color: var(--brand);
 	font-weight: 600;
 	text-decoration: underline;
 	text-underline-offset: 3px;
-	word-break: break-all;
 }
-
 .del-button {
-	display: inline-block;
-	margin-top: clamp(20px, 3vw, 24px);
-	padding: 14px 24px;
+	justify-self: start;
+	display: inline-flex;
+	align-items: center;
+	min-height: 52px;
+	padding: 0 24px;
 	border-radius: 999px;
-	background: var(--brand-red);
-	color: #fff;
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-weight: 700;
+	background: var(--brand);
+	color: var(--on-brand) !important;
+	font-weight: 600;
 	text-decoration: none;
 }
-
-.del-button:hover {
-	background: #b81e00;
+.del-list {
+	display: grid;
+	gap: 10px;
 }
-
-.del-button:focus-visible,
-.del-link:focus-visible {
-	outline: 3px solid var(--brand-yellow);
-	outline-offset: 3px;
+.del-list li {
+	position: relative;
+	padding-left: 26px;
+	line-height: 1.6;
+	color: color-mix(in srgb, var(--ink) 82%, var(--surface));
 }
-
+.del-list li::before {
+	content: "";
+	position: absolute;
+	left: 4px;
+	top: 0.62em;
+	width: 8px;
+	height: 8px;
+	border-radius: 2px;
+	background: var(--cat-1);
+}
 .del-table {
-	background: var(--card);
-	border-radius: 24px;
+	margin-top: 18px;
+	border-radius: 1.5rem;
 	overflow: hidden;
-	box-shadow: 0 20px 50px rgba(23, 19, 15, 0.07);
+	border: 1px solid var(--line);
+	background: var(--surface);
 }
-
 .del-row {
 	display: grid;
-	grid-template-columns: 1.4fr 1.4fr 0.8fr;
+	grid-template-columns: 1.3fr 1.2fr 0.6fr;
 	gap: 16px;
-	padding: 16px clamp(20px, 3vw, 28px);
-	border-top: 1px solid var(--paper-line);
-	font-family: "MADE Tommy Soft", sans-serif;
+	padding: 16px 20px;
+	border-top: 1px solid var(--line);
 	font-size: 15px;
 	line-height: 1.5;
-	color: var(--ink-soft);
 }
-
 .del-row-head {
-	border-top: none;
-	font-family: var(--mono);
-	font-size: 12px;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--ink);
-	background: var(--brand-red-soft);
+	border-top: 0;
+	background: var(--bg);
+	font-weight: 700;
+	font-size: 14px;
 }
-
 .del-cell-data {
-	color: var(--ink);
 	font-weight: 600;
 }
-
 .del-cell-period {
-	color: var(--ink);
 	font-weight: 700;
+	color: var(--brand);
 }
-
-@media (max-width: 640px) {
-	.del-row {
-		grid-template-columns: 1fr;
-		gap: 4px;
+.contact-note {
+	padding: 20px 24px;
+	border-radius: 1.5rem;
+	background: var(--brand-soft);
+	font-size: 16px;
+}
+@media (max-width: 760px) {
+	.del-grid {
+		grid-template-columns: minmax(0, 1fr);
 	}
-
 	.del-row-head {
 		display: none;
 	}
+	.del-row {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 4px;
+	}
+	.del-row:nth-child(2) {
+		border-top: 0;
+	}
 }
-
 </style>

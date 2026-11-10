@@ -1,11 +1,14 @@
 # Mealgro web — brand reference
 
-> **November 2026: the home, vendor, rider and public affiliate pages were
-> rebuilt in the admin's v2 system** (owner's call: "the new design similar to
-> the admin"). They are described in [Rebuilt marketing pages](#rebuilt-marketing-pages-v2)
-> below and follow the portal tokens, not the marketing tokens. The rest of the
-> marketing site (about, contact, legal, status, account deletion, error) still
-> uses the older red / MADE Tommy Soft look described next, until it is rebuilt.
+> **November 2026: every public page is in the admin's v2 system** (owner's
+> call): home, vendors, riders, the public affiliate page, about, contact,
+> terms, privacy, account deletion, status and the 404/500 page. They are
+> described in [Rebuilt marketing pages](#rebuilt-marketing-pages-v2) below.
+> The older red / MADE Tommy Soft sections that follow describe components no
+> page uses any more (`components/home`, `components/vendors`,
+> `components/riders`, `components/shared/{Navigation,MobileMenu,NavDropdown,Footer}.vue`,
+> `navLinks.ts`) and the images only they used; they are kept for reference
+> until someone deletes them.
 
 The reference for every change to mealgro.com. The site has **two surfaces that
 are different designs on purpose**: the marketing site, and the signed-in
@@ -340,7 +343,9 @@ the ellipsis character, money via `lib/*/format.ts`.
 
 # Rebuilt marketing pages (v2)
 
-`/`, `/vendors`, `/riders` and `/affiliate` (the public page). They use the
+`/`, `/vendors`, `/riders`, `/affiliate` (the public page), `/about`,
+`/contact`, `/terms`, `/privacy`, `/account-deletion`, `/status` and the error
+page. They use the
 admin's v2 system, like the portals, plus an ink **stage** for video sections.
 **Light only** (owner, Nov 2026): no dark theme and no day/night toggle on these
 pages, whatever the device or a stored `mg.theme` says. The portals keep both.
@@ -349,13 +354,16 @@ pages, whatever the device or a stored `mg.theme` says. The portals keep both.
 | --- | --- |
 | Colours | `components/portal/tokens.css`, scoped to `.portal, .site` (the dark blocks there are `.portal` only). Site-only additions there: `--stage` / `--on-stage` (ink video sections, the same in both themes) and `--app-red` (only inside phone mock-ups, so they look like the customer app) |
 | All site CSS (type, buttons, shapes, tiles, steps, phone, FAQ, forms, sign-up block) | `components/site/site.css`, scoped to `.site` |
-| Page frame: header, main, footer, the stylesheet | `components/site/SitePage.vue` (`app="rider"` switches the footer's download band to the rider app). `pages/+Layout.vue` leaves these paths bare (`SITE_PAGES`) |
+| Page frame: header, main, footer, the stylesheet | `components/site/SitePage.vue` (`app="rider"` switches the footer's download band to the rider app). `pages/+Layout.vue` renders only a slot (and starts analytics, not on `/account`) |
 | Header (floating ink bar, Get the app, menu under 980px) | `components/site/SiteHeader.vue`; links in `lib/site/links.ts` (`SITE_LINKS`) |
 | Footer + the `#get-app` download band | `components/site/SiteFooter.vue`; store links in `lib/site/links.ts` (`null` = no listing yet, button hidden) |
 | The home page's opening: one screen, copy beside (or above) the phone, with Pause | `components/site/FeedStory.vue` |
 | The customer app's feed rebuilt in HTML, playing real dish clips: vertical pager of stores, sideways through a store's dishes, and the bookmark (save). A scripted demo loops; visitors can drag and tap, and it resumes after 9 s. Menu, Add to cart and the other rail icons are drawn as in the app but open nothing. Drawn on a 390 × 844 canvas and scaled. Used on the home page, the vendor hero and the footer | `components/site/phone/AppPhone.vue` (+ `PhoneVideo`); stores and dishes in `lib/site/phone.ts` |
 | A lazy, muted, in-view-only video | `components/site/FeedClip.vue`; Pause / reduced motion via `lib/site/media.ts` |
-| Hero for the other pages | `components/site/PageHero.vue` |
+| Hero for the vendor, rider and affiliate pages (copy + visual) | `components/site/PageHero.vue` |
+| Hero for the text pages (label, title, lead, key/value facts, optional slot) | `components/site/DocHero.vue` |
+| A numbered legal document: renders the page's markdown as written, numbers sections, contents (sticky on desktop, folding on phones), section highlight, `#section-N` links, back to top | `components/site/LegalDoc.vue` + `components/shared/legalDocumentParser.ts` |
+| Long-form text from markdown (about, legal): headings, lists, clause numbers, contact card, pull quotes, values grid | `.s-prose` in `components/site/site.css` |
 | Waitlist forms (Web3Forms, same keys and field names as before) | `components/site/WaitlistForm.vue` |
 
 Media: `public/media/dish/*.mp4` are nine of Mealgro's own seed food clips
