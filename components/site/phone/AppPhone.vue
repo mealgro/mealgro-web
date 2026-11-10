@@ -1,24 +1,18 @@
 <script setup lang="ts">
 // The customer app's feed, rebuilt in HTML so the home page can show it with
 // real dish clips: swipe up for the next store, left and right through a
-// store's dishes, save, reviews, the dish sheet with its modifiers, the cart.
-// Layout, strings and colours follow mealgro-app (feeds/highlight_surface,
-// feed_highlight_widget, store_bottom_sheet, feed_bottom_sheet).
+// store's dishes, and save a dish with the bookmark. Layout, strings and
+// colours follow mealgro-app (feeds/highlight_surface, feed_highlight_widget).
 //
 // Drawn on a 390 × 844 canvas and scaled to fit, so it matches the app at any
-// size. Each `scene` runs a short scripted demo on loop; anyone can take over
-// by swiping or tapping, and the demo resumes after a pause. No demo runs with
-// "reduce motion" or while videos are paused: the scene's end state shows.
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+// size. A short scripted demo loops: sideways through a store's dishes, a save
+// now and then, up to the next store. Anyone can take over by swiping or
+// tapping, and the demo resumes after a pause. No demo runs with "reduce
+// motion" or while videos are paused.
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import PhoneVideo from "./PhoneVideo.vue";
-import DishSheet from "./DishSheet.vue";
-import ReviewsSheet from "./ReviewsSheet.vue";
-import CartSheet from "./CartSheet.vue";
-import { DELIVERY_ADDRESS, STORES, modifiersFor, naira, type ModGroup } from "../../../lib/site/phone";
+import { DELIVERY_ADDRESS, STORES, naira } from "../../../lib/site/phone";
 import { reducedMotion, videosPaused } from "../../../lib/site/media";
-
-export type Scene = "feed" | "swipe" | "save" | "dish" | "cart";
-const props = withDefaults(defineProps<{ scene?: Scene }>(), { scene: "feed" });
 
 const W = 390;
 const H = 844;
@@ -34,67 +28,15 @@ let ro: ResizeObserver | null = null;
 let io: IntersectionObserver | null = null;
 
 // ── Feed state ──────────────────────────────────────────────────────────────
-/** Where each scene starts in the feed. */
-const START: Record<Scene, number> = { feed: 0, swipe: 1, save: 3, dish: 0, cart: 0 };
 /** Vertical position, unbounded: store = vi mod N, so swiping up never ends. */
-const vi = ref(START[props.scene]);
+const vi = ref(0);
 const hl = reactive<number[]>(STORES.map(() => 0));
 const saved = reactive<Record<string, boolean>>({});
-const sheet = ref<null | "reviews" | "dish" | "cart">(null);
 const pressed = ref<string | null>(null);
 
 const storeIdx = computed(() => mod(vi.value));
 const store = computed(() => STORES[storeIdx.value]);
-const dish = computed(() => store.value.dishes[hl[storeIdx.value]]);
 const pages = computed(() => [vi.value - 1, vi.value, vi.value + 1]);
-
-// ── Dish sheet state ────────────────────────────────────────────────────────
-const groups = computed<ModGroup[]>(() => modifiersFor(dish.value));
-const picks = ref<number[][]>([]);
-const extraQty = reactive<Record<string, number>>({});
-const qty = ref(1);
-function resetPicks() {
-	picks.value = groups.value.map((g) => (g.required ? [0] : []));
-	for (const key of Object.keys(extraQty)) delete extraQty[key];
-	qty.value = 1;
-}
-const unit = computed(() => {
-	let total = dish.value.price;
-	groups.value.forEach((g, gi) => {
-		for (const oi of picks.value[gi] ?? []) total += g.options[oi].price * (extraQty[`${gi}:${oi}`] ?? 1);
-	});
-	return total;
-});
-const total = computed(() => unit.value * qty.value);
-function toggle(gi: number, oi: number) {
-	const g = groups.value[gi];
-	const cur = picks.value[gi] ?? [];
-	if (g.max === 1) {
-		picks.value[gi] = g.required ? [oi] : cur.includes(oi) ? [] : [oi];
-	} else if (cur.includes(oi)) {
-		picks.value[gi] = cur.filter((x) => x !== oi);
-		delete extraQty[`${gi}:${oi}`];
-	} else if (cur.length < g.max) {
-		picks.value[gi] = [...cur, oi];
-		if (g.quantities) extraQty[`${gi}:${oi}`] = 1;
-	}
-}
-function bumpExtra(gi: number, oi: number, d: number) {
-	const key = `${gi}:${oi}`;
-	const n = (extraQty[key] ?? 1) + d;
-	if (n < 1) toggle(gi, oi);
-	else extraQty[key] = Math.min(n, 5);
-}
-const cartLine = computed(() => {
-	const parts: string[] = [];
-	groups.value.forEach((g, gi) => {
-		for (const oi of picks.value[gi] ?? []) {
-			const n = extraQty[`${gi}:${oi}`];
-			parts.push(n && n > 1 ? `${g.options[oi].name} ×${n}` : g.options[oi].name);
-		}
-	});
-	return parts.join(" · ");
-});
 
 // ── Moves ───────────────────────────────────────────────────────────────────
 function goStore(d: number) {
@@ -110,10 +52,6 @@ const savedKey = computed(() => `${storeIdx.value}:${hl[storeIdx.value]}`);
 function toggleSave() {
 	saved[savedKey.value] = !saved[savedKey.value];
 }
-function openDish() {
-	resetPicks();
-	sheet.value = "dish";
-}
 
 // ── The finger that shows what the demo is doing ────────────────────────────
 type Touch = { x: number; y: number; dx: number; dy: number; key: number };
@@ -126,16 +64,15 @@ function pointAt(el: Element | null | undefined) {
 	return { x: (r.left + r.width / 2 - c.left) / k.value, y: (r.top + r.height / 2 - c.top) / k.value };
 }
 
-// ── The demo scripts ────────────────────────────────────────────────────────
+// ── The demo ────────────────────────────────────────────────────────────────
 let run = 0;
 const sleep = (ms: number, my: number) =>
 	new Promise<void>((resolve, reject) => setTimeout(() => (my === run ? resolve() : reject(new Error("stop"))), ms));
 
 /** Feed controls live on every rendered page; aim at the one on screen. */
 async function tap(sel: string, my: number, action: () => void) {
-	const el = canvas.value?.querySelector(`.spage.cur ${sel}`) ?? canvas.value?.querySelector(sel);
-	const p = pointAt(el);
-	touch.value = { ...p, dx: 0, dy: 0, key: ++touchKey };
+	const el = canvas.value?.querySelector(`.spage.cur ${sel}`);
+	touch.value = { ...pointAt(el), dx: 0, dy: 0, key: ++touchKey };
 	await sleep(260, my);
 	pressed.value = sel;
 	action();
@@ -143,131 +80,50 @@ async function tap(sel: string, my: number, action: () => void) {
 	pressed.value = null;
 	touch.value = null;
 }
-async function swipe(dir: "up" | "left" | "right", my: number) {
-	const start = dir === "up" ? { x: 250, y: 600 } : { x: dir === "left" ? 300 : 90, y: 420 };
-	const d = dir === "up" ? { dx: 0, dy: -260 } : { dx: dir === "left" ? -200 : 200, dy: 0 };
-	touch.value = { ...start, ...d, key: ++touchKey };
+async function swipe(dir: "up" | "left", my: number) {
+	const from = dir === "up" ? { x: 250, y: 600 } : { x: 300, y: 420 };
+	const d = dir === "up" ? { dx: 0, dy: -260 } : { dx: -200, dy: 0 };
+	touch.value = { ...from, ...d, key: ++touchKey };
 	await sleep(160, my);
 	if (dir === "up") goStore(1);
-	else goDish(dir === "left" ? 1 : -1);
+	else goDish(1);
 	await sleep(420, my);
 	touch.value = null;
 }
-async function scrollSheet(sel: string, to: number, my: number) {
-	canvas.value?.querySelector(sel)?.scrollTo({ top: to, behavior: "smooth" });
-	await sleep(700, my);
-}
 
-/** Put the phone where a scene starts (also its still frame). */
-function setUp(scene: Scene) {
-	sheet.value = null;
+function setUp() {
 	pressed.value = null;
 	touch.value = null;
 	hl.fill(0);
 	for (const key of Object.keys(saved)) delete saved[key];
-	vi.value = START[scene];
-	if (scene === "dish" || scene === "cart") {
-		openDish();
-		if (scene === "cart") {
-			// Turkey, large, two portions of plantain: the order the dish scene builds.
-			picks.value[0] = [1];
-			picks.value[1] = [1];
-			picks.value[2] = [0];
-			extraQty["2:0"] = 2;
-		}
-	}
+	vi.value = 0;
 }
 
-async function script(scene: Scene, my: number) {
-	if (scene === "feed") {
-		for (;;) {
-			await sleep(3600, my);
-			await swipe("up", my);
+/** Each store: its first dish, sideways through the rest, then up to the
+ *  next. Every other store, the dish on screen gets saved before moving on. */
+async function script(my: number) {
+	for (let round = 0; ; round++) {
+		// Each lap round the stores starts with nothing saved.
+		if (round % N === 0) for (const key of Object.keys(saved)) delete saved[key];
+		const n = store.value.dishes.length;
+		for (let i = 1; i < n; i++) {
+			await sleep(2300, my);
+			await swipe("left", my);
 		}
-	}
-	if (scene === "swipe") {
-		for (;;) {
-			const n = store.value.dishes.length;
-			for (let i = 1; i < n; i++) {
-				await sleep(2400, my);
-				await swipe("left", my);
-			}
-			await sleep(2200, my);
-			await swipe("up", my);
-		}
-	}
-	if (scene === "save") {
-		for (;;) {
-			await sleep(1800, my);
-			await tap(".rail .save", my, toggleSave);
-			await sleep(1400, my);
-			await tap(".rail .reviews", my, () => (sheet.value = "reviews"));
-			await sleep(1200, my);
-			await scrollSheet(".rs-body", 240, my);
-			await sleep(1400, my);
-			await tap(".rs-close", my, () => (sheet.value = null));
-			await sleep(1400, my);
-			await swipe("up", my);
-		}
-	}
-	if (scene === "dish") {
-		for (;;) {
-			setUp("dish");
-			sheet.value = null;
-			await sleep(1500, my);
-			await tap(".cart-btn", my, openDish);
+		if (round % 2 === 0 && !saved[savedKey.value]) {
 			await sleep(1300, my);
-			await scrollSheet(".ds-body", 330, my);
-			await tap('[data-opt="0:1"]', my, () => toggle(0, 1));
-			await sleep(700, my);
-			await scrollSheet(".ds-body", 560, my);
-			await tap('[data-opt="1:1"]', my, () => toggle(1, 1));
-			await sleep(700, my);
-			await scrollSheet(".ds-body", 760, my);
-			await tap('[data-opt="2:0"]', my, () => toggle(2, 0));
-			await sleep(500, my);
-			await nextTick();
-			await tap('[data-plus="2:0"]', my, () => bumpExtra(2, 0, 1));
-			await sleep(700, my);
-			await tap(".ds-plus", my, () => (qty.value = 2));
-			await sleep(2600, my);
-			await tap(".ds-close", my, () => (sheet.value = null));
-			await sleep(900, my);
+			await tap(".rail .save", my, () => (saved[savedKey.value] = true));
 		}
-	}
-	if (scene === "cart") {
-		for (;;) {
-			setUp("cart");
-			await sleep(1600, my);
-			await tap(".ds-add", my, () => (sheet.value = "cart"));
-			await sleep(1600, my);
-			await tap(".cs-go", my, () => {});
-			await sleep(2400, my);
-			await tap(".cs-close", my, () => (sheet.value = null));
-			await sleep(1000, my);
-		}
+		await sleep(2000, my);
+		await swipe("up", my);
 	}
 }
 
 const still = computed(() => reducedMotion.value || videosPaused.value);
 function start() {
 	const my = ++run;
-	setUp(props.scene);
-	if (still.value) {
-		// The scene's still frame: a sheet shows its finished state.
-		if (props.scene === "save") {
-			saved[savedKey.value] = true;
-		}
-		if (props.scene === "dish") {
-			picks.value[0] = [1];
-			picks.value[1] = [1];
-			picks.value[2] = [0];
-			extraQty["2:0"] = 2;
-		}
-		if (props.scene === "cart") sheet.value = "cart";
-		return;
-	}
-	script(props.scene, my).catch(() => {});
+	setUp();
+	if (!still.value) script(my).catch(() => {});
 }
 function stop() {
 	run++;
@@ -281,7 +137,7 @@ function takeOver() {
 	stop();
 	if (resume) clearTimeout(resume);
 	resume = setTimeout(() => {
-		if (visible.value) start();
+		if (visible.value && !still.value) script(++run).catch(() => {});
 	}, 9000);
 }
 let down: { x: number; y: number } | null = null;
@@ -298,7 +154,6 @@ function onUp(e: PointerEvent) {
 	const dy = (e.clientY - down.y) / k.value;
 	down = null;
 	dragged = Math.hypot(dx, dy) > 12;
-	if (sheet.value) return;
 	if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)) goStore(dy < 0 ? 1 : -1);
 	else if (Math.abs(dx) > 40) goDish(dx < 0 ? 1 : -1);
 }
@@ -311,13 +166,6 @@ function onFeedTap(e: MouseEvent) {
 	else if (x > W * 0.67) goDish(1);
 }
 
-watch(
-	() => props.scene,
-	() => {
-		if (resume) clearTimeout(resume);
-		if (visible.value) start();
-	},
-);
 watch(still, () => visible.value && start());
 
 onMounted(() => {
@@ -338,7 +186,7 @@ onMounted(() => {
 		{ threshold: 0.25 },
 	);
 	if (root.value) io.observe(root.value);
-	setUp(props.scene);
+	setUp();
 });
 onBeforeUnmount(() => {
 	stop();
@@ -367,7 +215,7 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 						<PhoneVideo
 							:id="d.video"
 							:load="near(p, di)"
-							:play="playing && p === vi && di === hl[mod(p)] && sheet !== 'dish' && sheet !== 'cart'"
+							:play="playing && p === vi && di === hl[mod(p)]"
 						/>
 					</div>
 				</div>
@@ -409,35 +257,35 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 					</div>
 
 					<div class="rail">
-						<button class="r reviews" type="button" tabindex="-1" :class="{ press: pressed === '.rail .reviews' }" @click.stop="sheet = 'reviews'">
+						<span class="r">
 							<svg viewBox="0 0 28 28" width="30" height="30" fill="currentColor"><path d="M25.67 9.92a7.58 7.58 0 0 0-13.57-4.66c5.92.23 10.65 5.1 10.65 11.07l-.01.39.39.1c1.13.3 2.16-.73 1.86-1.85l-.15-.56c-.12-.45-.05-.92.15-1.35.43-.95.68-2.02.68-3.14Z" /><path fill-rule="evenodd" d="M21 16.33a9.33 9.33 0 0 1-13.36 8.42c-.42-.2-.9-.27-1.34-.15l-1.43.38a1.52 1.52 0 0 1-1.86-1.86l.38-1.43c.12-.45.05-.92-.15-1.34A9.33 9.33 0 1 1 21 16.33ZM7.58 17.5a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Zm4.09 0a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Zm4.08 0a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Z" /></svg>
 							<span>{{ s.reviews }}</span>
-						</button>
+						</span>
 						<button class="r save" type="button" tabindex="-1" :class="{ on: saved[`${mod(p)}:${hl[mod(p)]}`], press: pressed === '.rail .save' }" @click.stop="toggleSave">
 							<svg viewBox="0 0 28 28" width="30" height="30" fill="currentColor"><path fill-rule="evenodd" d="M24.5 12.95v5.82c0 3.62 0 5.42-.86 6.21-.4.38-.92.61-1.47.68-1.15.13-2.5-1.06-5.19-3.44-1.19-1.05-1.78-1.58-2.47-1.71a2.6 2.6 0 0 0-1.02 0c-.69.13-1.28.66-2.47 1.71-2.69 2.38-4.04 3.57-5.19 3.44-.55-.07-1.07-.3-1.47-.68-.86-.79-.86-2.59-.86-6.21v-5.82c0-5 0-7.5 1.54-9.06C6.58 2.33 9.05 2.33 14 2.33s7.42 0 8.96 1.56c1.54 1.55 1.54 4.06 1.54 9.06ZM9.63 7c0-.48.39-.88.87-.88h7c.48 0 .88.4.88.88s-.4.88-.88.88h-7A.88.88 0 0 1 9.62 7Z" /></svg>
 							<span>{{ s.saves + (saved[`${mod(p)}:${hl[mod(p)]}`] ? 1 : 0) }}</span>
 						</button>
-						<button class="r" type="button" tabindex="-1" @click.stop>
+						<span class="r">
 							<svg viewBox="0 0 28 28" width="30" height="30" fill="currentColor"><path d="m16.28 6.05 5.81 5.16c1.08.96 1.63 1.45 1.83 2.02.17.5.17 1.04 0 1.54-.2.57-.75 1.06-1.83 2.02l-5.81 5.16c-.5.44-.74.66-.95.67a.58.58 0 0 1-.47-.21c-.13-.16-.13-.5-.13-1.15V18c-2.83 0-5.83.91-8.01 2.52-1.14.84-1.71 1.27-1.92 1.25a.63.63 0 0 1-.46-.28c-.11-.19-.01-.77.18-1.93C5.82 12.02 11 10 14.73 10V6.75c0-.66 0-.99.13-1.15.12-.14.29-.22.47-.21.21 0 .46.22.95.66Z" /></svg>
 							<span>Share</span>
-						</button>
-						<button class="r" type="button" tabindex="-1" @click.stop>
+						</span>
+						<span class="r">
 							<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M3 9.2v5.6c0 .9.7 1.6 1.6 1.6h2.3l4.4 3.6c.8.6 1.9.1 1.9-.9V4.9c0-1-1.1-1.5-1.9-.9L6.9 7.6H4.6C3.7 7.6 3 8.3 3 9.2Z" /><path d="m16.5 9 5 5m0-5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
-						</button>
+						</span>
 					</div>
 
 					<div class="actions">
-						<button class="menu-btn" type="button" tabindex="-1" @click.stop="openDish">
+						<span class="menu-btn">
 							<img src="/media/app-icons/menu_fork_knife.svg" alt="" width="15" height="16" />
 							Menu
-						</button>
-						<button class="cart-btn" type="button" tabindex="-1" :class="{ press: pressed === '.cart-btn' }" @click.stop="openDish">
+						</span>
+						<span class="cart-btn">
 							<span class="cart-l">
 								<img src="/media/app-icons/cart_icon.svg" alt="" width="20" height="20" />
 								Add to cart
 							</span>
 							<span class="cart-r">{{ naira(s.dishes[hl[mod(p)]].price) }}</span>
-						</button>
+						</span>
 					</div>
 				</template>
 			</section>
@@ -465,44 +313,6 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 				<span class="tab"><img src="/media/app-icons/user_icons.svg" alt="" class="white-icon" width="24" height="24" />Profile</span>
 			</nav>
 
-			<!-- Sheets -->
-			<Transition name="scrim">
-				<div v-if="sheet" class="scrim" @click="sheet = null" />
-			</Transition>
-			<Transition name="sheet">
-				<DishSheet
-					v-if="sheet === 'dish'"
-					:dish="dish"
-					:groups="groups"
-					:picks="picks"
-					:extra-qty="extraQty"
-					:qty="qty"
-					:total="total"
-					:pressed="pressed"
-					:playing="playing"
-					@close="sheet = null"
-					@toggle="toggle"
-					@extra="bumpExtra"
-					@qty="(n: number) => (qty = Math.max(1, n))"
-					@add="sheet = 'cart'"
-				/>
-			</Transition>
-			<Transition name="sheet">
-				<ReviewsSheet v-if="sheet === 'reviews'" :store="store" @close="sheet = null" />
-			</Transition>
-			<Transition name="sheet">
-				<CartSheet
-					v-if="sheet === 'cart'"
-					:store="store"
-					:dish="dish"
-					:line="cartLine"
-					:qty="qty"
-					:unit="unit"
-					:pressed="pressed"
-					@close="sheet = null"
-				/>
-			</Transition>
-
 			<!-- Status bar and home indicator, over everything -->
 			<div class="status">
 				<span class="time">9:41</span>
@@ -513,7 +323,7 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 					<span class="batt"><i /></span>
 				</span>
 			</div>
-			<span class="home" :class="{ dark: !!sheet }" />
+			<span class="home" />
 
 			<span v-if="touch" :key="touch.key" class="finger" :style="{ left: `${touch.x}px`, top: `${touch.y}px`, '--dx': `${touch.dx}px`, '--dy': `${touch.dy}px` }" :class="{ drag: touch.dx || touch.dy }" />
 		</div>
@@ -748,8 +558,7 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 .r.save.on span {
 	color: #fff;
 }
-.r.press,
-.cart-btn.press {
+.r.press {
 	transform: scale(0.88);
 }
 .r.save.on svg {
@@ -889,10 +698,6 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 	z-index: 30;
 	transition: color 0.3s;
 }
-.status.dark,
-.home.dark {
-	color: var(--g1);
-}
 .island {
 	position: absolute;
 	left: 50%;
@@ -935,30 +740,6 @@ const near = (page: number, di: number) => Math.abs(page - vi.value) <= 1 && Mat
 	transform: translateX(-50%);
 	z-index: 30;
 	pointer-events: none;
-}
-
-/* ── Sheets ── */
-.scrim {
-	position: absolute;
-	inset: 0;
-	background: rgb(0 0 0 / 0.35);
-	z-index: 10;
-}
-.scrim-enter-active,
-.scrim-leave-active {
-	transition: opacity 0.3s;
-}
-.scrim-enter-from,
-.scrim-leave-to {
-	opacity: 0;
-}
-.sheet-enter-active,
-.sheet-leave-active {
-	transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-.sheet-enter-from,
-.sheet-leave-to {
-	transform: translateY(100%);
 }
 
 /* ── The demo's finger ── */

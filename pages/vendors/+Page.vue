@@ -62,7 +62,7 @@ const faqs = [
 					<img class="s-hero-photo" src="/media/photo/vendor_package.webp" alt="" width="1000" height="1000" fetchpriority="high" />
 					<div class="s-phone s-phone--rec" aria-hidden="true">
 						<div class="s-phone-screen">
-							<AppPhone scene="swipe" />
+							<AppPhone />
 						</div>
 					</div>
 					<div class="s-pop pop-order" aria-hidden="true">

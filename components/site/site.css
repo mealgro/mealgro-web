@@ -114,12 +114,6 @@
 	top: 12px;
 }
 
-/* Pages with a video feed snap each slide into place, gently (proximity, so
-   the rest of the page scrolls freely). */
-:root:has(.feed) {
-	scroll-snap-type: y proximity;
-}
-
 /* ── Stage: the ink video sections, the same in both themes ───────────────── */
 .s-stage {
 	--focus: var(--cat-3);

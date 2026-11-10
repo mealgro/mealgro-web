@@ -74,7 +74,7 @@ const socials = [
 				<div class="s-phone s-phone--rec">
 					<div class="s-phone-screen">
 						<FeedClip v-if="isRider" id="rider-app" />
-						<AppPhone v-else scene="feed" />
+						<AppPhone v-else />
 					</div>
 				</div>
 			</div>

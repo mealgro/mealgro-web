@@ -1,4 +1,4 @@
-// Content for the home page's hand-built phone (components/site/phone). The
+// Content for the hand-built phone (components/site/phone/AppPhone.vue). The
 // stores are made up; every dish is named for what its clip actually shows.
 // Clips: Mealgro's own seed videos (mealgro/data), in public/media/dish.
 
@@ -143,95 +143,5 @@ export const STORES: Store[] = [
 
 /** Where the phone says it delivers to. */
 export const DELIVERY_ADDRESS = "12 Herbert Macaulay Way, Yaba";
-
-export type ModOption = { name: string; price: number };
-export type ModGroup = {
-	title: string;
-	required: boolean;
-	/** 1 for pick-one groups, more for "Select up to n". */
-	max: number;
-	/** Selected options can have a quantity of their own. */
-	quantities?: boolean;
-	options: ModOption[];
-};
-
-/** The modifiers on Mama Ronke's jollof, as the app's dish sheet lays them out. */
-export const JOLLOF_MODIFIERS: ModGroup[] = [
-	{
-		title: "Choose your protein",
-		required: true,
-		max: 1,
-		options: [
-			{ name: "Peppered chicken", price: 0 },
-			{ name: "Peppered turkey", price: 1500 },
-			{ name: "Beef", price: 800 },
-		],
-	},
-	{
-		title: "Portion",
-		required: true,
-		max: 1,
-		options: [
-			{ name: "Regular", price: 0 },
-			{ name: "Large", price: 1200 },
-		],
-	},
-	{
-		title: "Extras",
-		required: false,
-		max: 3,
-		quantities: true,
-		options: [
-			{ name: "Fried plantain", price: 500 },
-			{ name: "Coleslaw", price: 400 },
-			{ name: "Boiled egg", price: 300 },
-		],
-	},
-	{
-		title: "Something to drink",
-		required: false,
-		max: 1,
-		options: [
-			{ name: "Zobo", price: 600 },
-			{ name: "Chapman", price: 900 },
-		],
-	},
-];
-
-/** Every other dish gets a simpler set, so any dish opens a real-looking sheet. */
-export function modifiersFor(dish: Dish): ModGroup[] {
-	if (dish.video === "jollof-chicken") return JOLLOF_MODIFIERS;
-	const large = Math.round((dish.price * 0.3) / 100) * 100;
-	return [
-		{
-			title: "Portion",
-			required: true,
-			max: 1,
-			options: [
-				{ name: "Regular", price: 0 },
-				{ name: "Large", price: large },
-			],
-		},
-		{
-			title: "Something to drink",
-			required: false,
-			max: 1,
-			options: [
-				{ name: "Zobo", price: 600 },
-				{ name: "Chapman", price: 900 },
-			],
-		},
-	];
-}
-
-export type Review = { name: string; text: string; ago: string; score: number };
-
-/** Reviews shown for whichever store is open; written to fit any of them. */
-export const REVIEWS: Review[] = [
-	{ name: "Adaeze Okafor", text: "Exactly what the video showed. Still hot when it arrived.", ago: "2d ago", score: 9 },
-	{ name: "Tunde Bakare", text: "Generous portion and the pepper is just right. Ordering again.", ago: "4d ago", score: 10 },
-	{ name: "Halima Yusuf", text: "Rider was quick and polite. Packaging kept everything neat.", ago: "1w ago", score: 8 },
-	{ name: "Chidi Nwosu", text: "Good food, a little late on a Friday night.", ago: "2w ago", score: 7 },
-];
 
 export const naira = (n: number) => `₦${n.toLocaleString("en-NG")}`;
