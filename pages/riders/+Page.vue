@@ -72,7 +72,7 @@ const faqs = [
 			<template #visual>
 				<div class="s-hero-visual">
 					<img class="s-hero-photo right" src="/media/photo/rider_backpack.webp" alt="" width="1000" height="1000" fetchpriority="high" />
-					<div class="s-phone" aria-hidden="true">
+					<div class="s-phone s-phone--rec" aria-hidden="true">
 						<div class="s-phone-screen">
 							<FeedClip id="rider-app" eager />
 						</div>

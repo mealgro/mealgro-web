@@ -1,6 +1,6 @@
 /* The rebuilt marketing pages (home, vendors, riders, affiliate): the admin
    console's v2 system (ink and paper, cobalt / rose / sun / mint with a shape
-   each, Bricolage Grotesque + Instrument Sans, light and dark), plus an ink
+   each, Bricolage Grotesque + Instrument Sans; light only), plus an ink
    "stage" for the video sections. Colours come from ../portal/tokens.css
    (scoped to `.site`); nothing here holds a hex value. Scoped to `.site`, so
    the older marketing pages and the portals are not touched. */
@@ -11,7 +11,7 @@
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 :root:has(.site) {
 	background: var(--portal-canvas);
-	color-scheme: light dark;
+	color-scheme: light;
 }
 /* pages/+Layout.vue sets overflow-x: hidden on html and body, which makes body
    a scroll container and stops position: sticky (the feed's phone). Clip
@@ -19,12 +19,6 @@
 :root:has(.site),
 :root:has(.site) body {
 	overflow-x: clip;
-}
-:root[data-theme="light"]:has(.site) {
-	color-scheme: light;
-}
-:root[data-theme="dark"]:has(.site) {
-	color-scheme: dark;
 }
 .site {
 	--font-display: "Bricolage Grotesque Variable", "Instrument Sans Variable", system-ui, sans-serif;
@@ -350,6 +344,10 @@
 	overflow: hidden;
 	isolation: isolate;
 	--screen-top: 40px;
+}
+/* A screen recording brings its own status bar and camera cut-out. */
+.s-phone--rec .s-phone-screen::before {
+	display: none;
 }
 .s-phone-screen::before {
 	content: "";

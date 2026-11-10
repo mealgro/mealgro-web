@@ -5,7 +5,8 @@
 
    Scoped to `.portal` and `.site` (the rebuilt marketing pages: home,
    vendors, riders, affiliate), so both are one family; the older marketing
-   pages keep their own palette. Dark is
+   pages keep their own palette. The `.site` pages are light only (owner's
+   call): only `.portal` takes the dark values below. Dark is
    written twice, as the admin does: once for the chosen theme
    (`data-theme="dark"`) and once for the OS (`prefers-color-scheme`) until a
    theme is chosen. */
@@ -58,8 +59,7 @@
 	--app-red: #d62300;
 }
 
-:root[data-theme="dark"] .portal,
-:root[data-theme="dark"] .site {
+:root[data-theme="dark"] .portal {
 	--surface: #1b1b29;
 	--bg: #12121c;
 	--line: #2d2d42;
@@ -85,8 +85,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) .portal,
-	:root:not([data-theme="light"]) .site {
+	:root:not([data-theme="light"]) .portal {
 		--surface: #1b1b29;
 		--bg: #12121c;
 		--line: #2d2d42;
@@ -118,13 +117,11 @@
 :root:has(.site) {
 	--portal-canvas: #f1f0f5;
 }
-:root[data-theme="dark"]:has(.portal),
-:root[data-theme="dark"]:has(.site) {
+:root[data-theme="dark"]:has(.portal) {
 	--portal-canvas: #12121c;
 }
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]):has(.portal),
-	:root:not([data-theme="light"]):has(.site) {
+	:root:not([data-theme="light"]):has(.portal) {
 		--portal-canvas: #12121c;
 	}
 }

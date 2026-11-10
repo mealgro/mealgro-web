@@ -2,9 +2,8 @@
 // The foot of every rebuilt marketing page: the download band (the target of
 // every "Get the app" on the page), then the site's links.
 import logoImage from "../../assets/logo.svg";
-import FeedScreen from "./FeedScreen.vue";
+import FeedClip from "./FeedClip.vue";
 import StoreButtons from "./StoreButtons.vue";
-import { CLIPS } from "../../lib/site/media";
 import { CUSTOMER_APP, RIDER_APP } from "../../lib/site/links";
 
 const props = withDefaults(defineProps<{ app?: "customer" | "rider" }>(), { app: "customer" });
@@ -71,9 +70,9 @@ const socials = [
 				/>
 			</div>
 			<div class="band-phone" aria-hidden="true">
-				<div class="s-phone">
+				<div class="s-phone s-phone--rec">
 					<div class="s-phone-screen">
-						<FeedScreen :clip="CLIPS.pasta" cart-href="#get-app" />
+						<FeedClip :id="isRider ? 'rider-app' : 'app-feed'" />
 					</div>
 				</div>
 			</div>

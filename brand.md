@@ -342,26 +342,31 @@ the ellipsis character, money via `lib/*/format.ts`.
 
 `/`, `/vendors`, `/riders` and `/affiliate` (the public page). They use the
 admin's v2 system, like the portals, plus an ink **stage** for video sections.
+**Light only** (owner, Nov 2026): no dark theme and no day/night toggle on these
+pages, whatever the device or a stored `mg.theme` says. The portals keep both.
 
 | What | File |
 | --- | --- |
-| Colours | `components/portal/tokens.css`, scoped to `.portal, .site`. Site-only additions there: `--stage` / `--on-stage` (ink video sections, the same in both themes) and `--app-red` (only inside phone mock-ups, so they look like the customer app) |
+| Colours | `components/portal/tokens.css`, scoped to `.portal, .site` (the dark blocks there are `.portal` only). Site-only additions there: `--stage` / `--on-stage` (ink video sections, the same in both themes) and `--app-red` (only inside phone mock-ups, so they look like the customer app) |
 | All site CSS (type, buttons, shapes, tiles, steps, phone, FAQ, forms, sign-up block) | `components/site/site.css`, scoped to `.site` |
 | Page frame: header, main, footer, the stylesheet | `components/site/SitePage.vue` (`app="rider"` switches the footer's download band to the rider app). `pages/+Layout.vue` leaves these paths bare (`SITE_PAGES`) |
-| Header (floating ink bar, day/night toggle, Get the app, menu under 980px) | `components/site/SiteHeader.vue`; links in `lib/site/links.ts` (`SITE_LINKS`) |
+| Header (floating ink bar, Get the app, menu under 980px) | `components/site/SiteHeader.vue`; links in `lib/site/links.ts` (`SITE_LINKS`) |
 | Footer + the `#get-app` download band | `components/site/SiteFooter.vue`; store links in `lib/site/links.ts` (`null` = no listing yet, button hidden) |
-| The home feed (sticky phone, snap slides, full-screen clips on phones) | `components/site/FeedStory.vue` |
-| A screen of the app's feed over a clip | `components/site/FeedScreen.vue` |
+| The home feed: snap slides beside one fixed phone that plays real recordings of the app, each new one swiping up into it; on phones each slide has its own phone | `components/site/FeedStory.vue` |
+| A drawn mock of the app's feed screen over a food clip (vendor hero only) | `components/site/FeedScreen.vue` |
 | A lazy, muted, in-view-only video | `components/site/FeedClip.vue`; Pause / reduced motion via `lib/site/media.ts` |
 | Hero for the other pages | `components/site/PageHero.vue` |
 | Waitlist forms (Web3Forms, same keys and field names as before) | `components/site/WaitlistForm.vue` |
 
-Media: `public/media/feed/*.mp4|webp` are Mealgro's own seed clips
-(`mealgro/data`), cut to 6 s, 480 px wide, muted H.264 (~300–570 KB) with a
-WebP poster; `rider-app.mp4` is from the app recording in
-`mealgro/marketing/films/capture`. `public/media/photo/*.webp` are this repo's
+Media: `public/media/feed/app-*.mp4` are cuts of the real customer-app screen
+recordings in `mealgro/marketing/films/capture` (`rec_feed.mp4` 0–7.4 s and
+4.4–7.4 s, `rec_order.mp4` store 20 s, item 45 s, checkout 72.4 s);
+`rider-app.mp4` is from `rec_rider.mp4`. `spaghetti` and `noodles` are
+Mealgro's own seed food clips (`mealgro/data`). All 480 px wide, muted H.264,
+`+faststart`, with a WebP poster of an early frame (120–870 KB each). `public/media/photo/*.webp` are this repo's
 own Mealgro-branded photos, compressed. Add a clip by encoding it the same way
-and adding it to `CLIPS` in `lib/site/media.ts`.
+(`ffmpeg -an -vf scale=480:-2,fps=24 -crf 28 -movflags +faststart`) and
+referencing its name from `FeedClip`.
 
 Rules: one orchestrated arrival per page (copy rises, phone settles), nothing
 loops except the clips, and clips stop for Pause and for reduced motion. Don't

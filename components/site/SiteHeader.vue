@@ -1,11 +1,10 @@
 <script setup lang="ts">
 // The floating ink bar on the rebuilt marketing pages: logo, the site's links,
-// the day/night toggle, and Get the app (which jumps to the footer's download
+// and Get the app (which jumps to the footer's download
 // band). Under 980px the links fold into a menu.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { usePageContext } from "vike-vue/usePageContext";
 import logoImage from "../../assets/logo.svg";
-import ThemeToggle from "../portal/ThemeToggle.vue";
 import { SITE_LINKS } from "../../lib/site/links";
 
 const pageContext = usePageContext();
@@ -42,7 +41,6 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
 				</li>
 			</ul>
 			<div class="end">
-				<ThemeToggle />
 				<a class="get" href="#get-app">Get the app</a>
 				<button
 					ref="menuBtn"
