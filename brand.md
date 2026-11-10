@@ -349,6 +349,14 @@ page. They use the
 admin's v2 system, like the portals, on white with a light grey **stage**
 (`#F6F6F6`, the old hero's background) for the opening bands. Only the
 footer's download band is dark (`.s-dark`).
+**Mealgro red leads** (owner, Nov 2026): on `.site`, `--brand` is `#D62300`
+(hover `#BD1F00`, tint `#FDECE8`; white on it is 5.1:1), set in `tokens.css`.
+Red goes where it matters: the main button of each page (`.s-btn--primary`:
+Get the app, Join the waitlist, Become an affiliate, Download now, Get Mealgro
+for Android, Go Home), the header's Get the app, the current page in the
+header, links, legal numbering and contents, list bullets, the cravings
+segments, the Explore chevrons. Second buttons stay ink outlines. The portals
+keep cobalt; the category colours (sun, rose, mint) stay as accents.
 **Light only** (owner, Nov 2026): no dark theme and no day/night toggle on these
 pages, whatever the device or a stored `mg.theme` says. The portals keep both.
 

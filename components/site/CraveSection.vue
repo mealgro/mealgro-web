@@ -120,8 +120,8 @@ const cards = [
 	width: 40px;
 	height: 40px;
 	border-radius: 50%;
-	background: var(--ink);
-	color: var(--surface);
+	background: var(--brand);
+	color: var(--on-brand);
 }
 .sr-only {
 	position: absolute;

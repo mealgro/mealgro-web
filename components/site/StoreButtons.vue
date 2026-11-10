@@ -8,7 +8,7 @@ defineProps<{ links: StoreLinks; appName: string }>();
 
 <template>
 	<div class="s-actions">
-		<a v-if="links.android" class="s-btn s-btn--ink" :href="links.android" rel="noopener" target="_blank">
+		<a v-if="links.android" class="s-btn s-btn--primary" :href="links.android" rel="noopener" target="_blank">
 			<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" /></svg>
 			Get {{ appName }} for Android
 			<span class="sr-only">(opens Google Play in a new tab)</span>

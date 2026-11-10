@@ -207,7 +207,7 @@
 }
 .s-btn--primary:hover {
 	color: var(--on-brand);
-	background: color-mix(in srgb, var(--brand) 88%, var(--ink));
+	background: var(--brand-hover);
 }
 .s-btn--ink {
 	background: var(--ink);
@@ -732,7 +732,7 @@
 	width: 7px;
 	height: 7px;
 	border-radius: 2px;
-	background: var(--cat-1);
+	background: var(--brand);
 }
 .s-prose ol {
 	counter-reset: li;

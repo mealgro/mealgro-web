@@ -54,7 +54,7 @@ const faqs = [
 				Mealgro rider brings the order to them.
 			</p>
 			<div class="s-actions">
-				<a class="s-btn s-btn--ink" href="#join">Join the vendor waitlist</a>
+				<a class="s-btn s-btn--primary" href="#join">Join the vendor waitlist</a>
 				<a class="s-btn s-btn--outline" href="/account">Sign in to the vendor portal</a>
 			</div>
 			<template #visual>

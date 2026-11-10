@@ -62,6 +62,17 @@
 	--app-red: #d62300;
 }
 
+/* The public pages lead with Mealgro red (owner, Nov 2026): main buttons,
+   Get the app, the current page in the header, links, numbering. White on
+   it is 5.1:1. The portals keep cobalt; the category colours stay as they
+   are on both. */
+.site {
+	--brand: #d62300;
+	--brand-hover: #bd1f00;
+	--on-brand: #ffffff;
+	--brand-soft: #fdece8;
+}
+
 :root[data-theme="dark"] .portal {
 	--surface: #1b1b29;
 	--bg: #12121c;

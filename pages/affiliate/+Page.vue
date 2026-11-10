@@ -68,9 +68,9 @@ const steps = [
 				</template>
 			</p>
 			<div class="s-actions">
-				<a v-if="signedIn" class="s-btn s-btn--ink" href="/affiliate/dashboard">Go to your dashboard</a>
+				<a v-if="signedIn" class="s-btn s-btn--primary" href="/affiliate/dashboard">Go to your dashboard</a>
 				<template v-else>
-					<a class="s-btn s-btn--ink" href="/affiliate/signup">Become an affiliate</a>
+					<a class="s-btn s-btn--primary" href="/affiliate/signup">Become an affiliate</a>
 					<a class="s-btn s-btn--outline" href="/affiliate/login">Sign in</a>
 				</template>
 			</div>

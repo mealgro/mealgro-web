@@ -17,7 +17,7 @@ import { videosPaused } from "../../lib/site/media";
 					kitchen, sideways for more of its dishes, and save the ones you want to come back to.
 				</p>
 				<div class="s-actions rise" style="--i: 2">
-					<a class="s-btn s-btn--ink" href="#get-app">Get the app</a>
+					<a class="s-btn s-btn--primary" href="#get-app">Get the app</a>
 					<a class="s-btn s-btn--outline" href="#how">How ordering works</a>
 				</div>
 			</div>

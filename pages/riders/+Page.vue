@@ -66,7 +66,7 @@ const faqs = [
 				online when it suits you; every naira you earn shows in the app.
 			</p>
 			<div class="s-actions">
-				<a class="s-btn s-btn--ink" href="#join">Join the rider waitlist</a>
+				<a class="s-btn s-btn--primary" href="#join">Join the rider waitlist</a>
 				<a class="s-btn s-btn--outline" href="#get-app">Get the rider app</a>
 			</div>
 			<template #visual>
