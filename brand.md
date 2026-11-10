@@ -391,7 +391,9 @@ Add a clip by encoding it the same way
 referencing its name from `FeedClip`.
 
 Rules: one orchestrated arrival per page (copy rises, phone settles), nothing
-loops except the clips, and clips stop for Pause and for reduced motion. Don't
+loops except the clips, the home hero's floating food (bobbing 20px over 4s,
+as on the old site) and the cravings photos; all of them stop for Pause and
+for reduced motion. Don't
 name a class after a Tailwind utility (`ring`, `grid` with other meaning…):
 Tailwind scans these files and its utility wins. Links in `.site` inherit colour
 at zero specificity (`:where(.site) a`), so any button class can colour a link.

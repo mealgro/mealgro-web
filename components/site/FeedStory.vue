@@ -8,7 +8,7 @@ import { videosPaused } from "../../lib/site/media";
 </script>
 
 <template>
-	<section class="feed s-stage" aria-labelledby="feed-h">
+	<section class="feed s-stage" :class="{ still: videosPaused }" aria-labelledby="feed-h">
 		<div class="s-wrap grid">
 			<div class="copy">
 				<h1 id="feed-h" class="s-h1 rise" style="--i: 0">Order what you just watched.</h1>
@@ -82,30 +82,54 @@ import { videosPaused } from "../../lib/site/media";
 	height: auto;
 	pointer-events: none;
 	filter: drop-shadow(0 24px 30px color-mix(in srgb, var(--ink) 22%, transparent));
-	animation: float-in 1s var(--ease) both;
+	/* Arrives once (transform), then bobs as on the old home page
+	   (translate, so the two don't fight): 20px over 4s, offset per item. */
+	animation:
+		float-in 1s var(--ease) var(--in) both,
+		bob 4s linear var(--bob) infinite;
+}
+.feed.still .float {
+	animation-play-state: running, paused;
 }
 .f-pizza {
+	--in: 0.25s;
+	--bob: 0s;
 	width: calc(var(--pw) * 0.62);
 	top: 2%;
 	left: calc(var(--pw) * -0.62);
-	animation-delay: 0.25s;
 }
 .f-small {
+	--in: 0.4s;
+	--bob: 1.3s;
 	width: calc(var(--pw) * 0.36);
 	bottom: 16%;
 	left: calc(var(--pw) * -0.42);
-	animation-delay: 0.4s;
 }
 .f-burger {
+	--in: 0.35s;
+	--bob: 0.7s;
 	width: calc(var(--pw) * 0.66);
 	top: 40%;
 	right: calc(var(--pw) * -0.56);
-	animation-delay: 0.35s;
 }
 @keyframes float-in {
 	from {
 		opacity: 0;
 		transform: translateY(30px) scale(0.9);
+	}
+}
+@keyframes bob {
+	0%,
+	100% {
+		translate: 0 0;
+	}
+	50% {
+		translate: 0 -20px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.float {
+		animation: float-in 1s var(--ease) var(--in) both;
 	}
 }
 .phone {
