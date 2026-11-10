@@ -8,6 +8,22 @@
 @import "@fontsource-variable/instrument-sans/wght.css";
 @import "../portal/tokens.css";
 
+/* Lato (SIL OFL 1.1): the app sets it on labels and buttons, so the phone
+   mock-up on the home page uses it too. MADE Tommy Soft, the app's main face,
+   comes from pages/fonts.css. */
+@font-face {
+	font-family: "Lato";
+	src: url("/media/fonts/Lato-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Lato";
+	src: url("/media/fonts/Lato-Bold.ttf") format("truetype");
+	font-weight: 700;
+	font-display: swap;
+}
+
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 :root:has(.site) {
 	background: var(--portal-canvas);

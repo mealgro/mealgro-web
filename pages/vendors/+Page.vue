@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import SitePage from "../../components/site/SitePage.vue";
 import PageHero from "../../components/site/PageHero.vue";
-import FeedScreen from "../../components/site/FeedScreen.vue";
+import AppPhone from "../../components/site/phone/AppPhone.vue";
 import WaitlistForm, { type Field } from "../../components/site/WaitlistForm.vue";
-import { CLIPS } from "../../lib/site/media";
 
 const fields: Field[] = [
 	{ name: "full_name", label: "Full name", autocomplete: "name" },
@@ -61,14 +60,14 @@ const faqs = [
 			<template #visual>
 				<div class="s-hero-visual">
 					<img class="s-hero-photo" src="/media/photo/vendor_package.webp" alt="" width="1000" height="1000" fetchpriority="high" />
-					<div class="s-phone" aria-hidden="true">
+					<div class="s-phone s-phone--rec" aria-hidden="true">
 						<div class="s-phone-screen">
-							<FeedScreen :clip="CLIPS.spaghetti" eager cart-href="#join" />
+							<AppPhone scene="swipe" />
 						</div>
 					</div>
 					<div class="s-pop pop-order" aria-hidden="true">
 						<span class="sh sh-sq" style="--c: var(--cat-1)" />
-						<span><strong>New order</strong>Seafood pasta × 2 · ₦7,800</span>
+						<span><strong>New order</strong>Seafood spaghetti × 2 · ₦19,600</span>
 					</div>
 				</div>
 			</template>

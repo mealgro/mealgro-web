@@ -3,6 +3,7 @@
 // every "Get the app" on the page), then the site's links.
 import logoImage from "../../assets/logo.svg";
 import FeedClip from "./FeedClip.vue";
+import AppPhone from "./phone/AppPhone.vue";
 import StoreButtons from "./StoreButtons.vue";
 import { CUSTOMER_APP, RIDER_APP } from "../../lib/site/links";
 
@@ -72,7 +73,8 @@ const socials = [
 			<div class="band-phone" aria-hidden="true">
 				<div class="s-phone s-phone--rec">
 					<div class="s-phone-screen">
-						<FeedClip :id="isRider ? 'rider-app' : 'app-feed'" />
+						<FeedClip v-if="isRider" id="rider-app" />
+						<AppPhone v-else scene="feed" />
 					</div>
 				</div>
 			</div>

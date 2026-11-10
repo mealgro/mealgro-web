@@ -352,19 +352,26 @@ pages, whatever the device or a stored `mg.theme` says. The portals keep both.
 | Page frame: header, main, footer, the stylesheet | `components/site/SitePage.vue` (`app="rider"` switches the footer's download band to the rider app). `pages/+Layout.vue` leaves these paths bare (`SITE_PAGES`) |
 | Header (floating ink bar, Get the app, menu under 980px) | `components/site/SiteHeader.vue`; links in `lib/site/links.ts` (`SITE_LINKS`) |
 | Footer + the `#get-app` download band | `components/site/SiteFooter.vue`; store links in `lib/site/links.ts` (`null` = no listing yet, button hidden) |
-| The home feed: snap slides beside one fixed phone that plays real recordings of the app, each new one swiping up into it; on phones each slide has its own phone | `components/site/FeedStory.vue` |
-| A drawn mock of the app's feed screen over a food clip (vendor hero only) | `components/site/FeedScreen.vue` |
+| The home feed: snap slides beside one fixed phone (under the copy on phones); each slide sets the phone's scene | `components/site/FeedStory.vue` |
+| The customer app rebuilt in HTML, playing real dish clips: vertical pager of stores, sideways through a store's dishes, rail (reviews, save, share, mute), dish sheet with modifiers, reviews sheet, cart. Scenes `feed`, `swipe`, `save`, `dish`, `cart` loop a scripted demo; visitors can drag and tap, and the demo resumes after 9 s. Drawn on a 390 × 844 canvas and scaled. Used on the home feed, the vendor hero and the footer | `components/site/phone/AppPhone.vue` (+ `DishSheet`, `ReviewsSheet`, `CartSheet`, `PhoneVideo`); stores, dishes, modifiers and reviews in `lib/site/phone.ts` |
 | A lazy, muted, in-view-only video | `components/site/FeedClip.vue`; Pause / reduced motion via `lib/site/media.ts` |
 | Hero for the other pages | `components/site/PageHero.vue` |
 | Waitlist forms (Web3Forms, same keys and field names as before) | `components/site/WaitlistForm.vue` |
 
-Media: `public/media/feed/app-*.mp4` are cuts of the real customer-app screen
-recordings in `mealgro/marketing/films/capture` (`rec_feed.mp4` 0–7.4 s and
-4.4–7.4 s, `rec_order.mp4` store 20 s, item 45 s, checkout 72.4 s);
-`rider-app.mp4` is from `rec_rider.mp4`. `spaghetti` and `noodles` are
-Mealgro's own seed food clips (`mealgro/data`). All 480 px wide, muted H.264,
-`+faststart`, with a WebP poster of an early frame (120–870 KB each). `public/media/photo/*.webp` are this repo's
-own Mealgro-branded photos, compressed. Add a clip by encoding it the same way
+Media: `public/media/dish/*.mp4` are nine of Mealgro's own seed food clips
+(`mealgro/data`), each named in `lib/site/phone.ts` for what it shows; 6 s,
+400 px wide, muted H.264 with `+faststart` (255–495 KB) and a WebP poster of
+the first frame. The drinks clips there are left out: their cups and bottles
+carry other brands. `public/media/feed/rider-app.mp4` is from the rider-app
+recording in `mealgro/marketing/films/capture`; `noodles.mp4` is a seed clip.
+`public/media/app-icons/*.svg` are copied from `mealgro-app/assets/icons`;
+`public/media/fonts/Lato-*.ttf` from `mealgro-app/assets/fonts` (SIL OFL 1.1).
+The phone also uses MADE Tommy Soft from `pages/fonts.css`, whose files are
+marked "PERSONAL USE": check that licence before relying on it.
+The phone's colours are the app's own (`app_color.dart`), declared at the top
+of `AppPhone.vue`: the one place on these pages with hex values outside the
+tokens, so it matches the app it shows.
+Add a clip by encoding it the same way
 (`ffmpeg -an -vf scale=480:-2,fps=24 -crf 28 -movflags +faststart`) and
 referencing its name from `FeedClip`.
 
