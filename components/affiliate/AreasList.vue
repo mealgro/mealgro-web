@@ -20,6 +20,8 @@ defineProps<{ areas: AreaState[] }>();
 </template>
 
 <style scoped>
+/* Uses the v2 tokens (components/portal/tokens.css): the public affiliate page
+   is a `.site` page. */
 .areas {
 	list-style: none;
 	margin: 0;
@@ -29,17 +31,15 @@ defineProps<{ areas: AreaState[] }>();
 	gap: 16px;
 }
 .area {
-	background: #ffffff;
-	border: 1px solid #e5e5e5;
-	border-radius: 18px;
-	padding: 20px;
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: 1.75rem;
+	padding: 24px;
 }
 .area h3 {
-	margin: 0 0 12px;
-	font-family: "MADE Tommy Soft", sans-serif;
-	font-size: 20px;
-	font-weight: 700;
-	color: #121212;
+	margin: 0 0 14px;
+	font-size: 22px;
+	color: var(--ink);
 }
 .chips {
 	list-style: none;
@@ -52,14 +52,14 @@ defineProps<{ areas: AreaState[] }>();
 .chip {
 	padding: 6px 12px;
 	border-radius: 999px;
-	background: #fdece8;
-	color: #a81c00;
+	background: var(--brand-soft);
+	color: var(--ink);
 	font-size: 14px;
 	line-height: 1.3;
 }
 .chip--all {
-	background: #d62300;
-	color: #ffffff;
+	background: var(--brand);
+	color: var(--on-brand);
 	font-weight: 600;
 }
 </style>

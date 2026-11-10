@@ -1,5 +1,12 @@
 # Mealgro web — brand reference
 
+> **November 2026: the home, vendor, rider and public affiliate pages were
+> rebuilt in the admin's v2 system** (owner's call: "the new design similar to
+> the admin"). They are described in [Rebuilt marketing pages](#rebuilt-marketing-pages-v2)
+> below and follow the portal tokens, not the marketing tokens. The rest of the
+> marketing site (about, contact, legal, status, account deletion, error) still
+> uses the older red / MADE Tommy Soft look described next, until it is rebuilt.
+
 The reference for every change to mealgro.com. The site has **two surfaces that
 are different designs on purpose**: the marketing site, and the signed-in
 portals. They share the Mealgro logo and the product name, and nothing else:
@@ -327,3 +334,37 @@ the ellipsis character, money via `lib/*/format.ts`.
 
 - Auth pages are an ink panel with shapes, not the admin's full-bleed `bg-login.jpeg` photo; the photo (555 KB) was not copied into this repo.
 - `Modal` is a div dialog without a focus trap (Escape and click-outside close it; focus moves into it on open). The admin's native `<dialog>` would give a trap for free.
+
+
+---
+
+# Rebuilt marketing pages (v2)
+
+`/`, `/vendors`, `/riders` and `/affiliate` (the public page). They use the
+admin's v2 system, like the portals, plus an ink **stage** for video sections.
+
+| What | File |
+| --- | --- |
+| Colours | `components/portal/tokens.css`, scoped to `.portal, .site`. Site-only additions there: `--stage` / `--on-stage` (ink video sections, the same in both themes) and `--app-red` (only inside phone mock-ups, so they look like the customer app) |
+| All site CSS (type, buttons, shapes, tiles, steps, phone, FAQ, forms, sign-up block) | `components/site/site.css`, scoped to `.site` |
+| Page frame: header, main, footer, the stylesheet | `components/site/SitePage.vue` (`app="rider"` switches the footer's download band to the rider app). `pages/+Layout.vue` leaves these paths bare (`SITE_PAGES`) |
+| Header (floating ink bar, day/night toggle, Get the app, menu under 980px) | `components/site/SiteHeader.vue`; links in `lib/site/links.ts` (`SITE_LINKS`) |
+| Footer + the `#get-app` download band | `components/site/SiteFooter.vue`; store links in `lib/site/links.ts` (`null` = no listing yet, button hidden) |
+| The home feed (sticky phone, snap slides, full-screen clips on phones) | `components/site/FeedStory.vue` |
+| A screen of the app's feed over a clip | `components/site/FeedScreen.vue` |
+| A lazy, muted, in-view-only video | `components/site/FeedClip.vue`; Pause / reduced motion via `lib/site/media.ts` |
+| Hero for the other pages | `components/site/PageHero.vue` |
+| Waitlist forms (Web3Forms, same keys and field names as before) | `components/site/WaitlistForm.vue` |
+
+Media: `public/media/feed/*.mp4|webp` are Mealgro's own seed clips
+(`mealgro/data`), cut to 6 s, 480 px wide, muted H.264 (~300–570 KB) with a
+WebP poster; `rider-app.mp4` is from the app recording in
+`mealgro/marketing/films/capture`. `public/media/photo/*.webp` are this repo's
+own Mealgro-branded photos, compressed. Add a clip by encoding it the same way
+and adding it to `CLIPS` in `lib/site/media.ts`.
+
+Rules: one orchestrated arrival per page (copy rises, phone settles), nothing
+loops except the clips, and clips stop for Pause and for reduced motion. Don't
+name a class after a Tailwind utility (`ring`, `grid` with other meaning…):
+Tailwind scans these files and its utility wins. Links in `.site` inherit colour
+at zero specificity (`:where(.site) a`), so any button class can colour a link.

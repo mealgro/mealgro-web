@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import Footer from "../../components/shared/Footer.vue";
+import SitePage from "../../components/site/SitePage.vue";
+import PageHero from "../../components/site/PageHero.vue";
 import AreasList from "../../components/affiliate/AreasList.vue";
 import PauseBanner from "../../components/affiliate/PauseBanner.vue";
 import { publicApi } from "../../lib/affiliate/api";
 import { money } from "../../lib/affiliate/format";
 import { HOME, session } from "../../lib/affiliate/session";
 import type { Program } from "../../lib/affiliate/types";
-import logoImage from "../../assets/logo.svg";
 
 const program = ref<Program | null>(null);
 const failed = ref(false);
@@ -51,398 +51,272 @@ const steps = [
 </script>
 
 <template>
-	<div class="aff-landing">
-		<section class="hero">
-			<div class="hero-in">
-				<div class="topbar">
-					<a href="/" class="topbar-logo"><img :src="logoImage" alt="Mealgro home" /></a>
-					<a v-if="signedIn" class="topbar-link" href="/affiliate/dashboard">Dashboard</a>
-					<a v-else class="topbar-link" href="/affiliate/login">Sign in</a>
-				</div>
-
-				<p class="eyebrow">Mealgro Affiliate Program</p>
-				<h1>
-					<template v-if="paused">Our affiliate program is paused for now</template>
-					<template v-else-if="reward">Earn {{ reward }} for every vendor we approve</template>
-					<template v-else>Earn a cash reward for every vendor we approve</template>
-				</h1>
-				<p class="lead">
-					<template v-if="paused">
-						New vendors you bring in won't earn a reward until it's back. Sign up now and we'll tell
-						you when it resumes. Free to join.
-					</template>
-					<template v-else>
-						Know restaurants, kitchens and food sellers? Bring them to Mealgro with your affiliate
-						code and get paid when they're approved. Free to join.
-					</template>
-				</p>
-				<div class="cta">
-					<template v-if="signedIn">
-						<a class="btn btn--dark" href="/affiliate/dashboard">Go to your dashboard</a>
-					</template>
-					<template v-else>
-						<a class="btn btn--dark" href="/affiliate/signup">Become an affiliate</a>
-						<a class="btn btn--ghost" href="/affiliate/login">Sign in</a>
-					</template>
-				</div>
-				<div v-if="program && !program.active" class="pause">
-					<PauseBanner variant="public" :message="program.message" />
-				</div>
+	<SitePage>
+		<PageHero>
+			<h1 class="s-h1">
+				<template v-if="paused">Our affiliate program is paused for now.</template>
+				<template v-else>Get paid for every kitchen you bring.</template>
+			</h1>
+			<p class="s-lead s-muted">
+				<template v-if="paused">
+					New vendors you bring in won't earn a reward until it's back. Sign up now and we'll tell
+					you when it resumes. Free to join.
+				</template>
+				<template v-else>
+					Know restaurants, kitchens and food sellers? Give them your affiliate code and earn
+					{{ reward ?? "a cash reward" }} for every one we approve. Free to join.
+				</template>
+			</p>
+			<div class="s-actions">
+				<a v-if="signedIn" class="s-btn s-btn--ink" href="/affiliate/dashboard">Go to your dashboard</a>
+				<template v-else>
+					<a class="s-btn s-btn--ink" href="/affiliate/signup">Become an affiliate</a>
+					<a class="s-btn s-btn--outline" href="/affiliate/login">Sign in</a>
+				</template>
 			</div>
-		</section>
+			<div v-if="program && !program.active" class="pause">
+				<PauseBanner variant="public" :message="program.message" />
+			</div>
+			<template #visual>
+				<div class="reward tone-2" :aria-busy="!program && !failed">
+					<span class="halo" aria-hidden="true" />
+					<p class="reward-k">
+						<span class="sh sh-ci" style="--c: var(--on-2)" aria-hidden="true" />
+						{{ paused ? "Rewards paused" : "Per vendor we approve" }}
+					</p>
+					<p class="reward-v disp">{{ paused ? "Back soon" : (reward ?? "Cash") }}</p>
+					<dl class="reward-facts">
+						<div>
+							<dt>Minimum withdrawal</dt>
+							<dd>{{ minimum ?? "Low" }}</dd>
+						</div>
+						<div>
+							<dt>Paid to</dt>
+							<dd>Your bank</dd>
+						</div>
+					</dl>
+				</div>
+			</template>
+		</PageHero>
 
-		<section class="block" aria-labelledby="how-h">
-			<div class="block-in">
-				<h2 id="how-h">How it works</h2>
-				<ol class="steps">
-					<li v-for="(s, i) in steps" :key="s.title" class="step">
-						<span class="step-n" aria-hidden="true">{{ i + 1 }}</span>
-						<h3>{{ s.title }}</h3>
+		<section class="s-section" aria-labelledby="how-h">
+			<div class="s-wrap">
+				<div class="s-head">
+					<h2 id="how-h" class="s-h2">How it works</h2>
+				</div>
+				<ol class="s-steps">
+					<li v-for="(s, i) in steps" :key="s.title" class="s-step" :class="`tone-${[2, 1, 4][i]}`">
+						<div class="s-step-n">
+							<span>{{ i + 1 }}</span>
+							<span class="sh" :class="['sh-ci', 'sh-sq', 'sh-di'][i]" aria-hidden="true" />
+						</div>
+						<h3 class="s-h3">{{ s.title }}</h3>
 						<p>{{ s.text }}</p>
 					</li>
 				</ol>
 			</div>
 		</section>
 
-		<section class="block block--soft" aria-labelledby="where-h">
-			<div class="block-in">
-				<h2 id="where-h">Where it's active</h2>
-				<p class="sub">
-					Rewards are paid for vendors in these areas. We add more cities over time — a vendor who
-					registers before their city goes live still counts if it's active when we approve them.
-				</p>
+		<section class="s-section tight" aria-labelledby="where-h">
+			<div class="s-wrap">
+				<div class="s-head">
+					<h2 id="where-h" class="s-h2">Where it's active</h2>
+					<p class="s-lead s-muted">
+						Rewards are paid for vendors in these areas. We add more cities over time — a vendor
+						who registers before their city goes live still counts if it's active when we approve
+						them.
+					</p>
+				</div>
 				<AreasList v-if="program?.areas.length" :areas="program.areas" />
-				<p v-else-if="program" class="empty">
+				<p v-else-if="program" class="s-card empty">
 					No cities are active right now. Sign up and we'll let you know when they are.
 				</p>
-				<p v-else-if="failed" class="empty">
+				<p v-else-if="failed" class="s-card empty">
 					We couldn't load the list of cities just now. Please refresh to try again.
 				</p>
-				<p v-else class="empty" role="status">Loading the active cities…</p>
+				<p v-else class="s-card empty" role="status">Loading the active cities…</p>
 			</div>
 		</section>
 
-		<section class="block" aria-labelledby="pay-h">
-			<div class="block-in pay">
-				<div>
-					<h2 id="pay-h">Getting paid</h2>
+		<section class="s-section tight" aria-labelledby="pay-h">
+			<div class="s-wrap pay">
+				<div class="s-card pay-facts">
+					<h2 id="pay-h" class="s-h2">Getting paid</h2>
 					<ul class="facts">
 						<li>
-							<strong>{{ reward ?? "A cash reward" }}</strong>
-							<span>for every vendor we approve in an active city</span>
+							<span class="sh sh-ci" style="--c: var(--cat-2)" aria-hidden="true" />
+							<div>
+								<strong>{{ reward ?? "A cash reward" }}</strong>
+								<span>for every vendor we approve in an active city</span>
+							</div>
 						</li>
 						<li>
-							<strong>{{ minimum ?? "Low minimum" }}</strong>
-							<span>minimum withdrawal, paid straight to your Nigerian bank account</span>
+							<span class="sh sh-sq" style="--c: var(--cat-1)" aria-hidden="true" />
+							<div>
+								<strong>{{ minimum ?? "Low minimum" }}</strong>
+								<span>minimum withdrawal, paid straight to your Nigerian bank account</span>
+							</div>
 						</li>
 						<li>
-							<strong>No hold, no clawback</strong>
-							<span>once a reward is in your balance, it's yours</span>
+							<span class="sh sh-di" style="--c: var(--cat-4)" aria-hidden="true" />
+							<div>
+								<strong>No hold, no clawback</strong>
+								<span>once a reward is in your balance, it's yours</span>
+							</div>
 						</li>
 					</ul>
 				</div>
-				<div class="join">
-					<h3>Ready to start?</h3>
+				<div class="s-hero-panel join">
+					<h3 class="s-h2">Ready to start?</h3>
 					<p>It takes a minute. We'll email you a code to confirm — no password needed.</p>
-					<a v-if="signedIn" class="btn btn--red" href="/affiliate/dashboard">Go to your dashboard</a>
+					<a v-if="signedIn" class="s-btn join-btn" href="/affiliate/dashboard">Go to your dashboard</a>
 					<template v-else>
-						<a class="btn btn--red" href="/affiliate/signup">Sign up</a>
-						<p class="small">Already an affiliate? <a href="/affiliate/login">Sign in</a></p>
+						<a class="s-btn join-btn" href="/affiliate/signup">Sign up</a>
+						<p class="small">Already an affiliate? <a class="s-link" href="/affiliate/login">Sign in</a></p>
 					</template>
 				</div>
 			</div>
 		</section>
-
-		<Footer />
-	</div>
+	</SitePage>
 </template>
 
 <style scoped>
-.aff-landing {
-	font-family: "MADE Tommy Soft", sans-serif;
-	color: #121212;
-	background: #ffffff;
-}
-.hero {
-	background: #d62300;
-	color: #ffffff;
-}
-.hero-in {
-	max-width: 1100px;
-	margin: 0 auto;
-	padding: 150px clamp(16px, 5vw, 72px) 96px;
-	text-align: center;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-.topbar {
-	display: none;
-}
-.eyebrow {
-	margin: 0 0 16px;
-	font-size: 15px;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	font-weight: 700;
-	opacity: 0.85;
-}
-.hero h1 {
-	margin: 0;
-	max-width: 820px;
-	font-size: clamp(36px, 6vw, 64px);
-	line-height: 1.05;
-	font-weight: 800;
-	letter-spacing: -0.5px;
-	color: #ffffff;
-}
-.lead {
-	margin: 24px 0 0;
-	max-width: 620px;
-	font-size: clamp(17px, 2vw, 20px);
-	line-height: 1.5;
-	opacity: 0.92;
-}
-.cta {
-	margin-top: 36px;
-	display: flex;
-	gap: 14px;
-	flex-wrap: wrap;
-	justify-content: center;
-}
-.btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-height: 60px;
-	padding: 0 32px;
-	border-radius: 16px;
-	font-size: 20px;
-	font-weight: 500;
-	text-decoration: none;
-	transition: opacity 0.2s, background 0.2s;
-}
-.btn:hover {
-	opacity: 0.9;
-}
-.btn:focus-visible {
-	outline: 3px solid #ffffff;
-	outline-offset: 3px;
-}
-.btn--dark {
-	background: #121212;
-	color: #ffffff;
-}
-.btn--ghost {
-	border: 2px solid #ffffff;
-	color: #ffffff;
-}
-.btn--red {
-	background: #d62300;
-	color: #ffffff;
-}
-.btn--red:focus-visible {
-	outline-color: #d62300;
-}
 .pause {
-	margin-top: 32px;
 	width: 100%;
-	max-width: 620px;
-	text-align: left;
+	max-width: 560px;
 }
 .pause :deep(.aff-banner) {
 	display: flex;
 	gap: 12px;
-	padding: 14px 16px;
-	border-radius: 14px;
-	background: #fff7ea;
-	color: #7a3d06;
+	align-items: flex-start;
+	padding: 16px 20px;
+	border-radius: 1.5rem;
+	background: var(--warn);
+	color: var(--on-warn);
 	font-size: 15px;
-	line-height: 1.5;
-}
-.pause :deep(.aff-banner p) {
-	margin: 0;
 }
 .pause :deep(.aff-banner svg) {
 	flex: none;
-	margin-top: 3px;
+	margin-top: 2px;
 }
-
-.block {
-	padding: 88px 0;
+.reward {
+	position: relative;
+	overflow: hidden;
+	width: min(100%, 440px);
+	aspect-ratio: 4 / 5;
+	border-radius: 2rem;
+	padding: clamp(24px, 4vw, 40px);
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	isolation: isolate;
+	animation: settle 0.9s var(--ease) 0.2s both;
 }
-.block--soft {
-	background: #f6f6f6;
+.halo {
+	position: absolute;
+	z-index: -1;
+	top: -22%;
+	right: -30%;
+	width: 95%;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--on-2) 8%, transparent);
 }
-.block-in {
-	max-width: 1100px;
-	margin: 0 auto;
-	padding: 0 clamp(16px, 5vw, 72px);
+.reward-k {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 600;
 }
-.block h2 {
-	margin: 0 0 12px;
-	font-size: clamp(30px, 4vw, 44px);
-	font-weight: 800;
-	letter-spacing: -0.3px;
-	color: #121212;
+.reward-v {
+	margin-top: auto !important;
+	font-size: clamp(56px, 8vw, 104px);
+	line-height: 0.9;
+	letter-spacing: -0.05em;
+	overflow-wrap: anywhere;
 }
-.sub {
-	margin: 0 0 32px;
-	max-width: 680px;
-	font-size: 17px;
-	line-height: 1.55;
-	color: #6b635b;
-}
-.steps {
-	list-style: none;
-	margin: 36px 0 0;
-	padding: 0;
+.reward-facts {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 20px;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+	margin-top: 16px !important;
+	padding-top: 16px;
+	border-top: 2px solid color-mix(in srgb, var(--on-2) 22%, transparent);
 }
-.step {
-	padding: 28px;
-	border-radius: 22px;
-	background: #fdece8;
+.reward-facts dt {
+	font-size: 14px;
 }
-.step-n {
-	display: grid;
-	place-items: center;
-	width: 44px;
-	height: 44px;
-	border-radius: 12px;
-	background: #d62300;
-	color: #ffffff;
+.reward-facts dd {
+	font-family: var(--font-display);
 	font-weight: 800;
-	font-size: 20px;
-}
-.step h3 {
-	margin: 18px 0 8px;
 	font-size: 22px;
-	font-weight: 700;
-	color: #121212;
+	letter-spacing: -0.02em;
 }
-.step p {
-	margin: 0;
-	font-size: 16px;
-	line-height: 1.55;
-	color: #6b635b;
+@keyframes settle {
+	from {
+		opacity: 0;
+		transform: rotate(-4deg) translateY(24px);
+	}
+}
+.tight {
+	padding-top: 0;
 }
 .empty {
-	margin: 0;
 	padding: 24px;
-	border-radius: 18px;
-	background: #ffffff;
-	border: 1px dashed #d9d9d9;
-	color: #6b635b;
-	font-size: 16px;
+	color: var(--muted);
 }
 .pay {
 	display: grid;
-	grid-template-columns: 1.3fr 1fr;
-	gap: 40px;
-	align-items: start;
+	grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+	gap: 16px;
+}
+.pay-facts {
+	padding: clamp(24px, 4vw, 48px);
+	display: grid;
+	gap: 28px;
 }
 .facts {
-	list-style: none;
-	margin: 24px 0 0;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
+	display: grid;
 	gap: 18px;
 }
 .facts li {
 	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	padding-left: 18px;
-	border-left: 4px solid #d62300;
+	gap: 14px;
+	align-items: baseline;
 }
 .facts strong {
-	font-size: 24px;
-	font-weight: 700;
+	display: block;
+	font-family: var(--font-display);
+	font-size: 22px;
+	letter-spacing: -0.02em;
 }
-.facts span {
-	font-size: 16px;
-	color: #6b635b;
+.facts span:not(.sh) {
+	color: var(--muted);
 }
 .join {
-	padding: 32px;
-	border-radius: 24px;
-	background: #121212;
-	color: #ffffff;
-	display: flex;
-	flex-direction: column;
-	gap: 14px;
-	align-items: flex-start;
+	padding: clamp(24px, 4vw, 48px);
+	display: grid;
+	gap: 18px;
+	align-content: center;
+	justify-items: start;
 }
-.join h3 {
-	margin: 0;
-	font-size: 28px;
-	font-weight: 700;
-	color: #ffffff;
+.join-btn {
+	background: var(--on-hero);
+	color: var(--hero);
 }
-.join p {
-	margin: 0;
-	font-size: 16px;
-	line-height: 1.5;
-	opacity: 0.9;
+.join-btn:hover {
+	color: var(--hero);
 }
-.join .small {
+.small {
 	font-size: 15px;
 }
-.join a:not(.btn) {
-	color: #ffffff;
-	text-decoration: underline;
-}
-
-@media (max-width: 1024px) {
-	.hero-in {
-		padding-top: 24px;
-	}
-	.topbar {
-		display: flex;
-		width: 100%;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 56px;
-	}
-	.topbar-logo img {
-		width: 96px;
-		height: auto;
-		display: block;
-		filter: brightness(0) invert(1);
-	}
-	.topbar-link {
-		color: #ffffff;
-		font-size: 17px;
-		text-decoration: none;
-		padding: 10px 18px;
-		border: 2px solid rgba(255, 255, 255, 0.8);
-		border-radius: 12px;
-	}
-}
-@media (max-width: 860px) {
-	.steps,
+@media (max-width: 899px) {
 	.pay {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 	}
-	.block {
-		padding: 64px 0;
-	}
-}
-@media (max-width: 480px) {
-	.btn {
-		width: 100%;
-		min-height: 56px;
-		font-size: 18px;
-	}
-	.cta {
-		width: 100%;
-	}
-	.join {
-		padding: 24px;
+	.reward {
+		aspect-ratio: auto;
+		min-height: 340px;
 	}
 }
 </style>

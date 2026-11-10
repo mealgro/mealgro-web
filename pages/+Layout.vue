@@ -1,7 +1,7 @@
 <!-- https://vike.dev/Layout -->
 
 <template>
-	<slot v-if="isPortal" />
+	<slot v-if="isPortal || isSitePage" />
 	<div v-else id="page-container">
 		<Navigation />
 		<!-- Global Logo -->
@@ -37,6 +37,11 @@ const isPortal = computed(
 		pageContext.urlPathname === "/account" ||
 		pageContext.urlPathname.startsWith("/account/"),
 );
+// The rebuilt marketing pages bring their own header and footer
+// (components/site/SitePage.vue). The signed-in affiliate pages under
+// /affiliate/* are not in this list.
+const SITE_PAGES = ["/", "/vendors", "/riders", "/affiliate"];
+const isSitePage = computed(() => SITE_PAGES.includes(pageContext.urlPathname));
 const isRedLogoPage = computed(() => {
 	const path = pageContext.urlPathname;
 	return (
@@ -81,6 +86,9 @@ const preventZoomTouch = (e: TouchEvent) => {
 
 onMounted(() => {
 	if (isPortal.value) return;
+	initAnalytics();
+	// The rebuilt pages keep the browser's zoom.
+	if (isSitePage.value) return;
 	document.addEventListener("keydown", preventZoomKeyboard);
 	document.addEventListener("wheel", preventZoomWheel, { passive: false });
 	document.addEventListener("touchstart", preventZoomTouch, {
@@ -93,6 +101,9 @@ onMounted(() => {
 	document.addEventListener("gesturechange", (e) => e.preventDefault());
 	document.addEventListener("gestureend", (e) => e.preventDefault());
 
+});
+
+function initAnalytics() {
 	const firebaseConfig = {
 		apiKey: "AIzaSyDkL_P3BwyvYc3QJC3uGPajn29LZwBf_wc",
 		authDomain: "mealgro-logistics.firebaseapp.com",
@@ -105,8 +116,8 @@ onMounted(() => {
 
 	// Initialize Firebase
 	const app = initializeApp(firebaseConfig);
-	const analytics = getAnalytics(app);
-});
+	getAnalytics(app);
+}
 
 onUnmounted(() => {
 	document.removeEventListener("keydown", preventZoomKeyboard);

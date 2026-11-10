@@ -3,11 +3,14 @@
    mealgro-admin/brand.md. This is the ONLY file in the portals that holds a
    colour value; everything else uses these variables or color-mix() of them.
 
-   Scoped to `.portal`, so the marketing site keeps its own palette. Dark is
+   Scoped to `.portal` and `.site` (the rebuilt marketing pages: home,
+   vendors, riders, affiliate), so both are one family; the older marketing
+   pages keep their own palette. Dark is
    written twice, as the admin does: once for the chosen theme
    (`data-theme="dark"`) and once for the OS (`prefers-color-scheme`) until a
    theme is chosen. */
-.portal {
+.portal,
+.site {
 	/* Surfaces and text (base-100/200/300, base-content) */
 	--surface: #ffffff;
 	--bg: #f1f0f5;
@@ -47,9 +50,16 @@
 	/* Scrim behind drawers and dialogs */
 	--scrim: color-mix(in srgb, var(--rail) 55%, transparent);
 	--ease: cubic-bezier(0.16, 1, 0.3, 1);
+	/* Marketing site only: the video stage is ink in both themes (like the
+	   rail), and the phone mock-ups use the customer app's own red so they
+	   look like the app they show. Never use it for site UI. */
+	--stage: #0a0a12;
+	--on-stage: #f1f0f5;
+	--app-red: #d62300;
 }
 
-:root[data-theme="dark"] .portal {
+:root[data-theme="dark"] .portal,
+:root[data-theme="dark"] .site {
 	--surface: #1b1b29;
 	--bg: #12121c;
 	--line: #2d2d42;
@@ -75,7 +85,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) .portal {
+	:root:not([data-theme="light"]) .portal,
+	:root:not([data-theme="light"]) .site {
 		--surface: #1b1b29;
 		--bg: #12121c;
 		--line: #2d2d42;
@@ -103,14 +114,17 @@
 
 /* The page canvas behind the portal (the root element cannot read the
    variables above, which are scoped to `.portal`). */
-:root:has(.portal) {
+:root:has(.portal),
+:root:has(.site) {
 	--portal-canvas: #f1f0f5;
 }
-:root[data-theme="dark"]:has(.portal) {
+:root[data-theme="dark"]:has(.portal),
+:root[data-theme="dark"]:has(.site) {
 	--portal-canvas: #12121c;
 }
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]):has(.portal) {
+	:root:not([data-theme="light"]):has(.portal),
+	:root:not([data-theme="light"]):has(.site) {
 		--portal-canvas: #12121c;
 	}
 }
