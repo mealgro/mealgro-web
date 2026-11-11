@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import AnnouncementCards from "./AnnouncementCards.vue";
+import MaintenanceBanner from "./MaintenanceBanner.vue";
 import PortalFrame, { type RailItem } from "./PortalFrame.vue";
+import { PLANNED_TITLE, maintenance } from "../../lib/maintenance";
+import { store as storeApi } from "../../lib/portal/api";
 import { session } from "../../lib/portal/session";
 import { toasts } from "../../lib/portal/toast";
-import type { Capability } from "../../lib/portal/types";
+import type { Capability, VendorAnnouncement } from "../../lib/portal/types";
 
 const props = defineProps<{
 	title: string;
@@ -33,6 +37,26 @@ const user = session.user;
 const store = session.store;
 const stores = session.stores;
 
+// The store's announcement cards, on every page. A failure only means none
+// are shown: they are extras.
+const cards = ref<VendorAnnouncement[]>([]);
+const cardsLoaded = ref(false);
+async function loadCards() {
+	try {
+		if (session.can("view-store")) cards.value = await storeApi.announcements();
+	} catch {
+		// Nothing to show.
+	} finally {
+		cardsLoaded.value = true;
+	}
+}
+// Planned maintenance reaches vendors as an announcement card too (from the
+// API, in GMT); the frame's own banner (local times) stands in only when that
+// card isn't there. Waits for the cards so the two never flash together.
+const plannedBanner = computed(
+	() => cardsLoaded.value && !cards.value.some((c) => c.channel === "broadcast" && c.title === PLANNED_TITLE),
+);
+
 const reload = () => location.reload();
 const BOOT_MS = 15_000;
 onMounted(async () => {
@@ -43,10 +67,13 @@ onMounted(async () => {
 		return;
 	}
 	if (!signedIn) {
-		location.replace("/account/login");
+		// Maintenance (the profile call met it) is not a reason to sign in
+		// again: the frame shows maintenance, and reloads when it's over.
+		if (!maintenance.active.value) location.replace("/account/login");
 		return;
 	}
 	ready.value = true;
+	void loadCards();
 });
 </script>
 
@@ -84,6 +111,10 @@ onMounted(async () => {
 				<span class="rail-label">Store</span>
 				<strong>{{ store.display_name }}</strong>
 			</div>
+		</template>
+		<template #banners>
+			<MaintenanceBanner v-if="plannedBanner" />
+			<AnnouncementCards :cards="cards" />
 		</template>
 		<template v-if="$slots.actions" #actions><slot name="actions" /></template>
 		<slot />

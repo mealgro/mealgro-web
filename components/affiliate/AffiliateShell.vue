@@ -3,7 +3,9 @@
 // banners and the terms gate on every page. A sibling of
 // components/portal/PortalShell.vue; the look is PortalFrame's.
 import { computed, onMounted, ref } from "vue";
+import MaintenanceBanner from "../portal/MaintenanceBanner.vue";
 import PortalFrame, { type RailItem } from "../portal/PortalFrame.vue";
+import { maintenance } from "../../lib/maintenance";
 import { LOGIN, session } from "../../lib/affiliate/session";
 import { toasts } from "../../lib/affiliate/toast";
 import PauseBanner from "./PauseBanner.vue";
@@ -39,7 +41,9 @@ onMounted(async () => {
 		return;
 	}
 	if (!signedIn) {
-		location.replace(LOGIN);
+		// Maintenance (the profile call met it) is not a reason to sign in
+		// again: the frame shows maintenance, and reloads when it's over.
+		if (!maintenance.active.value) location.replace(LOGIN);
 		return;
 	}
 	ready.value = true;
@@ -73,6 +77,8 @@ onMounted(async () => {
 			<a class="more" href="/affiliate?view=public">How the program works</a>
 		</template>
 		<template #banners>
+			<!-- Affiliates have no announcements feed: this is how they hear of it. -->
+			<MaintenanceBanner />
 			<!-- One notice at a time, the most serious first: a suspension says it all. -->
 			<div v-if="suspended" class="p-alert" role="status">
 				<p>

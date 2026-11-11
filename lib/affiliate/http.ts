@@ -1,3 +1,4 @@
+import { maintenance } from "../maintenance";
 import type { ApiError, TokenPair } from "./types";
 
 /** In development the dev server proxies `/api` to the local API (see
@@ -109,6 +110,8 @@ async function call<T>(method: Method, path: string, body: unknown, auth: string
 			name: "HttpError",
 			message: resp.statusText || "Something went wrong.",
 		};
+		// Maintenance shows itself in the frame, whichever call met it first.
+		maintenance.noticeError(info.name);
 		throw new AffiliateApiError(info, resp.status);
 	}
 	return json.data;

@@ -231,3 +231,31 @@ export type Report = {
 
 /** `code` is the ISO country code on a country, lower or upper case. */
 export type Place = { id: string; name: string; code?: string };
+
+/** Where an announcement card's button goes (`update-app` is the app's own). */
+export type AnnouncementAction =
+	| {
+			kind:
+				| "open-subscription"
+				| "open-delivery-settings"
+				| "open-bank-account"
+				| "open-business-hours"
+				| "open-store-settings"
+				| "update-app"
+				| "open-orders-needing-attention";
+	  }
+	| { kind: "open-link"; value: string };
+
+/** A card from `GET /vendor/store/announcements`: the store's own audit, or
+ *  Mealgro to every vendor (`broadcast`) or to this store (`direct`). */
+export type VendorAnnouncement = {
+	/** Stable while the card lasts, so a dismissal can be remembered. */
+	id: string;
+	kind: "warning" | "info";
+	channel: "account" | "broadcast" | "direct";
+	title: string;
+	message: string;
+	action: AnnouncementAction | null;
+	/** Warnings never are: they stay until their cause is gone. */
+	dismissible: boolean;
+};

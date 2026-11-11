@@ -555,6 +555,86 @@
 	margin-left: 10px;
 	vertical-align: middle;
 }
+/* A card of an alert (vendor announcements): title on its own line, a link
+   under the message, and a close button for the ones that can be dismissed. */
+.portal .p-alert-title {
+	display: block;
+	font-weight: 700;
+}
+.portal .p-alert-more {
+	margin-top: 6px;
+	font-weight: 600;
+}
+.portal .p-alert--closable {
+	padding-right: 56px;
+}
+.portal .p-alert-x {
+	position: absolute;
+	right: 6px;
+	top: 6px;
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+}
+.portal .p-alert-x:hover {
+	background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+/* ── Maintenance: the page (or sign-in card) while Mealgro is closed ──────── */
+.portal .p-maint {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	text-align: center;
+	color: var(--muted);
+}
+.portal .p-maint--page {
+	min-height: 100vh;
+	justify-content: center;
+	padding: 32px 16px;
+}
+.portal .p-maint > p {
+	max-width: 40ch;
+	margin-top: 0;
+}
+.portal .p-maint-logo {
+	width: 88px;
+	height: auto;
+	margin-bottom: 8px;
+	filter: grayscale(1) contrast(0.6);
+	opacity: 0.6;
+}
+.portal .p-maint-title {
+	color: var(--ink);
+	font-size: clamp(24px, 4vw, 32px);
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+}
+.portal .p-maint strong {
+	color: var(--ink);
+}
+.portal .p-maint .p-btn {
+	margin-top: 8px;
+}
+.portal .p-maint-hint {
+	font-size: 13px;
+}
+/* The admin's note, quoted as theirs (maintenance page and banner). */
+.portal .p-maint-note {
+	margin-top: 6px;
+	font-style: italic;
+}
+.portal .p-maint .p-maint-note {
+	margin-top: 0;
+	color: var(--ink);
+}
 
 /* ── Tables: a card, with a quiet uppercase header; one card per row on phones */
 .portal .p-scroll {

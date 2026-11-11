@@ -15,6 +15,7 @@ import type {
 	StoreSettings,
 	Subscription,
 	SubscriptionPlan,
+	VendorAnnouncement,
 } from "./types";
 
 /** The core's "today" list starts at midnight UTC, which is 1:00 am in Nigeria.
@@ -98,6 +99,9 @@ export const store = {
 	settings: () => api<StoreSettings>("GET", "/vendor/store/settings"),
 	setOnline: (is_online: boolean) =>
 		api<null>("PATCH", "/vendor/store/online-status", { is_online }),
+	/** The store's announcement cards, warnings first. No `x-app-version` is
+	 *  sent, so the API leaves out the app's "new version" card. */
+	announcements: () => api<VendorAnnouncement[]>("GET", "/vendor/store/announcements"),
 };
 
 export const subscription = {

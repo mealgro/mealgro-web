@@ -9,9 +9,11 @@ import { usePageContext } from "vike-vue/usePageContext";
 import "./portal.css";
 import logoImage from "../../assets/logo.svg";
 import ConfirmHost from "./ConfirmHost.vue";
+import MaintenanceState from "./MaintenanceState.vue";
 import ThemeToggle from "./ThemeToggle.vue";
 import ToastHost from "./ToastHost.vue";
 import { watchAlerts } from "./alertFocus";
+import { maintenance, useMaintenancePoll } from "../../lib/maintenance";
 import type { Toast } from "../../lib/portal/toast";
 
 export type RailItem = { href: string; label: string; icon: string };
@@ -37,6 +39,12 @@ const props = defineProps<{
 }>();
 defineEmits<{ signOut: []; retry: [] }>();
 
+// Maintenance comes before everything else: whatever the page or the session
+// was doing, Mealgro is closed. Asked once at boot (never waited for), and
+// noticed by the fetch wrappers on any call; nobody is signed out for it.
+const down = maintenance.active;
+useMaintenancePoll();
+
 const pageContext = usePageContext();
 const path = computed(() => pageContext.urlPathname.replace(/\/$/, "") || props.homeHref);
 const menu = ref(false);
@@ -56,6 +64,7 @@ const onMq = () => {
 };
 let stopAlerts = () => {};
 onMounted(() => {
+	maintenance.checkOnce();
 	mq = window.matchMedia("(max-width: 1023px)");
 	onMq();
 	mq.addEventListener("change", onMq);
@@ -92,7 +101,8 @@ const initials = computed(
 
 <template>
 	<div class="portal pf" @keydown="onKeydown">
-		<div v-if="bootError" class="pf-boot" role="alert">
+		<MaintenanceState v-if="down" page />
+		<div v-else-if="bootError" class="pf-boot" role="alert">
 			<img :src="logoImage" alt="Mealgro" />
 			<p>{{ bootError }}</p>
 			<button class="p-btn p-btn--primary" type="button" @click="$emit('retry')">Retry</button>

@@ -2,9 +2,12 @@
 // Sign-in and sign-up for both areas: an ink panel with the brand and a line
 // about the area, and the form card beside it (above it on phones). One bold
 // panel per page, as everywhere else.
+import { onMounted } from "vue";
 import "./portal.css";
 import logoImage from "../../assets/logo.svg";
+import MaintenanceState from "./MaintenanceState.vue";
 import ThemeToggle from "./ThemeToggle.vue";
+import { maintenance, useMaintenancePoll } from "../../lib/maintenance";
 
 withDefaults(
 	defineProps<{
@@ -19,6 +22,12 @@ withDefaults(
 	}>(),
 	{ tagline: undefined, homeHref: "/" },
 );
+
+// During maintenance the card says so instead of offering a sign-in that can
+// only fail: asked on arrival, and noticed by the fetch wrappers on a try.
+const down = maintenance.active;
+useMaintenancePoll();
+onMounted(() => maintenance.checkOnce());
 </script>
 
 <template>
@@ -46,7 +55,8 @@ withDefaults(
 				<ThemeToggle />
 			</div>
 			<div class="au-card card-box arrive" :class="{ 'au-card--wide': wide }">
-				<slot />
+				<MaintenanceState v-if="down" />
+				<slot v-else />
 			</div>
 		</main>
 	</div>
