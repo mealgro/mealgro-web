@@ -85,12 +85,30 @@ watch(
 		cities.value = state ? await places.cities(state).catch(() => []) : [];
 	},
 );
+// A branch's label is the area it is in, at most this long (the server
+// refuses more): it sits after the business's name everywhere.
+const AREA_MAX = 30;
+
+/** The city as an area label: whole words while they fit, as the server cuts
+ *  the first branch's. */
+function areaFromCity(city: string): string {
+	const name = city.trim();
+	if (name.length <= AREA_MAX) return name;
+	let label = "";
+	for (const word of name.split(/\s+/)) {
+		const next = label ? `${label} ${word}` : word;
+		if (next.length > AREA_MAX) break;
+		label = next;
+	}
+	return label || name.slice(0, AREA_MAX);
+}
+
 // The label defaults to the city chosen, as it does for the first branch.
 watch(
 	() => form.value.city,
 	(city) => {
 		const name = cities.value.find((c) => c.id === city)?.name;
-		if (name && !form.value.label.trim()) form.value.label = name;
+		if (name && !form.value.label.trim()) form.value.label = areaFromCity(name);
 	},
 );
 
@@ -115,9 +133,9 @@ async function open() {
 async function relabel(b: Branch) {
 	const ask = await confirmAction({
 		title: "Rename this branch?",
-		message: `Customers see it as “${brand.value?.name} (${b.branch_label})”. What should follow “${brand.value?.name}”?`,
+		message: `Customers see it as “${brand.value?.name} (${b.branch_label})”. Which area is it in? Just the area, not the street.`,
 		confirmText: "Rename",
-		input: { label: "Branch name", value: b.branch_label, required: true, maxLength: 50 },
+		input: { label: "Area", value: b.branch_label, required: true, maxLength: AREA_MAX, placeholder: "e.g. Wuse 2" },
 	});
 	const label = ask?.value;
 	if (!label || label === b.branch_label) return;
@@ -228,9 +246,9 @@ const tone = (s: Branch["status"]) =>
 				<label class="p-field"><span>Street address</span>
 					<input v-model="form.address" class="p-input" maxlength="200" placeholder="12 Example Street" />
 				</label>
-				<label class="p-field"><span>Branch name</span>
-					<input v-model="form.label" class="p-input" maxlength="50" required />
-					<small>Customers see “{{ brand?.name }} ({{ form.label || "…" }})”.</small>
+				<label class="p-field"><span>Area</span>
+					<input v-model="form.label" class="p-input" :maxlength="AREA_MAX" placeholder="e.g. Wuse 2" required />
+					<small>The area it's in, not the street address. Customers see “{{ brand?.name }} ({{ form.label || "…" }})”.</small>
 				</label>
 				<label class="p-check">
 					<input v-model="form.copy_menu" type="checkbox" />

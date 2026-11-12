@@ -34,6 +34,7 @@ useDialog(panel, () => settleConfirm(false), toRef(state, "open"));
 							class="p-input"
 							data-autofocus
 							:maxlength="state.input.maxLength"
+							:placeholder="state.input.placeholder"
 							:required="state.input.required"
 						/>
 					</label>

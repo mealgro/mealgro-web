@@ -12,7 +12,7 @@ export type ConfirmOptions = {
 	/** Red confirm button, for a step that can't be undone. */
 	destructive?: boolean;
 	/** Asks for a line of text too. */
-	input?: { label: string; value?: string; required?: boolean; maxLength?: number };
+	input?: { label: string; value?: string; required?: boolean; maxLength?: number; placeholder?: string };
 };
 export type ConfirmResult = { value: string };
 
