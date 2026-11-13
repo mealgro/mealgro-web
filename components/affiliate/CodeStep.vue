@@ -1,8 +1,10 @@
 <script setup lang="ts">
 // The emailed 6-digit code: entry, a resend with a 60 s cooldown, and the
-// expired/burned case (5 wrong tries burn a code).
+// expired/burned case (5 wrong tries burn a code). Used by the affiliate area
+// and Mealgro Ads; each passes its own error readers (the affiliate ones are
+// the default).
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { describe, errorCode } from "../../lib/affiliate/format";
+import { describe as affiliateDescribe, errorCode as affiliateErrorCode } from "../../lib/affiliate/format";
 
 const props = defineProps<{
 	email: string;
@@ -14,7 +16,13 @@ const props = defineProps<{
 	backLabel?: string;
 	/** Replaces the "we emailed a code" line. */
 	lead?: string;
+	/** Readable text for a failure. */
+	describeError?: (e: unknown) => string;
+	/** The API's error name for a failure. */
+	errorName?: (e: unknown) => string;
 }>();
+const describe = (e: unknown) => (props.describeError ?? affiliateDescribe)(e);
+const errorCode = (e: unknown) => (props.errorName ?? affiliateErrorCode)(e);
 const emit = defineEmits<{ back: []; done: [] }>();
 
 const COOLDOWN = 60;
@@ -85,7 +93,7 @@ async function again() {
 		input.value?.focus();
 	} catch (e) {
 		error.value = describe(e);
-		if (errorCode(e) === "AffiliateErrorCodeRecentlySent") startCooldown();
+		if (errorCode(e).endsWith("ErrorCodeRecentlySent")) startCooldown();
 	} finally {
 		busy.value = false;
 	}

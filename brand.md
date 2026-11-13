@@ -19,7 +19,7 @@ pattern from one into the other.
 | Surface | Pages | Look | Styling lives in |
 | --- | --- | --- | --- |
 | **Marketing** | `/`, `/vendors`, `/riders`, `/about`, `/contact`, `/terms`, `/privacy`, `/account-deletion`, `/affiliate` (public landing), `/status`, `_error` | Brand red `#D62300`, MADE Tommy Soft, big display type, photography | Scoped `<style>` per component, some Tailwind utilities |
-| **Portals** | `/account/*` (vendor portal), `/affiliate/(app)/*` (affiliate area: dashboard, wallet, bank, referrals, profile, sign-in, sign-up) | The admin console's **v2 visual system**: ink and paper, cobalt / rose / sun / mint with a shape each, Bricolage Grotesque + Instrument Sans, light and dark | `components/portal/tokens.css` + `components/portal/portal.css`, scoped to `.portal` |
+| **Portals** | `/account/*` (vendor portal), `/affiliate/(app)/*` (affiliate area: dashboard, wallet, bank, referrals, profile, sign-in, sign-up), `/ads/*` (Mealgro Ads advertiser portal: unlisted, `noindex`, never linked from the site; `components/ads`, `lib/ads`) | The admin console's **v2 visual system**: ink and paper, cobalt / rose / sun / mint with a shape each, Bricolage Grotesque + Instrument Sans, light and dark | `components/portal/tokens.css` + `components/portal/portal.css`, scoped to `.portal` |
 
 The portals follow `mealgro-admin/brand.md` (the source of truth for v2). This
 file records how this repo applies it. The marketing sections below describe
