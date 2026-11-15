@@ -18,8 +18,8 @@
 	--line: #e2e0ec;
 	--ink: #12121c;
 	--muted: color-mix(in srgb, var(--ink) 70%, var(--surface));
-	/* Cobalt: primary buttons, focus, active states, links */
-	--brand: #2f3bff;
+	/* Mealgro red: primary buttons, focus, active states, links */
+	--brand: #d62300;
 	--on-brand: #ffffff;
 	--brand-soft: color-mix(in srgb, var(--brand) 10%, var(--surface));
 	/* Status: jade, sun, vermilion, cobalt. Each fill has its own text colour. */
@@ -64,8 +64,9 @@
 
 /* The public pages lead with Mealgro red (owner, Nov 2026): main buttons,
    Get the app, the current page in the header, links, numbering. White on
-   it is 5.1:1. The portals keep cobalt; the category colours stay as they
-   are on both. */
+   it is 5.1:1. The portals lead with it too (owner, 15 Nov 2026; `--brand`
+   above, `#EC4A26` on dark surfaces so red text stays readable); info and
+   the category colours stay as they are on both. */
 .site {
 	--brand: #d62300;
 	--brand-hover: #bd1f00;
@@ -78,8 +79,8 @@
 	--bg: #12121c;
 	--line: #2d2d42;
 	--ink: #f1f0f5;
-	--brand: #7b85ff;
-	--on-brand: #0e0e18;
+	--brand: #ec4a26;
+	--on-brand: #ffffff;
 	--ok: #3dd6a0;
 	--on-ok: #0a1f18;
 	--warn: #ffc52e;
@@ -104,8 +105,8 @@
 		--bg: #12121c;
 		--line: #2d2d42;
 		--ink: #f1f0f5;
-		--brand: #7b85ff;
-		--on-brand: #0e0e18;
+		--brand: #ec4a26;
+		--on-brand: #ffffff;
 		--ok: #3dd6a0;
 		--on-ok: #0a1f18;
 		--warn: #ffc52e;
