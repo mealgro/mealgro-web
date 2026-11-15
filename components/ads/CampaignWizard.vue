@@ -673,7 +673,9 @@ const blockedWhy = computed(() => {
 						</div>
 						<div>
 							<dt>After the hold</dt>
-							<dd :class="{ neg: after !== null && after < 0 }">{{ after !== null ? m(after) : "—" }}</dd>
+							<dd :class="{ neg: after !== null && after < 0 }">
+								{{ after === null ? "—" : after < 0 ? `${m(-after)} short` : m(after) }}
+							</dd>
 						</div>
 					</template>
 				</dl>

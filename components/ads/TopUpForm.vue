@@ -101,7 +101,7 @@ async function go() {
 		</div>
 		<small :id="`${idPrefix}-hint`" class="p-hint">
 			<template v-if="min && max">From {{ money(min) }} to {{ money(max) }}. </template>
-			Pay by card or bank transfer on Paystack.
+			Pay by card on Paystack.
 			<strong v-if="bonus > 0" class="bonus">You'll get {{ money(amountLike(min, bonus)) }} bonus credit.</strong>
 		</small>
 		<p :id="`${idPrefix}-notice`" class="p-alert p-alert--info notice">{{ notice }} Top-ups include VAT.</p>
