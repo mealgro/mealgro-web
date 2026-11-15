@@ -297,7 +297,7 @@ const shortBy = computed(() => {
 			</form>
 			<div v-if="wallet && (short || (after !== null && after < 0))" class="p-stack-sm topup">
 				<p><strong>Not enough credit.</strong> Top up first, then add the budget.</p>
-				<TopUpForm :pricing="pricing" :notice="wallet.notice" :return-path="`/ads/campaigns/view?id=${c.id}`" :suggested="shortBy" id-prefix="ads-add-topup" />
+				<TopUpForm :pricing="pricing" :notice="wallet.notice" :offer="wallet.bonus_offer" :return-path="`/ads/campaigns/view?id=${c.id}`" :suggested="shortBy" id-prefix="ads-add-topup" />
 			</div>
 			<template #footer>
 				<button class="p-btn p-btn--ghost" type="button" @click="adding = false">Cancel</button>

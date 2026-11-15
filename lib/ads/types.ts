@@ -61,6 +61,19 @@ export type WalletLine = {
 	at: string;
 };
 
+/** A top-up bonus running now, as it applies to this advertiser. Admins
+ *  switch it on and off. */
+export type BonusOffer = {
+	/** 100 doubles a top-up. */
+	percent: number;
+	/** The most bonus one top-up earns. */
+	cap: Amount;
+	first_top_up_only: boolean;
+	ends_at: string | null;
+	/** False when it's a first-top-up offer and they've topped up before. */
+	eligible: boolean;
+};
+
 export type Wallet = {
 	currency: string;
 	available: Amount;
@@ -69,16 +82,27 @@ export type Wallet = {
 	frozen: boolean;
 	/** Always shown before a top-up. */
 	notice: string;
+	/** The top-up bonus running now, if any. */
+	bonus_offer: BonusOffer | null;
 	history: WalletLine[];
 };
 
-export type TopUpCheckout = { reference: string; authorization_url: string };
+export type TopUpCheckout = {
+	reference: string;
+	authorization_url: string;
+	/** Bonus credit this top-up earns once paid; zero for none. */
+	bonus: Amount;
+};
 
 export type TopUpStatus = "pending" | "paid" | "failed";
 
 export type TopUp = {
 	reference: string;
 	amount: Amount;
+	/** Bonus promised when it started. */
+	bonus: Amount;
+	/** Bonus credited once paid. */
+	bonus_paid: Amount;
 	status: TopUpStatus;
 	paid_at: string | null;
 	created_at: string;

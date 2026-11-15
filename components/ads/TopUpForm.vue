@@ -2,9 +2,9 @@
 // Adds ad credit through Paystack. The non-refundable notice is shown above
 // the button and again in the confirm step, before every top-up.
 import { computed, ref, watch } from "vue";
-import { amountLike, describe, money, parseMajor, toMinor } from "../../lib/ads/format";
+import { amountLike, bonusFor, bonusOfferText, describe, money, parseMajor, toMinor } from "../../lib/ads/format";
 import { startTopUp } from "../../lib/ads/topup";
-import type { Pricing } from "../../lib/ads/types";
+import type { BonusOffer, Pricing } from "../../lib/ads/types";
 import { confirmAction } from "../../lib/portal/confirm";
 
 const props = withDefaults(
@@ -12,6 +12,8 @@ const props = withDefaults(
 		pricing: Pricing | null;
 		/** WalletDto.notice: credit can only be spent on ads. */
 		notice: string;
+		/** WalletDto.bonus_offer: shown when they're eligible. */
+		offer?: BonusOffer | null;
 		/** Where Paystack sends the payer back (a page under /ads/). */
 		returnPath: string;
 		/** An amount to start with, in major units. */
@@ -20,7 +22,7 @@ const props = withDefaults(
 		blocked?: string | null;
 		idPrefix?: string;
 	}>(),
-	{ suggested: null, blocked: null, idPrefix: "ads-topup" },
+	{ offer: null, suggested: null, blocked: null, idPrefix: "ads-topup" },
 );
 
 const text = ref(props.suggested ? String(props.suggested) : "");
@@ -37,6 +39,8 @@ const min = computed(() => props.pricing?.top_up_min ?? null);
 const max = computed(() => props.pricing?.top_up_max ?? null);
 const symbol = computed(() => min.value?.symbol ?? "₦");
 const major = computed(() => parseMajor(text.value));
+const offer = computed(() => (props.offer?.eligible ? props.offer : null));
+const bonus = computed(() => bonusFor(offer.value, major.value));
 
 function check(): string {
 	if (major.value === null || major.value <= 0) return "Enter an amount, like 20000.";
@@ -52,7 +56,7 @@ async function go() {
 	const amount = amountLike(min.value, major.value);
 	const ok = await confirmAction({
 		title: `Top up ${money(amount)}?`,
-		message: `${props.notice} You'll pay on Paystack's page, then come back here.`,
+		message: `${bonus.value > 0 ? `You'll get ${money(amountLike(min.value, bonus.value))} bonus credit too. ` : ""}${props.notice} Top-ups include VAT. You'll pay on Paystack's page, then come back here.`,
 		confirmText: "Continue to payment",
 	});
 	if (!ok) return;
@@ -71,6 +75,10 @@ async function go() {
 	<form class="p-stack-sm" novalidate @submit.prevent="go">
 		<div v-if="blocked" class="p-alert p-alert--warn" role="status">{{ blocked }}</div>
 		<div v-if="error" class="p-alert" role="alert">{{ error }}</div>
+		<p v-if="offer" class="p-alert p-alert--ok offer" role="status">
+			<span class="sh sh-cd" style="--c: var(--cat-3)" aria-hidden="true" />
+			<span>{{ bonusOfferText(offer) }}</span>
+		</p>
 		<div class="row">
 			<label class="p-field grow">
 				<span>Amount ({{ symbol }})</span>
@@ -94,8 +102,9 @@ async function go() {
 		<small :id="`${idPrefix}-hint`" class="p-hint">
 			<template v-if="min && max">From {{ money(min) }} to {{ money(max) }}. </template>
 			Pay by card or bank transfer on Paystack.
+			<strong v-if="bonus > 0" class="bonus">You'll get {{ money(amountLike(min, bonus)) }} bonus credit.</strong>
 		</small>
-		<p :id="`${idPrefix}-notice`" class="p-alert p-alert--info notice">{{ notice }}</p>
+		<p :id="`${idPrefix}-notice`" class="p-alert p-alert--info notice">{{ notice }} Top-ups include VAT.</p>
 	</form>
 </template>
 
@@ -111,5 +120,20 @@ async function go() {
 }
 .notice {
 	font-weight: 600;
+}
+.offer {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 600;
+}
+.offer .sh {
+	width: 20px;
+	height: 13px;
+}
+.bonus {
+	display: block;
+	margin-top: 4px;
+	color: var(--ok);
 }
 </style>

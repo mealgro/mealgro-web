@@ -8,7 +8,7 @@ import type { AdFormat, MediaKind } from "../../lib/ads/types";
 withDefaults(
 	defineProps<{
 		format: AdFormat;
-		/** An image or video address (the CDN, or a local file being uploaded). */
+		/** The video (feed) or image (banner): the CDN, or a local file being uploaded. */
 		mediaUrl?: string | null;
 		mediaKind?: MediaKind;
 		poster?: string | null;
@@ -37,7 +37,7 @@ const WIDTHS = [360, 390, 430];
 			<img v-else-if="mediaUrl" class="media" :src="mediaUrl" alt="" />
 			<div v-else class="empty">
 				<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l5-5 4 4 3-3 6 6M3 5h18v14H3zM15 9h.01" /></svg>
-				<span>Your image or video</span>
+				<span>Your video</span>
 			</div>
 			<div class="shade" aria-hidden="true" />
 			<div class="copy">

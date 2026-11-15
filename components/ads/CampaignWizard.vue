@@ -169,7 +169,7 @@ async function checkFile(file: File, url: string): Promise<string> {
 	const isVideo = VIDEO_TYPES.includes(file.type) || /\.(mp4|mov|m4v)$/i.test(file.name);
 	const isImage = IMAGE_TYPES.includes(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name);
 	if (form.format === "banner" && !isImage) return "Banners take one image: JPG, PNG or WebP.";
-	if (!isImage && !isVideo) return "Upload a JPG, PNG or WebP image, or an MP4 or MOV video.";
+	if (form.format === "feed" && !isVideo) return "Feed ads take a video: MP4 or MOV, portrait, 5 to 30 seconds.";
 	if (isImage) {
 		if (file.size > 20 * MB) return "Images can be at most 20 MB.";
 		try {
@@ -300,6 +300,7 @@ const STEP_OF: Record<string, number> = {
 	AdsErrorImageTooSmall: 2,
 	AdsErrorVideoNotPortrait: 2,
 	AdsErrorBannerNeedsImage: 2,
+	AdsErrorFeedNeedsVideo: 2,
 	AdsErrorDescriptionRequired: 2,
 	AdsErrorDescriptionTooLong: 2,
 	AdsErrorDestinationInvalid: 2,
@@ -539,7 +540,7 @@ const blockedWhy = computed(() => {
 					<FormatPicture :format="f" />
 					<span class="format-text">
 						<strong>{{ f === "feed" ? "Feed ad" : "Banner" }}</strong>
-						<span v-if="f === 'feed'">A full page between the dishes people swipe through. Image or portrait video, with a short line of text.</span>
+						<span v-if="f === 'feed'">A full-screen portrait video between the dishes people swipe through, with a short line of text.</span>
 						<span v-else>A wide image in the carousel at the top of Explore, 120 points tall.</span>
 						<span v-if="pricing" class="price">{{ money(f === "feed" ? pricing.feed_cpm : pricing.banner_cpm) }} per 1,000 impressions</span>
 					</span>
@@ -560,12 +561,12 @@ const blockedWhy = computed(() => {
 					<div>
 						<h2 id="w2-h">Your ad</h2>
 						<p class="p-muted">
-							<template v-if="form.format === 'feed'">An image (at least 1080×1920) or a portrait video (5 to 30 seconds, up to 50 MB, MP4 or MOV). It's cropped to 9:16 from the centre. Videos play muted, with a sound button.</template>
+							<template v-if="form.format === 'feed'">A portrait video (9:16, like 1080×1920), 5 to 30 seconds, up to 50 MB, MP4 or MOV. It plays muted, with a sound button.</template>
 							<template v-else>One image, 1290×360. Keep words and logos in the middle 1080×360: phones cut off the sides.</template>
 						</p>
 					</div>
 					<div class="p-field">
-						<span>{{ form.format === "feed" ? "Image or video" : "Image" }}</span>
+						<span>{{ form.format === "feed" ? "Video" : "Image" }}</span>
 						<div class="p-row p-wrap">
 							<button class="p-btn" type="button" :disabled="busy || !!blockedWhy" @click="fileInput?.click()">
 								{{ progress !== null ? `Uploading… ${Math.round(progress * 100)}%` : hasMedia ? "Replace" : "Upload" }}
@@ -577,7 +578,7 @@ const blockedWhy = computed(() => {
 							class="sr-only"
 							type="file"
 							tabindex="-1"
-							:accept="form.format === 'feed' ? 'image/jpeg,image/png,image/webp,video/mp4,video/quicktime' : 'image/jpeg,image/png,image/webp'"
+							:accept="form.format === 'feed' ? 'video/mp4,video/quicktime,.mp4,.mov,.m4v' : 'image/jpeg,image/png,image/webp'"
 							@change="onFile"
 						/>
 						<small v-if="mediaError" class="err" role="alert">{{ mediaError }}</small>
@@ -684,7 +685,7 @@ const blockedWhy = computed(() => {
 					<template v-if="shortBy">You need {{ m(Math.max(0, -(after ?? 0))) }} more.</template>
 					Top up, and you'll come back here to send the ad. Your draft is saved.
 				</p>
-				<TopUpForm :pricing="pricing" :notice="wallet.notice" :return-path="returnPath" :suggested="shortBy" :blocked="blockedWhy || null" id-prefix="w4-topup" />
+				<TopUpForm :pricing="pricing" :notice="wallet.notice" :offer="wallet.bonus_offer" :return-path="returnPath" :suggested="shortBy" :blocked="blockedWhy || null" id-prefix="w4-topup" />
 			</div>
 
 			<div v-if="isDraft && !termsCurrent" class="p-alert p-alert--warn" role="status">

@@ -11,6 +11,7 @@ const emit = defineEmits<{ paid: [amount: Amount] }>();
 const reference = ref<string | null>(null);
 const state = ref<"idle" | "checking" | "paid" | "pending" | "failed" | "error">("idle");
 const paidAmount = ref<Amount | null>(null);
+const bonusPaid = ref<Amount | null>(null);
 const error = ref("");
 
 async function check() {
@@ -20,6 +21,7 @@ async function check() {
 	state.value = out.state;
 	if (out.state === "paid") {
 		paidAmount.value = out.topUp.amount;
+		bonusPaid.value = out.topUp.bonus_paid?.amount > 0 ? out.topUp.bonus_paid : null;
 		emit("paid", out.topUp.amount);
 	}
 	if (out.state === "error") error.value = describe(out.error);
@@ -38,6 +40,7 @@ onMounted(() => {
 		<div v-if="state === 'checking'" class="p-alert p-alert--info" role="status">Checking your payment…</div>
 		<div v-else-if="state === 'paid'" class="p-alert p-alert--ok" role="status">
 			Payment received. {{ money(paidAmount) }} is in your ad wallet.
+			<template v-if="bonusPaid"> Your {{ money(bonusPaid) }} bonus landed too.</template>
 		</div>
 		<div v-else-if="state === 'pending'" class="p-alert p-alert--warn" role="status">
 			<p>

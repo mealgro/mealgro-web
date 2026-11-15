@@ -173,7 +173,7 @@ const done = () => location.assign(HOME);
 		area="Mealgro Ads"
 		home-href="/"
 		headline="Put your business in front of hungry customers."
-		tagline="Full-screen ads in the Mealgro feed and banners on Explore. Pay only for what's shown."
+		tagline="Full-screen video ads in the Mealgro feed and banners on Explore, for non-food businesses. Pay only for what's shown."
 		:wide="mode === 'signup'"
 	>
 		<template #top><HomeLink /></template>
@@ -187,10 +187,14 @@ const done = () => location.assign(HOME);
 			</div>
 
 			<ul v-if="step === 'form' && mode === 'signup'" class="pitch">
-				<li><span class="sh sh-sq" style="--c: var(--cat-1)" aria-hidden="true" /><span><strong>Feed ads.</strong> A full-screen image or video between the dishes people swipe through.</span></li>
+				<li><span class="sh sh-sq" style="--c: var(--cat-1)" aria-hidden="true" /><span><strong>Feed ads.</strong> A full-screen portrait video between the dishes people swipe through.</span></li>
 				<li><span class="sh sh-ci" style="--c: var(--cat-2)" aria-hidden="true" /><span><strong>Banners.</strong> A wide image at the top of Explore.</span></li>
 				<li><span class="sh sh-di" style="--c: var(--cat-4)" aria-hidden="true" /><span><strong>Prepaid, per 1,000 views.</strong> Top up, set a budget, and choose the states or cities you want. Every ad is reviewed before it shows.</span></li>
 			</ul>
+
+			<p v-if="step === 'form' && mode === 'signup'" class="p-alert p-alert--info" role="note">
+				<strong>Mealgro Ads is for non-food businesses. Restaurants, food vendors and delivery apps can't advertise.</strong>
+			</p>
 
 			<div v-if="step === 'form'" class="p-tabs" role="group" aria-label="Sign in or sign up">
 				<button type="button" :aria-pressed="mode === 'signup'" @click="switchTo('signup')">Sign up</button>
@@ -235,6 +239,7 @@ const done = () => location.assign(HOME);
 					<span>Full name</span>
 					<input v-model="form.full_name" class="p-input" autocomplete="name" maxlength="50" :aria-invalid="bad === 'full_name'" required />
 				</label>
+				<p class="p-hint nonfood">Mealgro Ads is for non-food businesses. Restaurants, food vendors and delivery apps can't advertise.</p>
 				<label class="p-field">
 					<span>Business name</span>
 					<input v-model="form.business_name" class="p-input" autocomplete="organization" maxlength="60" :aria-invalid="bad === 'business_name'" aria-describedby="ads-biz-hint" required />
@@ -303,6 +308,10 @@ const done = () => location.assign(HOME);
 	display: flex;
 	gap: 12px;
 	align-items: flex-start;
+}
+.nonfood {
+	font-weight: 600;
+	color: var(--ink);
 }
 .pitch .sh {
 	flex: none;

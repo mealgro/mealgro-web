@@ -7,7 +7,7 @@ import HeroPanel from "../../../components/portal/HeroPanel.vue";
 import StatTile from "../../../components/portal/StatTile.vue";
 import StateBlock from "../../../components/portal/StateBlock.vue";
 import { wallet as walletApi } from "../../../lib/ads/api";
-import { dateTime, describe, money } from "../../../lib/ads/format";
+import { bonusOfferText, dateTime, describe, money } from "../../../lib/ads/format";
 import { session } from "../../../lib/ads/session";
 import { checkTopUp } from "../../../lib/ads/topup";
 import { toast } from "../../../lib/ads/toast";
@@ -55,7 +55,10 @@ async function checkLine(line: WalletLine) {
 	checking.value = line.reference;
 	const out = await checkTopUp(line.reference);
 	checking.value = null;
-	if (out.state === "paid") toast(`Payment received. ${money(out.topUp.amount)} is in your ad wallet.`);
+	if (out.state === "paid")
+		toast(
+			`Payment received. ${money(out.topUp.amount)} is in your ad wallet.${out.topUp.bonus_paid?.amount > 0 ? ` Your ${money(out.topUp.bonus_paid)} bonus landed too.` : ""}`,
+		);
 	else if (out.state === "failed") toast("That payment didn't go through.", "bad");
 	else if (out.state === "pending") toast("Paystack hasn't confirmed that payment yet.", "bad");
 	else toast(describe(out.error), "bad");
@@ -79,6 +82,10 @@ async function checkLine(line: WalletLine) {
 			</p>
 		</div>
 
+		<div v-if="wallet?.bonus_offer?.eligible" class="p-alert p-alert--ok" role="status">
+			<p><strong>Top-up bonus.</strong> {{ bonusOfferText(wallet.bonus_offer) }} <a href="#top-up">Top up</a></p>
+		</div>
+
 		<div v-if="wallet" class="top" aria-label="Balances">
 			<HeroPanel class="top-hero" numeric eyebrow="Ad credit you can spend" shape="sq" color="var(--cat-1)" :title="money(wallet.available)" />
 			<div class="top-tiles">
@@ -95,7 +102,7 @@ async function checkLine(line: WalletLine) {
 				<h2 id="ads-topup-h">Top up</h2>
 				<p class="p-muted">Add credit, then spend it on your ads.</p>
 			</div>
-			<TopUpForm v-if="wallet" :pricing="pricing" :notice="wallet.notice" return-path="/ads/wallet" :blocked="blocked" />
+			<TopUpForm v-if="wallet" :pricing="pricing" :notice="wallet.notice" :offer="wallet.bonus_offer" return-path="/ads/wallet" :blocked="blocked" />
 			<StateBlock v-else :loading="!error" :error="error || null" @retry="load" />
 		</section>
 

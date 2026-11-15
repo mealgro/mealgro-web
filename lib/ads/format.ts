@@ -1,6 +1,6 @@
 import { sentence } from "../portal/format";
 import { AdsApiError } from "./http";
-import type { Amount, Campaign, CampaignStatus } from "./types";
+import type { Amount, BonusOffer, Campaign, CampaignStatus } from "./types";
 
 /** An API amount (AmountDto, major units) for display, always to the kobo:
  *  ₦12,500.00. Money sent TO the API is in minor units (`toMinor`). */
@@ -28,6 +28,22 @@ export function parseMajor(text: string): number | null {
 
 /** Major units to the minor units the API takes. */
 export const toMinor = (major: number) => Math.round(major * 100);
+
+/** The offer in a line: "Double your first top-up, up to ₦50,000.00", or
+ *  "Get 20% extra credit on top-ups, up to ₦10,000.00", with its end date. */
+export function bonusOfferText(o: BonusOffer): string {
+	const base =
+		o.percent === 100
+			? `Double your ${o.first_top_up_only ? "first top-up" : "top-ups"}, up to ${money(o.cap)}`
+			: `Get ${o.percent}% extra credit on ${o.first_top_up_only ? "your first top-up" : "top-ups"}, up to ${money(o.cap)}`;
+	return o.ends_at ? `${base}, until ${day(o.ends_at)}.` : `${base}.`;
+}
+
+/** The bonus a top-up of `major` would earn under the offer (major units). */
+export function bonusFor(o: BonusOffer | null | undefined, major: number | null): number {
+	if (!o || !o.eligible || major === null || major <= 0) return 0;
+	return Math.min(Math.floor(major * o.percent) / 100, o.cap.amount);
+}
 
 export const count = (n: number | null | undefined) => (n ?? 0).toLocaleString("en-NG");
 

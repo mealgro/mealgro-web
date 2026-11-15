@@ -6,15 +6,17 @@ import HeroPanel from "../../../components/portal/HeroPanel.vue";
 import StatTile from "../../../components/portal/StatTile.vue";
 import StateBlock from "../../../components/portal/StateBlock.vue";
 import TableState from "../../../components/portal/TableState.vue";
-import { campaigns as campaignsApi, me } from "../../../lib/ads/api";
-import { count, dateTime, describe, money } from "../../../lib/ads/format";
+import { campaigns as campaignsApi, me, wallet as walletApi } from "../../../lib/ads/api";
+import { bonusOfferText, count, dateTime, describe, money } from "../../../lib/ads/format";
 import { addDays, marketToday } from "../../../lib/ads/market";
 import { session } from "../../../lib/ads/session";
-import type { Campaign, CampaignStats, Notice, Overview } from "../../../lib/ads/types";
+import type { BonusOffer, Campaign, CampaignStats, Notice, Overview } from "../../../lib/ads/types";
 
 const user = session.user;
 const overview = ref<Overview | null>(null);
 const notices = ref<Notice[] | null>(null);
+/** The top-up bonus, when one is running and they can have it. */
+const offer = ref<BonusOffer | null>(null);
 const live = ref<Campaign[] | null>(null);
 const stats = ref<Record<string, CampaignStats>>({});
 const error = ref("");
@@ -41,10 +43,11 @@ async function loadLive() {
 
 async function load() {
 	error.value = "";
-	const [o, n] = await Promise.allSettled([me.overview(), me.notices()]);
+	const [o, n, w] = await Promise.allSettled([me.overview(), me.notices(), walletApi.get()]);
 	if (o.status === "fulfilled") overview.value = o.value;
 	else error.value = describe(o.reason);
 	notices.value = n.status === "fulfilled" ? n.value : [];
+	offer.value = w.status === "fulfilled" && w.value.bonus_offer?.eligible ? w.value.bonus_offer : null;
 }
 
 onMounted(async () => {
@@ -81,6 +84,10 @@ function weekOf(c: Campaign) {
 		<div v-if="error" class="p-alert" role="alert">
 			{{ error }}
 			<button class="p-btn p-btn--sm" type="button" @click="load">Retry</button>
+		</div>
+
+		<div v-if="offer" class="p-alert p-alert--ok" role="status">
+			<p><strong>Top-up bonus.</strong> {{ bonusOfferText(offer) }} <a href="/ads/wallet#top-up">Top up</a></p>
 		</div>
 
 		<div class="top">
