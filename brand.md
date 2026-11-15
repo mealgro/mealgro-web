@@ -19,14 +19,10 @@ pattern from one into the other.
 | Surface | Pages | Look | Styling lives in |
 | --- | --- | --- | --- |
 | **Marketing** | `/`, `/vendors`, `/riders`, `/about`, `/contact`, `/terms`, `/privacy`, `/account-deletion`, `/affiliate` (public landing), `/status`, `_error` | Brand red `#D62300`, MADE Tommy Soft, big display type, photography | Scoped `<style>` per component, some Tailwind utilities |
-| **Portals** | `/account/*` (vendor portal), `/affiliate/(app)/*` (affiliate area: dashboard, wallet, bank, referrals, profile, sign-in, sign-up), `/ads/*` (Mealgro Ads advertiser portal: unlisted, `noindex`, never linked from the site; `components/ads`, `lib/ads`) | The admin console's **v2 visual system**: ink and paper, cobalt / rose / sun / mint with a shape each, Bricolage Grotesque + Instrument Sans, light and dark | `components/portal/tokens.css` + `components/portal/portal.css`, scoped to `.portal` |
+| **Portals** | `/account/*` (vendor portal), `/affiliate/(app)/*` (affiliate area: dashboard, wallet, bank, referrals, profile, sign-in, sign-up), `/ads/*` (Mealgro Ads advertiser portal: unlisted, `noindex`, never linked from the site; `components/ads`, `lib/ads`) | The admin console's **v2 visual system** with **Mealgro red** as the brand colour (`#D62300`, `#EC4A26` on dark; owner, 15 Nov 2026): ink and paper, cobalt / rose / sun / mint category colours with a shape each, Bricolage Grotesque + Instrument Sans, light and dark | `components/portal/tokens.css` + `components/portal/portal.css`, scoped to `.portal` |
 
 The portals follow `mealgro-admin/brand.md` (the source of truth for v2). This
-file records how this repo applies it. One exception: **Mealgro Ads (`/ads/*`) leads with
-Mealgro red** (`#D62300`; `#EC4A26` on dark surfaces) instead of cobalt (owner,
-15 Nov 2026). Only the brand tokens move, in `components/ads/ads-brand.css`,
-scoped by `.ads-area` in `components/ads/AdsLayout.vue`; the category colours
-stay. The vendor portal and the affiliate area keep cobalt. The marketing sections below describe
+file records how this repo applies it. The marketing sections below describe
 the marketing site only; the portal sections start at
 [Portals](#portals-vendor-portal-and-affiliate-area).
 
