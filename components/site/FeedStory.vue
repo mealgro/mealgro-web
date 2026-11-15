@@ -16,10 +16,6 @@ import { videosPaused } from "../../lib/site/media";
 					Think TikTok for Food: short videos from kitchens near you. Swipe up for the next
 					kitchen, sideways for more of its dishes, and save the ones you want to come back to.
 				</p>
-				<div class="s-actions rise" style="--i: 2">
-					<a class="s-btn s-btn--primary" href="#get-app">Get the app</a>
-					<a class="s-btn s-btn--outline" href="#how">How ordering works</a>
-				</div>
 			</div>
 			<div class="phone-col">
 				<!-- The old home page's floating food, around the phone now -->
