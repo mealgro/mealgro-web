@@ -1,0 +1,34 @@
+/* Mealgro Ads leads with Mealgro red (owner, 15 Nov 2026), unlike the other
+   portals, which keep cobalt: main buttons, links, the current page, focus.
+   Only the brand tokens move; the category colours stay. The selectors carry
+   `.ads-area` on top of tokens.css's own, so they win in both themes. */
+.ads-area .portal {
+	--brand: #d62300;
+	--brand-hover: #bd1f00;
+	--on-brand: #ffffff;
+	--brand-soft: color-mix(in srgb, var(--brand) 10%, var(--surface));
+	--info: #d62300;
+	--on-info: #ffffff;
+}
+
+/* On the dark surfaces a touch lighter, so red text and links stay readable
+   (4.5:1 on #12121c) while white still reads on a red button. */
+:root[data-theme="dark"] .ads-area .portal {
+	--brand: #ec4a26;
+	--brand-hover: #f2603f;
+	--on-brand: #ffffff;
+	--brand-soft: color-mix(in srgb, var(--brand) 16%, var(--surface));
+	--info: #ec4a26;
+	--on-info: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .ads-area .portal {
+		--brand: #ec4a26;
+		--brand-hover: #f2603f;
+		--on-brand: #ffffff;
+		--brand-soft: color-mix(in srgb, var(--brand) 16%, var(--surface));
+		--info: #ec4a26;
+		--on-info: #ffffff;
+	}
+}
