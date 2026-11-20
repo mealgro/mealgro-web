@@ -11,8 +11,8 @@
 // once per page however many players use it) and played from a blob: URL,
 // which needs no ranges. It covers every <video>, whoever made it: templates,
 // innerHTML, components that set `src` later. A clip is fetched when it comes
-// near the screen or when code calls play() on it, so a page doesn't download
-// clips nobody gets to. Everywhere else nothing changes.
+// within a screen of the viewport or when code calls play() on it, so a page
+// doesn't download clips nobody gets to. Everywhere else nothing changes.
 
 const CLIP = /^\/media\/.+\.mp4$/;
 /** The same-origin path of a /media clip, or null for anything else. */
@@ -48,6 +48,9 @@ const inflight = new WeakMap<HTMLVideoElement, Promise<void>>();
 /** Players that code asked to play (and not to pause since). */
 const wants = new WeakSet<HTMLVideoElement>();
 let near: IntersectionObserver | null = null;
+/** Autoplay clips not yet moved: the fallback below checks where they are. */
+const waiting = new Set<HTMLVideoElement>();
+let poll: ReturnType<typeof setInterval> | undefined;
 let nativePlay: HTMLMediaElement["play"];
 
 /** Moves a player onto its blob. Undefined when it has nothing to move. */
@@ -56,6 +59,7 @@ function swap(v: HTMLVideoElement): Promise<void> | undefined {
 	if (!src) return inflight.get(v);
 	pending.delete(v);
 	near?.unobserve(v);
+	waiting.delete(v);
 	const done = blobFor(clipPath(src)!).then((url) => {
 		inflight.delete(v);
 		// Something pointed the player elsewhere meanwhile: leave it be.
@@ -74,6 +78,31 @@ function track(v: HTMLVideoElement) {
 	if (!src || !clipPath(src) || pending.get(v) === src) return;
 	pending.set(v, src);
 	near?.observe(v);
+	if (v.autoplay) {
+		waiting.add(v);
+		poll ??= setInterval(checkWaiting, 1000);
+	}
+}
+
+// IntersectionObserver misses a clip that a CSS animation carries on screen
+// (the TikTok wall's columns drift up and down): WebKit doesn't recompute it
+// for those. So once a second, any autoplay clip still waiting whose box is
+// within a screen of the viewport moves too. It stops when none are left.
+function checkWaiting() {
+	for (const v of waiting) {
+		if (!v.isConnected) {
+			waiting.delete(v);
+			continue;
+		}
+		const r = v.getBoundingClientRect();
+		const w = innerWidth;
+		const h = innerHeight;
+		if (r.width && r.bottom > -h && r.top < 2 * h && r.right > -w && r.left < 2 * w) void swap(v);
+	}
+	if (!waiting.size) {
+		clearInterval(poll);
+		poll = undefined;
+	}
 }
 
 let started = false;
