@@ -11,6 +11,7 @@
 import { onMounted } from "vue";
 import { usePageContext } from "vike-vue/usePageContext";
 import "../lib/theme";
+import { initWebkitVideo } from "../lib/site/webkitVideo";
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -22,6 +23,7 @@ const isPortal = () =>
 
 onMounted(() => {
 	if (isPortal()) return;
+	initWebkitVideo();
 	const firebaseConfig = {
 		apiKey: "AIzaSyDkL_P3BwyvYc3QJC3uGPajn29LZwBf_wc",
 		authDomain: "mealgro-logistics.firebaseapp.com",

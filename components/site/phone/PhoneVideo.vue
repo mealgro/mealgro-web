@@ -3,16 +3,15 @@
 // on screen or next to it), plays only while `play`, and starts over each time
 // it becomes the visible dish, as the app does.
 import { onMounted, ref, watch } from "vue";
-import { videoUrl } from "../../../lib/site/media";
 
 const props = defineProps<{ id: string; load: boolean; play: boolean }>();
 const el = ref<HTMLVideoElement | null>(null);
-const src = ref<string | undefined>(props.load ? videoUrl(`/media/dish/${props.id}.mp4`) : undefined);
+const src = ref<string | undefined>(props.load ? `/media/dish/${props.id}.mp4` : undefined);
 
 watch(
 	() => props.load,
 	(v) => {
-		if (v && !src.value) src.value = videoUrl(`/media/dish/${props.id}.mp4`);
+		if (v && !src.value) src.value = `/media/dish/${props.id}.mp4`;
 	},
 );
 
