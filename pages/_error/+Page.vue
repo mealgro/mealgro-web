@@ -12,7 +12,7 @@ const heading = is404 ? "Page Not Found" : "Internal Error";
 </script>
 
 <template>
-	<SitePage>
+	<SitePage :cta="false">
 		<DocHero :label="is404 ? '404' : '500'" :title="heading" :lead="String(abortReason)">
 			<a class="s-btn s-btn--primary" href="/">Go Home</a>
 		</DocHero>

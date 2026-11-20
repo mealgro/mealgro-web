@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // The opening band of the text pages (about, contact, legal, account
-// deletion, status): ink stage, a small label, the title, an optional lead
+// deletion, status): the red band, a sticker label, the title, an optional lead
 // and optional key/value facts. Quieter than PageHero: no visual beside it.
 defineProps<{
 	label?: string;
@@ -13,10 +13,7 @@ defineProps<{
 <template>
 	<section class="s-stage dh">
 		<div class="s-wrap dh-in">
-			<p v-if="label" class="dh-label">
-				<span class="sh sh-sq" style="--c: var(--cat-3)" aria-hidden="true" />
-				{{ label }}
-			</p>
+			<p v-if="label" class="s-kick dh-label">{{ label }}</p>
 			<h1 class="s-h1 dh-title">{{ title }}</h1>
 			<p v-if="lead" class="s-lead s-muted dh-lead">{{ lead }}</p>
 			<dl v-if="meta?.length" class="dh-meta">
@@ -41,16 +38,11 @@ defineProps<{
 	justify-items: start;
 }
 .dh-label {
-	display: inline-flex;
-	align-items: center;
-	gap: 10px;
-	font-size: 15px;
-	font-weight: 600;
-	color: color-mix(in srgb, var(--on-stage) 80%, var(--stage));
+	margin-bottom: 4px !important;
 }
 .dh-title {
-	font-size: clamp(40px, 6.4vw, 88px);
-	max-width: 16ch;
+	font-size: clamp(52px, 9vw, 128px);
+	max-width: 14ch;
 	animation: rise 0.8s var(--ease) both;
 }
 .dh-lead {

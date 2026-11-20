@@ -1,6 +1,7 @@
 // The landing page's motion: the loader, the hero zoom into the feed, the
 // kitchen story, the rider's ride across the city, the Gen Z cards, the video
 // wall, the creators fan, the chef slider, ratings, cravings and the FAQ.
+// The nav, its menu and the download section are components/brand's.
 //
 // Ported from the standalone design's inline script. `mountLanding` builds
 // everything inside `root` and returns a function that undoes all of it
@@ -16,7 +17,10 @@ import Lenis from "lenis";
 const DISH = "/media/dish/";
 const PEXELS = "/media/landing/pexels/";
 
-export function mountLanding(root: HTMLElement): () => void {
+/** What the page holds on to: the menu pauses smooth scrolling, unmount undoes it all. */
+export type LandingMotion = { lockScroll: (locked: boolean) => void; destroy: () => void };
+
+export function mountLanding(root: HTMLElement): LandingMotion {
 	gsap.registerPlugin(ScrollTrigger);
 
 	const html = document.documentElement;
@@ -119,9 +123,9 @@ export function mountLanding(root: HTMLElement): () => void {
 
 		/* ---------- hero feed ---------- */
 		const dishes = [
-			{ v: "beef-suya", name: "Beef Suya", desc: "Grilled beef in yaji spice, with fresh tomato and onion.", k: "Mallam Sule Suya", area: "Wuse", t: "15–25 mins", r: "4.7", n: "400+", p: "₦3,500", likes: 954, saves: 211 },
-			{ v: "jollof-chicken", name: "Jollof Rice And Chicken", desc: "Smoky party jollof with peppered chicken and fried plantain.", k: "Mama Ronke's Kitchen", area: "Yaba", t: "25–35 mins", r: "4.6", n: "300+", p: "₦4,300", likes: 412, saves: 128 },
-			{ v: "shrimp-boil", name: "Shrimp Boil Tray", desc: "Prawns, sweetcorn and lemon in spicy garlic butter.", k: "Bayside Boil", area: "Lekki", t: "35–50 mins", r: "4.8", n: "200+", p: "₦14,500", likes: 688, saves: 96 },
+			{ v: "beef-suya", name: "Beef Suya", desc: "Grilled beef in yaji spice, with fresh tomato and onion.", k: "Mallam Sule Suya", area: "Wuse", t: "15–25 mins", r: "4.7", n: "400+", p: "₦3,500", likes: 954, saves: 211, reviews: 96 },
+			{ v: "jollof-chicken", name: "Jollof Rice And Chicken", desc: "Smoky party jollof with peppered chicken and fried plantain.", k: "Mama Ronke's Kitchen", area: "Yaba", t: "25–35 mins", r: "4.6", n: "300+", p: "₦4,300", likes: 412, saves: 128, reviews: 128 },
+			{ v: "shrimp-boil", name: "Shrimp Boil Tray", desc: "Prawns, sweetcorn and lemon in spicy garlic butter.", k: "Bayside Boil", area: "Lekki", t: "35–50 mins", r: "4.8", n: "200+", p: "₦14,500", likes: 688, saves: 96, reviews: 74 },
 		];
 		const feed = $("#feed");
 		const segs = $("#segs");
@@ -153,9 +157,15 @@ export function mountLanding(root: HTMLElement): () => void {
 				if (j === idx) s.classList.add("active");
 			});
 			const apply = () => {
-				info.innerHTML = `<h3>${d.name}</h3><p>${d.desc}</p><div class="vend"><span class="av">${d.k[0]}</span>${d.k} · ${d.t} · ${d.area}</div><div class="stars"><b>★ ${d.r}</b> (${d.n})</div>`;
+				// The app's info block: dish, description, store and delivery time,
+				// area, then the badge and rating chips.
+				info.innerHTML =
+					`<p class="ac-title">${d.name}</p><p class="ac-desc">${d.desc}</p>` +
+					`<div class="ac-store"><img src="/media/app-icons/shop_icon.svg" alt=""><b>${d.k}</b><span class="ac-time"><img src="/media/app-icons/scooter_icon.svg" alt="">${d.t}</span></div>` +
+					`<div class="ac-city"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>${d.area}</div>` +
+					`<div class="ac-badges"><span class="ac-badge">🔥 POPULAR</span><span class="ac-rating"><img src="/media/app-icons/mealgro_icon.svg" alt="">${d.r}<svg viewBox="0 0 24 24" fill="#FEA000"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9Z"/></svg>(${d.n})</span></div>`;
 				$("#price").textContent = d.p;
-				$("#likes").textContent = String(d.likes);
+				$("#reviews").textContent = String(d.reviews);
 				$("#saves").textContent = String(d.saves);
 				info.classList.remove("swap");
 			};
@@ -761,47 +771,6 @@ export function mountLanding(root: HTMLElement): () => void {
 			}
 		});
 		gsap.from(".qa", { y: 60, opacity: 0, duration: 0.9, ease: "expo.out", stagger: 0.08, scrollTrigger: { trigger: "#faq", start: "top 85%" } });
-
-		/* ---------- nav hides on scroll down ---------- */
-		const nav = $("#nav");
-		let lastY = 0;
-		let menuOpen = false;
-		ScrollTrigger.create({
-			start: 0,
-			end: "max",
-			onUpdate: (self) => {
-				const y = self.scroll();
-				nav.classList.toggle("hide", y > lastY && y > 300 && !menuOpen);
-				lastY = y;
-			},
-		});
-
-		/* ---------- mobile menu ---------- */
-		const menuBtn = $("#menuBtn");
-		const mnav = $("#mnav");
-		const setMenu = (open: boolean) => {
-			menuOpen = open;
-			root.classList.toggle("menu-open", open);
-			html.classList.toggle("lp-menu-open", open);
-			menuBtn.setAttribute("aria-expanded", String(open));
-			menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-			mnav.setAttribute("aria-hidden", String(!open));
-			if (open) {
-				nav.classList.remove("hide");
-				lenis?.stop();
-			} else lenis?.start();
-		};
-		on(menuBtn, "click", () => setMenu(!menuOpen));
-		mnav.querySelectorAll("a").forEach((a) => on(a, "click", () => setMenu(false)));
-		on(window, "keydown", (e) => {
-			if ((e as KeyboardEvent).key === "Escape" && menuOpen) {
-				setMenu(false);
-				menuBtn.focus();
-			}
-		});
-		on(window, "resize", () => {
-			if (menuOpen && innerWidth > 860) setMenu(false);
-		});
 	}, root);
 
 	// Pins measure the page: again once fonts and images have settled.
@@ -814,12 +783,19 @@ export function mountLanding(root: HTMLElement): () => void {
 	if (document.readyState !== "complete") on(window, "load", refresh);
 	after(refresh, 1200);
 
-	return () => {
-		stopped = true;
-		timers.forEach((id) => clearTimeout(id));
-		timers.clear();
-		undo.splice(0).reverse().forEach((fn) => fn());
-		ctx.revert();
-		html.classList.remove("lp-loading", "lp-menu-open");
+	return {
+		// The nav (components/brand/BrandNav) owns the menu; it says when it opens.
+		lockScroll: (locked) => {
+			if (locked) lenis?.stop();
+			else lenis?.start();
+		},
+		destroy: () => {
+			stopped = true;
+			timers.forEach((id) => clearTimeout(id));
+			timers.clear();
+			undo.splice(0).reverse().forEach((fn) => fn());
+			ctx.revert();
+			html.classList.remove("lp-loading");
+		},
 	};
 }
