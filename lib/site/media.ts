@@ -5,7 +5,17 @@ import { ref } from "vue";
 // - noodles.mp4: a seed food clip (mealgro/data) for the home "Watch" tile.
 // The home page's phone plays its own dish clips; see lib/site/phone.ts.
 
-const src = (id: string) => `/media/feed/${id}.mp4`;
+// Videos load straight from Firebase Hosting in production, not through
+// mealgro.com. Cloudflare, in front of mealgro.com, asks Firebase for gzip;
+// Firebase gzips even an .mp4 (no header turns that off), and Cloudflare can
+// then answer no byte-range request with a 206. Safari and every iOS browser
+// refuse a video without one, so they played nothing. Firebase answers ranges
+// itself. Posters and images stay on mealgro.com.
+const VIDEO_ORIGIN = import.meta.env.DEV ? "" : "https://mealgro-logistics.web.app";
+/** Where a video under /public plays in every browser. */
+export const videoUrl = (path: string) => VIDEO_ORIGIN + path;
+
+const src = (id: string) => videoUrl(`/media/feed/${id}.mp4`);
 const poster = (id: string) => `/media/feed/${id}.webp`;
 export const clipSrc = src;
 export const clipPoster = poster;
