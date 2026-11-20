@@ -95,7 +95,6 @@ html.lp-loading{overflow:hidden}
 .lp .hero-phone .screen{cursor:pointer}
 .lp .sticker{position:absolute;z-index:8;font-family:var(--font-d);font-weight:700}
 .lp .st-burst{width:130px;height:130px;background:var(--yellow);color:var(--ink);font-size:20px;right:-96px;top:-40px}
-.lp .st-pill{left:-130px;top:90px;background:var(--cream);color:var(--ink);padding:10px 16px;border-radius:14px;font-size:15px;rotate:-8deg;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .lp .zoom{position:absolute;z-index:6;overflow:hidden;visibility:hidden;background:#000;border-radius:40px}
 .lp .zoom video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .lp .zoom .shade2{position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.75))}
@@ -103,7 +102,7 @@ html.lp-loading{overflow:hidden}
 .lp .zoom-cap .tag{display:inline-block;font-family:var(--font-d);font-weight:600;background:var(--yellow);color:var(--ink);padding:6px 14px;border-radius:999px;font-size:16px;margin-bottom:14px}
 .lp .zoom-cap h2{font-size:clamp(64px,11vw,180px)}
 .lp .zoom-cap p{font-size:clamp(17px,1.6vw,22px);margin-top:14px;max-width:640px;opacity:.95}
-@media (max-width:760px){.lp{--pw:min(240px,60vw,calc(52vh * 9 / 19.3))}.lp .hero-title{font-size:16vw;top:96px}.lp .hero-phone{top:auto;bottom:-24vh}.lp .hero-ctas{top:calc(96px + 16vw*3.3 + 10px);bottom:auto;flex-direction:column;align-items:center;text-align:center;gap:0}.lp .hero-ctas p{font-size:15px;margin-bottom:12px}.lp .scroll-cue{display:none}.lp .st-burst{width:90px;height:90px;font-size:14px;right:-58px;top:-28px}.lp .st-pill{display:none}}
+@media (max-width:760px){.lp{--pw:min(240px,60vw,calc(52vh * 9 / 19.3))}.lp .hero-title{font-size:16vw;top:96px}.lp .hero-phone{top:auto;bottom:-24vh}.lp .hero-ctas{top:calc(96px + 16vw*3.3 + 10px);bottom:auto;flex-direction:column;align-items:center;text-align:center;gap:0}.lp .hero-ctas p{font-size:15px;margin-bottom:12px}.lp .scroll-cue{display:none}.lp .st-burst{width:90px;height:90px;font-size:14px;right:-58px;top:-28px}}
 /* ================= KITCHEN (vendor films & posts) ================= */ .lp .kitchen{position:relative;height:100vh;height:100svh;background:var(--ink);color:var(--cream);overflow:hidden}
 .lp .k-bg{position:absolute;inset:-40px}
 .lp .k-bg video{width:100%;height:100%;object-fit:cover;filter:blur(22px) saturate(1.3) brightness(.45);transform:scale(1.15)}

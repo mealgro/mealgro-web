@@ -61,7 +61,6 @@ onBeforeUnmount(() => {
 
       <div id="heroPhone" class="hero-phone">
         <div class="sticker burst spin st-burst" data-burst="16">TAP TO<br>ORDER</div>
-        <div class="sticker st-pill">Swipe for the next kitchen 👆</div>
         <div class="phone">
           <div id="heroScreen" class="screen">
             <div class="island"></div>
