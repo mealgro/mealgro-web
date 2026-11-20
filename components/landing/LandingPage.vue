@@ -1,101 +1,47 @@
 <script setup lang="ts">
 // The landing page (mealgro.com). Ported from the standalone design: the
-// markup is here, the look in ./landing.css (all of it under .lp), and the
+// markup is here (the nav, download section and footer are the shared ones
+// in components/brand), the look in ./landing.css (all of it under .lp), and the
 // motion in ./landing.ts, which starts on mount and undoes itself on unmount
 // so the next page starts clean. Dish media is the site's own (/media/dish);
 // the stock clips and photos are in /media/landing (Pexels and Unsplash
 // licences: free to use, no attribution required).
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import "@fontsource-variable/fredoka";
-import "@fontsource-variable/nunito";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import "../brand/brand.css";
 import "./landing.css";
 import logoImage from "../../assets/logo.svg";
+import BrandNav from "../brand/BrandNav.vue";
+import BrandCta from "../brand/BrandCta.vue";
+import BrandFooter from "../brand/BrandFooter.vue";
 import { CUSTOMER_APP } from "../../lib/site/links";
+import { useStores } from "../../lib/site/stores";
+import type { LandingMotion } from "./landing";
 import { FAQS } from "./faqs";
 
 const root = ref<HTMLElement | null>(null);
 
-// The visitor's device, for the download buttons. Unknown until mounted (the
-// page is prerendered), so the server HTML shows every store.
-type Platform = "ios" | "android" | "mac" | "other";
-const platform = ref<Platform>("other");
-function detectPlatform(): Platform {
-	const ua = navigator.userAgent;
-	if (/android/i.test(ua)) return "android";
-	// iPadOS asks for the desktop site and says "Macintosh"; touch gives it away.
-	if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return "ios";
-	if (/Macintosh|Mac OS X/.test(ua)) return "mac";
-	return "other";
-}
-
-type Store = { key: "ios" | "android"; href: string };
-const allStores = (): Store[] => [
-	...(CUSTOMER_APP.ios ? [{ key: "ios" as const, href: CUSTOMER_APP.ios }] : []),
-	...(CUSTOMER_APP.android ? [{ key: "android" as const, href: CUSTOMER_APP.android }] : []),
-];
-/** On a phone, its own store when there is one; on a computer, every store, the Mac's first on a Mac. */
-const stores = computed<Store[]>(() => {
-	const list = allStores();
-	const p = platform.value;
-	if (p === "ios" || p === "android") {
-		const own = list.filter((s) => s.key === p);
-		if (own.length) return own;
-	}
-	const first = p === "ios" || p === "mac" ? "ios" : "android";
-	return [...list].sort((a, b) => Number(b.key === first) - Number(a.key === first));
-});
-/** A phone's "Download now" goes straight to its store; elsewhere it scrolls to the buttons. */
-const directStore = computed(() => {
-	const p = platform.value;
-	if (p !== "ios" && p !== "android") return null;
-	return allStores().find((s) => s.key === p)?.href ?? null;
-});
+// Download now: straight to a phone's store, else to the buttons.
+const { direct: directStore } = useStores(CUSTOMER_APP);
 const faqs = FAQS;
-const year = new Date().getFullYear();
-let stop: (() => void) | null = null;
+let motion: LandingMotion | null = null;
+// The menu covers the page: smooth scrolling pauses under it.
+const onMenu = (open: boolean) => motion?.lockScroll(open);
 
 onMounted(async () => {
-	platform.value = detectPlatform();
 	const { mountLanding } = await import("./landing");
-	if (root.value) stop = mountLanding(root.value);
+	if (root.value) motion = mountLanding(root.value);
 });
 onBeforeUnmount(() => {
-	stop?.();
-	stop = null;
+	motion?.destroy();
+	motion = null;
 });
 </script>
 
 <template>
-  <div ref="root" class="lp">
+  <div ref="root" class="lp brand">
     <div id="loader" aria-hidden="true"><div class="word chunk" data-chars>mealgro</div></div>
 
-    <nav id="nav" class="nav">
-      <a class="logo" href="/" aria-label="Mealgro home"><img :src="logoImage" alt="Mealgro"></a>
-      <ul>
-        <li><a href="/">Order food</a></li>
-        <li><a href="/vendors">Vendors</a></li>
-        <li><a href="/riders">Riders</a></li>
-        <li><a href="/affiliate">Affiliates</a></li>
-        <li><a href="/about">About</a></li>
-      </ul>
-      <a class="btn" :href="directStore ?? '#get-app'" :target="directStore ? '_blank' : undefined" :rel="directStore ? 'noopener' : undefined">Get the app</a>
-      <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><i></i><i></i></button>
-    </nav>
-
-    <div id="mnav" class="mnav" aria-hidden="true">
-      <ul>
-        <li><a href="/">Order food <small>01</small></a></li>
-        <li><a href="/vendors">Vendors <small>02</small></a></li>
-        <li><a href="/riders">Riders <small>03</small></a></li>
-        <li><a href="/affiliate">Affiliates <small>04</small></a></li>
-        <li><a href="/about">About <small>05</small></a></li>
-      </ul>
-      <div class="burst spin" data-burst="16">HUNGRY?</div>
-      <div class="mnav-foot">
-        <a class="btn yellow" :href="directStore ?? '#get-app'" :target="directStore ? '_blank' : undefined" :rel="directStore ? 'noopener' : undefined" data-close>Get the app →</a>
-        <div class="mnav-social"><a href="https://www.instagram.com/trymealgro">Instagram</a><a href="https://x.com/mealgro">X</a><a href="https://www.facebook.com/share/14VPaxDJVbY/">Facebook</a><a href="https://www.linkedin.com/company/mealgro/">LinkedIn</a></div>
-      </div>
-    </div>
+    <BrandNav @menu="onMenu" />
 
     <!-- ================= 1. HERO: phone zooms into the food ================= -->
     <section id="hero" class="hero">
@@ -123,24 +69,37 @@ onBeforeUnmount(() => {
             <div class="chrome">
               <div class="status"><span>9:41</span><span class="ic"><svg width="16" height="10" viewBox="0 0 17 11" fill="#fff"><rect y="7" width="3" height="4" rx="1" /><rect x="4.5" y="5" width="3" height="6" rx="1" /><rect x="9" y="2.5" width="3" height="8.5" rx="1" /><rect x="13.5" width="3" height="11" rx="1" /></svg><span class="bat"></span></span></div>
               <div id="segs" class="segs"></div>
-              <div class="topbar">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z" /><circle cx="12" cy="10" r="2.5" /></svg>
-                <span class="chip hot">🔥 POPULAR</span><span class="chip near">NEAR YOU</span>
-                <span class="r"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg></span>
-              </div>
-              <div class="rail">
-                <div><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 3 4.5 6.6 4.5c2.1 0 3.6 1.1 4.4 2.5.8-1.4 2.3-2.5 4.4-2.5 3.6 0 5.7 3.7 4.2 7.2C19.5 16.4 12 21 12 21Z" /></svg><span id="likes">954</span></div>
-                <div><svg viewBox="0 0 24 24" fill="#fff"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1Z" /></svg><span id="saves">211</span></div>
-                <div><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 11.5 21 3l-6.5 18-3.2-7.3L3 11.5Z" /></svg><span>Share</span></div>
-              </div>
-              <div id="info" class="info"></div>
-              <div class="cartbar"><span>＋ Add to cart</span><span id="price" class="price">₦3,500</span></div>
-              <div class="tabs">
-                <div class="on"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z" /></svg>Feed</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /></svg>Community</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5z" /></svg>Explore</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4" /></svg>Activity</div>
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>Profile</div>
+              <!-- The app's own buttons and dish info (mealgro-app feed), at its
+                   proportions: 1em is 10 of the app's 390 px -->
+              <div class="appui">
+                <div class="ac-top">
+                  <div class="ac-loc">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21.5s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+                    <div><small>Delivery To</small><strong>12 Herbert Macaulay Way, Yaba</strong></div>
+                  </div>
+                  <div class="ac-tools">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7.5" /><path d="m20.5 20.5-4-4" /></svg>
+                    <img src="/media/app-icons/filter_icon.svg" alt="">
+                  </div>
+                </div>
+                <div class="ac-rail">
+                  <span class="ac-r"><svg viewBox="0 0 28 28" fill="currentColor"><path d="M25.67 9.92a7.58 7.58 0 0 0-13.57-4.66c5.92.23 10.65 5.1 10.65 11.07l-.01.39.39.1c1.13.3 2.16-.73 1.86-1.85l-.15-.56c-.12-.45-.05-.92.15-1.35.43-.95.68-2.02.68-3.14Z" /><path fill-rule="evenodd" d="M21 16.33a9.33 9.33 0 0 1-13.36 8.42c-.42-.2-.9-.27-1.34-.15l-1.43.38a1.52 1.52 0 0 1-1.86-1.86l.38-1.43c.12-.45.05-.92-.15-1.34A9.33 9.33 0 1 1 21 16.33ZM7.58 17.5a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Zm4.09 0a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Zm4.08 0a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Z" /></svg><span id="reviews">96</span></span>
+                  <span class="ac-r"><svg viewBox="0 0 28 28" fill="currentColor"><path fill-rule="evenodd" d="M24.5 12.95v5.82c0 3.62 0 5.42-.86 6.21-.4.38-.92.61-1.47.68-1.15.13-2.5-1.06-5.19-3.44-1.19-1.05-1.78-1.58-2.47-1.71a2.6 2.6 0 0 0-1.02 0c-.69.13-1.28.66-2.47 1.71-2.69 2.38-4.04 3.57-5.19 3.44-.55-.07-1.07-.3-1.47-.68-.86-.79-.86-2.59-.86-6.21v-5.82c0-5 0-7.5 1.54-9.06C6.58 2.33 9.05 2.33 14 2.33s7.42 0 8.96 1.56c1.54 1.55 1.54 4.06 1.54 9.06ZM9.63 7c0-.48.39-.88.87-.88h7c.48 0 .88.4.88.88s-.4.88-.88.88h-7A.88.88 0 0 1 9.62 7Z" /></svg><span id="saves">211</span></span>
+                  <span class="ac-r"><svg viewBox="0 0 28 28" fill="currentColor"><path d="m16.28 6.05 5.81 5.16c1.08.96 1.63 1.45 1.83 2.02.17.5.17 1.04 0 1.54-.2.57-.75 1.06-1.83 2.02l-5.81 5.16c-.5.44-.74.66-.95.67a.58.58 0 0 1-.47-.21c-.13-.16-.13-.5-.13-1.15V18c-2.83 0-5.83.91-8.01 2.52-1.14.84-1.71 1.27-1.92 1.25a.63.63 0 0 1-.46-.28c-.11-.19-.01-.77.18-1.93C5.82 12.02 11 10 14.73 10V6.75c0-.66 0-.99.13-1.15.12-.14.29-.22.47-.21.21 0 .46.22.95.66Z" /></svg><span>Share</span></span>
+                  <span class="ac-r"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9.2v5.6c0 .9.7 1.6 1.6 1.6h2.3l4.4 3.6c.8.6 1.9.1 1.9-.9V4.9c0-1-1.1-1.5-1.9-.9L6.9 7.6H4.6C3.7 7.6 3 8.3 3 9.2Z" /><path d="m16.5 9 5 5m0-5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg></span>
+                </div>
+                <div id="info" class="ac-info"></div>
+                <div class="ac-actions">
+                  <span class="ac-menu"><img src="/media/app-icons/menu_fork_knife.svg" alt="">Menu</span>
+                  <span class="ac-cart"><span class="ac-cart-l"><img src="/media/app-icons/cart_icon.svg" alt="">Add to cart</span><span id="price" class="ac-cart-r">₦3,500</span></span>
+                </div>
+                <nav class="ac-tabs" aria-hidden="true">
+                  <span><img src="/media/app-icons/media_icon.svg" alt="">Feed</span>
+                  <span><img class="ac-white" src="/media/app-icons/community_icon.svg" alt="">Community</span>
+                  <span><img class="ac-white" src="/media/app-icons/explore_icon.svg" alt="">Explore</span>
+                  <span><img class="ac-white" src="/media/app-icons/outlined_bell.svg" alt="">Activity</span>
+                  <span><img class="ac-white" src="/media/app-icons/user_icons.svg" alt="">Profile</span>
+                </nav>
               </div>
               <div class="home-ind"></div>
             </div>
@@ -218,10 +177,42 @@ onBeforeUnmount(() => {
                   <video class="cover" src="/media/dish/jollof-chicken.mp4" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video>
                   <div class="shade"></div>
                   <div class="chrome">
-                    <div class="topbar" style="top:48px"><span class="chip hot">🔥 NEW</span><span class="chip near">NEAR YOU</span></div>
-                    <div class="rail"><div><svg viewBox="0 0 24 24" fill="#FF5A36"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 3 4.5 6.6 4.5c2.1 0 3.6 1.1 4.4 2.5.8-1.4 2.3-2.5 4.4-2.5 3.6 0 5.7 3.7 4.2 7.2C19.5 16.4 12 21 12 21Z" /></svg><span id="liveLikes">0</span></div><div><svg viewBox="0 0 24 24" fill="#fff"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1Z" /></svg><span id="liveSaves">0</span></div></div>
-                    <div class="info" style="bottom:58px"><h3>Jollof Rice And Chicken</h3><p>Smoky party jollof with peppered chicken and fried plantain.</p><div class="vend"><span class="av">M</span>Mama Ronke's Kitchen · Yaba</div></div>
-                    <div class="cartbar" style="bottom:12px"><span>＋ Add to cart</span><span class="price">₦4,300</span></div>
+                    <div class="appui">
+                      <div class="ac-top">
+                        <div class="ac-loc">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21.5s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+                          <div><small>Delivery To</small><strong>12 Herbert Macaulay Way, Yaba</strong></div>
+                        </div>
+                        <div class="ac-tools">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7.5" /><path d="m20.5 20.5-4-4" /></svg>
+                          <img src="/media/app-icons/filter_icon.svg" alt="">
+                        </div>
+                      </div>
+                      <div class="ac-rail">
+                        <span class="ac-r"><svg viewBox="0 0 28 28" fill="currentColor"><path d="M25.67 9.92a7.58 7.58 0 0 0-13.57-4.66c5.92.23 10.65 5.1 10.65 11.07l-.01.39.39.1c1.13.3 2.16-.73 1.86-1.85l-.15-.56c-.12-.45-.05-.92.15-1.35.43-.95.68-2.02.68-3.14Z" /><path fill-rule="evenodd" d="M21 16.33a9.33 9.33 0 0 1-13.36 8.42c-.42-.2-.9-.27-1.34-.15l-1.43.38a1.52 1.52 0 0 1-1.86-1.86l.38-1.43c.12-.45.05-.92-.15-1.34A9.33 9.33 0 1 1 21 16.33ZM7.58 17.5a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Zm4.09 0a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Zm4.08 0a1.17 1.17 0 1 0 0-2.33 1.17 1.17 0 0 0 0 2.33Z" /></svg><span id="liveLikes">0</span></span>
+                        <span class="ac-r"><svg viewBox="0 0 28 28" fill="currentColor"><path fill-rule="evenodd" d="M24.5 12.95v5.82c0 3.62 0 5.42-.86 6.21-.4.38-.92.61-1.47.68-1.15.13-2.5-1.06-5.19-3.44-1.19-1.05-1.78-1.58-2.47-1.71a2.6 2.6 0 0 0-1.02 0c-.69.13-1.28.66-2.47 1.71-2.69 2.38-4.04 3.57-5.19 3.44-.55-.07-1.07-.3-1.47-.68-.86-.79-.86-2.59-.86-6.21v-5.82c0-5 0-7.5 1.54-9.06C6.58 2.33 9.05 2.33 14 2.33s7.42 0 8.96 1.56c1.54 1.55 1.54 4.06 1.54 9.06ZM9.63 7c0-.48.39-.88.87-.88h7c.48 0 .88.4.88.88s-.4.88-.88.88h-7A.88.88 0 0 1 9.62 7Z" /></svg><span id="liveSaves">0</span></span>
+                        <span class="ac-r"><svg viewBox="0 0 28 28" fill="currentColor"><path d="m16.28 6.05 5.81 5.16c1.08.96 1.63 1.45 1.83 2.02.17.5.17 1.04 0 1.54-.2.57-.75 1.06-1.83 2.02l-5.81 5.16c-.5.44-.74.66-.95.67a.58.58 0 0 1-.47-.21c-.13-.16-.13-.5-.13-1.15V18c-2.83 0-5.83.91-8.01 2.52-1.14.84-1.71 1.27-1.92 1.25a.63.63 0 0 1-.46-.28c-.11-.19-.01-.77.18-1.93C5.82 12.02 11 10 14.73 10V6.75c0-.66 0-.99.13-1.15.12-.14.29-.22.47-.21.21 0 .46.22.95.66Z" /></svg><span>Share</span></span>
+                        <span class="ac-r"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9.2v5.6c0 .9.7 1.6 1.6 1.6h2.3l4.4 3.6c.8.6 1.9.1 1.9-.9V4.9c0-1-1.1-1.5-1.9-.9L6.9 7.6H4.6C3.7 7.6 3 8.3 3 9.2Z" /><path d="m16.5 9 5 5m0-5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg></span>
+                      </div>
+                      <div class="ac-info">
+                        <p class="ac-title">Jollof Rice And Chicken</p>
+                        <p class="ac-desc">Smoky party jollof with peppered chicken and fried plantain.</p>
+                        <div class="ac-store"><img src="/media/app-icons/shop_icon.svg" alt=""><b>Mama Ronke's Kitchen</b><span class="ac-time"><img src="/media/app-icons/scooter_icon.svg" alt="">25–35 mins</span></div>
+                        <div class="ac-city"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" /></svg>Yaba</div>
+                        <div class="ac-badges"><span class="ac-badge">🔥 NEW</span></div>
+                      </div>
+                      <div class="ac-actions">
+                        <span class="ac-menu"><img src="/media/app-icons/menu_fork_knife.svg" alt="">Menu</span>
+                        <span class="ac-cart"><span class="ac-cart-l"><img src="/media/app-icons/cart_icon.svg" alt="">Add to cart</span><span class="ac-cart-r">₦4,300</span></span>
+                      </div>
+                      <nav class="ac-tabs" aria-hidden="true">
+                        <span><img src="/media/app-icons/media_icon.svg" alt="">Feed</span>
+                        <span><img class="ac-white" src="/media/app-icons/community_icon.svg" alt="">Community</span>
+                        <span><img class="ac-white" src="/media/app-icons/explore_icon.svg" alt="">Explore</span>
+                        <span><img class="ac-white" src="/media/app-icons/outlined_bell.svg" alt="">Activity</span>
+                        <span><img class="ac-white" src="/media/app-icons/user_icons.svg" alt="">Profile</span>
+                      </nav>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -483,37 +474,8 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- ================= 7. CTA (kept) ================= -->
-    <section id="get-app" class="cta">
-      <div class="burst spin" data-burst="16">FREE<br>TO GET</div>
-      <div class="wrap" style="position:relative;z-index:2">
-        <h2 class="huge chunk"><span class="lw" data-chars>Swipe.</span><span class="lw" data-chars>Tap. Eat.</span></h2>
-        <p>Get Mealgro and see what the kitchens near you are cooking right now.</p>
-        <div class="stores">
-          <a v-for="(s, i) in stores" :key="s.key" class="btn" :class="i === 0 ? 'light' : 'ink'" :href="s.href" target="_blank" rel="noopener">
-            <template v-if="s.key === 'android'">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2.5v19l10-9.5L4 2.5Zm11.4 8.2L6.7 2.2l10.6 6.1-1.9 2.4Zm0 2.6 1.9 2.4-10.6 6.1 8.7-8.5Zm2.9-4.3 2.9 1.7c.7.4.7 1.4 0 1.8l-2.9 1.7-2.1-2.6 2.1-2.6Z" /></svg>
-              Get it on Google Play
-            </template>
-            <template v-else>
-              <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1ZM15 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5Z" /></svg>
-              Download on the App Store
-            </template>
-          </a>
-        </div>
-      </div>
-    </section>
+    <BrandCta />
 
-    <footer>
-      <div class="wrap">
-        <div class="foot">
-          <div><img :src="logoImage" alt="Mealgro" style="height:36px;margin-bottom:16px"><p style="max-width:260px;color:var(--muted)">Order what you just watched.</p></div>
-          <div><h4>Company</h4><a href="/about">About us</a><a href="/contact">Contact</a><a href="/status">Service status</a></div>
-          <div><h4>Join</h4><a href="/vendors">Sell on Mealgro</a><a href="/riders">Ride with Mealgro</a><a href="/affiliate">Affiliate program</a><a href="/account">Vendor portal</a></div>
-          <div><h4>Follow</h4><a href="https://www.instagram.com/trymealgro">Instagram</a><a href="https://x.com/mealgro">X</a><a href="https://www.facebook.com/share/14VPaxDJVbY/">Facebook</a><a href="https://www.linkedin.com/company/mealgro/">LinkedIn</a></div>
-        </div>
-        <div class="wordmark chunk"><span class="lw" data-chars>mealgro</span></div>
-        <div class="legal"><span>© {{ year }} Mealgro</span><span><a href="/terms">Terms of service</a> · <a href="/privacy">Privacy policy</a></span></div>
-      </div>
-    </footer>
+    <BrandFooter />
   </div>
 </template>

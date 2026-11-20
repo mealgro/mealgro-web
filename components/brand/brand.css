@@ -1,0 +1,103 @@
+/* Mealgro's brand look, from the landing page (components/landing): the
+   palette, Fredoka and Nunito, buttons, stickers, section headings, and the
+   nav, download section and footer every public page shares. Everything is
+   under .brand (the landing page and every SitePage carry it), so the
+   portals are not touched. */
+@import "@fontsource-variable/fredoka";
+@import "@fontsource-variable/nunito";
+
+.brand{
+  --cream:#FFF8F1; --peach:#FFE9D6; --ink:#16121B; --muted:#5d5563; --red:#D62300; --red-d:#A81B00; --red-2:#FF5A36;
+  --yellow:#FFD23F; --green:#2FB344; --purple:#7C5CFA; --pink:#FF9DCB;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --font-d:"Fredoka Variable","Fredoka",ui-rounded,system-ui,sans-serif; --font-b:"Nunito Variable","Nunito",system-ui,sans-serif;
+}
+:where(.brand .bnav,.brand .bcta,.brand .bfoot) *{box-sizing:border-box;margin:0;padding:0;font-family:inherit}
+:where(.brand .bnav,.brand .bfoot) ul{list-style:none}
+/* Zero specificity, so a button's own colour always wins */
+:where(.brand .bnav,.brand .bcta,.brand .bfoot) a{color:inherit;text-decoration:none}
+.brand .bnav img,.brand .bfoot img{display:block;max-width:100%}
+.brand .bfoot h4{color:var(--muted)}
+.brand .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.brand .chunk{font-family:var(--font-d);font-weight:700;letter-spacing:-.03em;line-height:.88}
+.brand .ch{display:inline-block;will-change:transform}
+.brand .lw{display:block;overflow:hidden;padding:.06em .04em .1em}
+.brand .bnav .nav{position:fixed;top:14px;left:50%;translate:-50% 0;z-index:60;display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+  border-radius:999px;padding:7px 7px 7px 18px;box-shadow:0 10px 40px rgba(22,18,27,.12);width:min(1160px,calc(100% - 28px));transition:transform .7s var(--ease)}
+.brand .bnav .nav.hide{transform:translateY(-150%)}
+.brand .bnav .nav .logo{margin-right:auto}
+.brand .bnav .nav .logo img{height:30px}
+.brand .bnav .nav ul{display:flex;list-style:none;gap:2px}
+.brand .bnav .nav ul a{font-family:var(--font-d);font-weight:600;font-size:16px;padding:10px 16px;border-radius:999px;transition:background .3s}
+.brand .bnav .nav ul a:hover{background:var(--peach)}
+@media (max-width:860px){.brand .bnav .nav ul{display:none}}
+.brand .bnav .menu-btn{display:none;flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--ink);cursor:pointer;position:relative}
+.brand .bnav .menu-btn i{position:absolute;left:14px;right:14px;height:2.5px;border-radius:2px;background:#fff;transition:transform .5s var(--ease),top .5s var(--ease)}
+.brand .bnav .menu-btn i:first-child{top:18px}
+.brand .bnav .menu-btn i:last-child{top:25.5px}
+.brand .bnav.menu-open .menu-btn i:first-child{top:22px;transform:rotate(45deg)}
+.brand .bnav.menu-open .menu-btn i:last-child{top:22px;transform:rotate(-45deg)}
+.brand .bnav .menu-btn:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+@media (max-width:860px){.brand .bnav .menu-btn{display:block}.brand .bnav .nav{padding-left:14px}}
+.brand .bnav .mnav{position:fixed;inset:0;z-index:55;background:var(--red);color:var(--cream);display:flex;flex-direction:column;justify-content:space-between;
+  padding:110px 24px 34px;clip-path:circle(0% at calc(100% - 44px) 37px);visibility:hidden;transition:clip-path .8s var(--ease),visibility 0s .8s}
+.brand .bnav.menu-open .mnav{clip-path:circle(150% at calc(100% - 44px) 37px);visibility:visible;transition:clip-path .8s var(--ease),visibility 0s}
+.brand .bnav .mnav ul{list-style:none}
+.brand .bnav .mnav li{overflow:hidden}
+.brand .bnav .mnav li a{display:flex;align-items:baseline;gap:14px;font-family:var(--font-d);font-weight:700;font-size:clamp(46px,13vw,90px);line-height:1.08;letter-spacing:-.03em;
+  transform:translateY(110%);transition:transform .7s var(--ease)}
+.brand .bnav .mnav li a small{font-size:14px;font-weight:600;color:var(--yellow);letter-spacing:0}
+.brand .bnav.menu-open .mnav li a{transform:none}
+.brand .bnav.menu-open .mnav li:nth-child(1) a{transition-delay:.15s}
+.brand .bnav.menu-open .mnav li:nth-child(2) a{transition-delay:.2s}
+.brand .bnav.menu-open .mnav li:nth-child(3) a{transition-delay:.25s}
+.brand .bnav.menu-open .mnav li:nth-child(4) a{transition-delay:.3s}
+.brand .bnav.menu-open .mnav li:nth-child(5) a{transition-delay:.35s}
+.brand .bnav .mnav-foot{display:flex;flex-direction:column;gap:18px;opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.brand .bnav.menu-open .mnav-foot{opacity:1;transform:none;transition-delay:.4s}
+.brand .bnav .mnav-foot .btn{align-self:flex-start;font-size:18px;padding:16px 26px}
+.brand .bnav .mnav-social{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--font-d);font-weight:600;font-size:16px}
+.brand .bnav .mnav-social a{opacity:.85}
+.brand .bnav .mnav .burst{position:absolute;right:24px;bottom:120px;width:110px;height:110px;background:var(--yellow);color:var(--ink);font-size:16px}
+html.brand-menu-open{overflow:hidden}
+.brand .btn{position:relative;display:inline-flex;align-items:center;gap:10px;font-family:var(--font-d);font-weight:600;font-size:17px;
+  background:var(--red);color:#fff;padding:14px 24px;border-radius:999px;overflow:hidden;isolation:isolate;transition:transform .5s var(--ease),color .4s;white-space:nowrap}
+.brand .btn::before{content:"";position:absolute;inset:0;background:var(--ink);transform:translateY(101%);transition:transform .5s var(--ease);z-index:-1}
+.brand .btn:hover::before{transform:none}
+.brand .btn.light{background:#fff;color:var(--ink)}
+.brand .btn.light:hover{color:#fff}
+.brand .btn.ink{background:var(--ink)}
+.brand .btn.ink::before{background:var(--red)}
+.brand .btn.yellow{background:var(--yellow);color:var(--ink)}
+.brand .btn.yellow:hover{color:#fff}
+.brand .bnav .nav .btn{padding:11px 20px;font-size:16px}
+/* Get the app: black on red, white once the ink fill rises (owner) */
+.brand .bnav .nav .btn{color:var(--ink)}
+.brand .bnav .nav .btn:hover{color:#fff}
+.brand .burst{display:grid;place-items:center;text-align:center;line-height:1;font-family:var(--font-d);font-weight:700}
+.brand .spin{animation:brand-spin 26s linear infinite}
+.brand .kick{display:inline-block;font-family:var(--font-d);font-weight:600;font-size:16px;background:var(--ink);color:var(--cream);padding:8px 16px;border-radius:999px;transform:rotate(-3deg);margin-bottom:22px}
+.brand .h2{font-size:clamp(56px,9vw,150px);color:var(--red)}
+.brand .lead{font-size:20px;color:var(--muted);max-width:460px;line-height:1.5}
+.brand .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:30px 40px;flex-wrap:wrap;margin-bottom:60px}
+.brand .bcta{background:var(--red);color:#fff;border-radius:48px;margin:0 12px;padding:150px 0 160px;overflow:hidden;text-align:center;position:relative}
+.brand .bcta .huge{font-size:clamp(76px,16vw,240px)}
+.brand .bcta p{font-size:21px;max-width:540px;margin:30px auto 40px;opacity:.95;line-height:1.45}
+.brand .bcta .stores{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.brand .bcta .burst{position:absolute;width:150px;height:150px;background:var(--yellow);color:var(--ink);font-size:21px;top:56px;right:7%}
+.brand footer.bfoot{padding:90px 0 40px;overflow:hidden}
+.brand .bfoot .foot{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:30px}
+.brand .bfoot .foot h4{font-family:var(--font-d);font-size:15px;color:var(--muted);font-weight:600;margin-bottom:14px}
+.brand .bfoot .foot a{display:block;font-family:var(--font-d);font-weight:600;font-size:18px;margin-bottom:8px;transition:color .3s}
+.brand .bfoot .foot a:hover{color:var(--red)}
+.brand .bfoot .wordmark{font-size:clamp(70px,17vw,250px);color:var(--red);margin-top:80px;white-space:nowrap;text-align:center;letter-spacing:-.05em}
+.brand .bfoot .legal{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:34px;color:var(--muted);font-size:14px}
+.brand .bfoot .legal a{display:inline}
+@media (max-width:760px){.brand .sec{padding:96px 0}.brand .bfoot .foot{grid-template-columns:1fr 1fr}.brand .bfoot .foot>div:first-child{grid-column:1/-1}.brand .bcta{padding:130px 0 120px;margin:0 8px;border-radius:36px}.brand .bcta .burst{width:96px;height:96px;font-size:14px;top:18px;right:14px}.brand .bcta .btn{font-size:16px}}
+
+/* The current page in the nav */
+.brand .bnav .nav ul a[aria-current="page"]{background:var(--peach);color:var(--red)}
+.brand .bnav .mnav li a[aria-current="page"]{color:var(--yellow)}
+@keyframes brand-spin{to{rotate:360deg}}
+@media (prefers-reduced-motion:reduce){.brand .spin{animation:none}.brand .bnav .nav,.brand .bnav .mnav,.brand .bnav .mnav li a,.brand .bnav .mnav-foot,.brand .btn,.brand .btn::before{transition:none!important}}
