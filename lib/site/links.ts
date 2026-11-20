@@ -5,7 +5,10 @@ export type StoreLinks = { ios: string | null; android: string | null };
 
 /** The customer app (it also holds vendor mode). Package id from mealgro-app. */
 export const CUSTOMER_APP: StoreLinks = {
-	ios: null,
+	// The same listing the API's share pages send iPhones to
+	// (mealgro core/src/modules/app/share). It opens once the App Store
+	// release is public.
+	ios: "https://apps.apple.com/app/mealgro/id6755588662",
 	android: "https://play.google.com/store/apps/details?id=app.mealgro.mobile",
 };
 

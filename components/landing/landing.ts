@@ -71,7 +71,10 @@ export function mountLanding(root: HTMLElement): () => void {
 		}
 		$$<HTMLAnchorElement>('a[href^="#"]').forEach((a) =>
 			on(a, "click", (e) => {
-				const t = root.querySelector<HTMLElement>(a.getAttribute("href")!);
+				// A phone's download links point at its store by now.
+				const href = a.getAttribute("href") ?? "";
+				if (!href.startsWith("#")) return;
+				const t = root.querySelector<HTMLElement>(href);
 				if (!t) return;
 				e.preventDefault();
 				if (lenis) lenis.scrollTo(t, { duration: 1.6, force: true });
