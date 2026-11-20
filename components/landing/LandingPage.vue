@@ -14,6 +14,7 @@ import BrandNav from "../brand/BrandNav.vue";
 import BrandCta from "../brand/BrandCta.vue";
 import BrandFooter from "../brand/BrandFooter.vue";
 import { CUSTOMER_APP } from "../../lib/site/links";
+import { videoUrl } from "../../lib/site/media";
 import { useStores } from "../../lib/site/stores";
 import type { LandingMotion } from "./landing";
 import { FAQS } from "./faqs";
@@ -119,7 +120,7 @@ onBeforeUnmount(() => {
 
     <!-- ================= 2. KITCHEN: vendor films, prices, posts ================= -->
     <section id="vendors-story" class="kitchen">
-      <div class="k-bg"><video src="/media/dish/jollof-chicken.mp4" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video></div>
+      <div class="k-bg"><video :src="videoUrl('/media/dish/jollof-chicken.mp4')" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video></div>
       <div class="k-grid">
         <div class="k-copy">
           <div class="k-kicker">Meanwhile, in a kitchen in Yaba <span id="kStep">01 / 04</span></div>
@@ -150,7 +151,7 @@ onBeforeUnmount(() => {
                 <div class="status"><span>9:41</span><span class="ic"><span class="bat"></span></span></div>
                 <!-- camera -->
                 <div class="scr scr-cam">
-                  <video id="camVid" class="cover" src="/media/dish/jollof-chicken.mp4" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video>
+                  <video id="camVid" class="cover" :src="videoUrl('/media/dish/jollof-chicken.mp4')" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video>
                   <div class="grid3"></div>
                   <div id="focus" class="focus"></div>
                   <div class="cam-top"><span>⚡</span><span id="rec" class="rec"><i></i><span id="recT">00:00</span></span><span>⚙︎</span></div>
@@ -160,7 +161,7 @@ onBeforeUnmount(() => {
                 <!-- editor -->
                 <div id="scrEdit" class="scr scr-edit">
                   <div class="ed-head"><span>Cancel</span><b>New post</b><span style="color:var(--yellow)">Draft</span></div>
-                  <div class="ed-thumb"><video class="cover" src="/media/dish/jollof-chicken.mp4" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video><span>0:15</span></div>
+                  <div class="ed-thumb"><video class="cover" :src="videoUrl('/media/dish/jollof-chicken.mp4')" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video><span>0:15</span></div>
                   <div class="ed-field"><small>CAPTION</small><span id="cap"></span><i class="caret"></i></div>
                   <div class="ed-row"><div class="ed-field ed-price"><small>PRICE</small><b id="edPrice">₦0</b></div><div class="ed-field"><small>READY IN</small>25–35 mins</div></div>
                   <div id="chips" class="ed-chips"><span>Rice</span><span>Chicken</span><span>Party jollof</span><span>Yaba</span></div>
@@ -173,7 +174,7 @@ onBeforeUnmount(() => {
                 </div>
                 <!-- live in feed -->
                 <div id="scrLive" class="scr scr-live">
-                  <video class="cover" src="/media/dish/jollof-chicken.mp4" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video>
+                  <video class="cover" :src="videoUrl('/media/dish/jollof-chicken.mp4')" poster="/media/dish/jollof-chicken.webp" muted loop playsinline autoplay></video>
                   <div class="shade"></div>
                   <div class="chrome">
                     <div class="appui">
@@ -330,7 +331,7 @@ onBeforeUnmount(() => {
             <div class="gz-mini">
               <div class="phone">
                 <div class="screen">
-                  <video src="/media/dish/shrimp-boil.mp4" poster="/media/dish/shrimp-boil.webp" muted loop playsinline autoplay></video>
+                  <video :src="videoUrl('/media/dish/shrimp-boil.mp4')" poster="/media/dish/shrimp-boil.webp" muted loop playsinline autoplay></video>
                   <div class="mini-tag"><span>Add to cart</span><span>₦14,500</span></div>
                 </div>
               </div>
@@ -445,7 +446,7 @@ onBeforeUnmount(() => {
             <span class="btn light">Become a rider →</span>
           </a>
           <a class="join" href="/affiliate">
-            <div class="bgimg"><video src="/media/landing/pexels/video-files/4994159/4994159-sd_540_960_25fps.mp4" poster="/media/landing/pexels/videos/4994159/pexels-photo-4994159.jpeg" muted loop playsinline autoplay preload="metadata" style="width:100%;height:100%;object-fit:cover"></video></div>
+            <div class="bgimg"><video :src="videoUrl('/media/landing/pexels/video-files/4994159/4994159-sd_540_960_25fps.mp4')" poster="/media/landing/pexels/videos/4994159/pexels-photo-4994159.jpeg" muted loop playsinline autoplay preload="metadata" style="width:100%;height:100%;object-fit:cover"></video></div>
             <div class="tagb burst spin" data-burst="14" style="background:var(--yellow)">EARN<br>₦₦₦</div>
             <h3 class="chunk">Bring kitchens, get paid</h3>
             <p>Know restaurants and food sellers? Earn a cash reward for every vendor we approve with your code.</p>
