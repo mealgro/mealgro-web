@@ -1,6 +1,5 @@
 import type { Config } from "vike/types";
 
-// Live status — read from the API at request time (SSR), never prerendered.
-export default {
-	prerender: false,
-} as Config;
+// Prerendered like every public page; the browser checks the API on arrival
+// and every 30 seconds after (lib/site/status.ts).
+export default {} as Config;

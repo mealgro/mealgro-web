@@ -37,46 +37,50 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useData } from "vike-vue/useData";
-import type { ServiceState, StatusData } from "./+data";
+import { checkStatus, type ServiceState, type StatusData } from "../../lib/site/status";
 import { localTime, plannedWhen } from "../../lib/maintenance";
 import SitePage from "../../components/site/SitePage.vue";
 import DocHero from "../../components/site/DocHero.vue";
 
-const data = useData<StatusData>();
+/** The latest check; null until the browser's first answer. */
+const status = ref<StatusData | null>(null);
 
-type RowState = ServiceState | "maintenance";
+type RowState = ServiceState | "maintenance" | "checking";
 const label: Record<RowState, string> = {
   operational: "Operational",
   down: "Down",
   unknown: "Unknown",
   maintenance: "Maintenance",
+  checking: "Checking",
 };
 
 /** Maintenance on now, or planned for later. */
-const down = computed(() => (data.maintenance?.active ? data.maintenance : null));
-const planned = computed(() =>
-  data.maintenance && !data.maintenance.active && data.maintenance.starts_at ? data.maintenance : null,
-);
+const down = computed(() => (status.value?.maintenance?.active ? status.value.maintenance : null));
+const planned = computed(() => {
+  const m = status.value?.maintenance;
+  return m && !m.active && m.starts_at ? m : null;
+});
 
 const rows = computed<{ name: string; state: RowState; ms: number | null }[]>(() => [
   {
     name: "API",
     // Up, but closed to everyone while maintenance is on.
-    state: down.value ? "maintenance" : data.api,
-    ms: data.apiMs,
+    state: !status.value ? "checking" : down.value ? "maintenance" : status.value.api,
+    ms: status.value?.apiMs ?? null,
   },
-  { name: "Live updates", state: data.live, ms: null },
+  { name: "Live updates", state: status.value?.live ?? "checking", ms: null },
 ]);
 
 const overall = computed(() => {
+  const s = status.value;
+  if (!s) return "checking";
   if (down.value) return "maintenance";
-  if (!data.reachable) return "unreachable";
-  return data.api === "operational" && data.live === "operational" ? "ok" : "partial";
+  if (!s.reachable) return "unreachable";
+  return s.api === "operational" && s.live === "operational" ? "ok" : "partial";
 });
 
 const shape = computed(
-  () => ({ ok: "sh-ci", maintenance: "sh-cd", partial: "sh-di", unreachable: "sh-di" })[overall.value],
+  () => ({ ok: "sh-ci", maintenance: "sh-cd", partial: "sh-di", unreachable: "sh-di", checking: "sh-sq" })[overall.value],
 );
 
 const headline = computed(
@@ -86,6 +90,7 @@ const headline = computed(
       partial: "Some systems are down",
       unreachable: "Mealgro is not reachable",
       maintenance: "Down for maintenance",
+      checking: "Checking Mealgro…",
     })[overall.value],
 );
 
@@ -95,17 +100,25 @@ const checkedAt = ref("");
 const backAt = ref("");
 const plannedAt = ref("");
 
-// Re-render from the server rather than polling the API from the browser, so
-// the page needs nothing from the API's CORS rules.
+// Checked from the browser on arrival and every 30 seconds (the API allows
+// mealgro.com); the page itself is prerendered.
 let timer: ReturnType<typeof setTimeout> | undefined;
-onMounted(() => {
-  checkedAt.value = new Date(data.checkedAt).toLocaleTimeString();
+let alive = true;
+async function refresh() {
+  const next = await checkStatus();
+  if (!alive) return;
+  status.value = next;
+  checkedAt.value = new Date(next.checkedAt).toLocaleTimeString();
   const end = down.value?.ends_at;
-  if (end && Date.parse(end) > Date.now()) backAt.value = localTime(end);
-  if (planned.value?.starts_at) plannedAt.value = plannedWhen(planned.value.starts_at, planned.value.ends_at);
-  timer = setTimeout(() => window.location.reload(), 30_000);
+  backAt.value = end && Date.parse(end) > Date.now() ? localTime(end) : "";
+  plannedAt.value = planned.value?.starts_at ? plannedWhen(planned.value.starts_at, planned.value.ends_at) : "";
+  timer = setTimeout(refresh, 30_000);
+}
+onMounted(refresh);
+onUnmounted(() => {
+  alive = false;
+  clearTimeout(timer);
 });
-onUnmounted(() => clearTimeout(timer));
 </script>
 
 <style scoped>
@@ -205,6 +218,14 @@ onUnmounted(() => clearTimeout(timer));
 .state.unknown {
 	background: var(--bg);
 	color: var(--muted);
+}
+.state.checking {
+	background: var(--bg);
+	color: var(--muted);
+}
+.overall.checking {
+	background: var(--bg);
+	--c: var(--muted);
 }
 .ms {
 	text-align: right;
