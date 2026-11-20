@@ -13,13 +13,9 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { videoUrl } from "../../lib/site/media";
 
 const DISH = "/media/dish/";
 const PEXELS = "/media/landing/pexels/";
-// The clips themselves: see videoUrl.
-const DISH_VIDEO = videoUrl(DISH);
-const PEXELS_VIDEO = videoUrl(PEXELS);
 
 /** What the page holds on to: the menu pauses smooth scrolling, unmount undoes it all. */
 export type LandingMotion = { lockScroll: (locked: boolean) => void; destroy: () => void };
@@ -130,7 +126,7 @@ export function mountLanding(root: HTMLElement): LandingMotion {
 		// zooms that same clip to full screen. A tap only throws hearts.
 		const d = { v: "beef-suya", name: "Beef Suya", desc: "Grilled beef in yaji spice, with fresh tomato and onion.", k: "Mallam Sule Suya", area: "Wuse", t: "15–25 mins", r: "4.7", n: "400+", p: "₦3,500", saves: 211, reviews: 96 };
 		const feed = $("#feed");
-		feed.innerHTML = `<div class="slide"><video muted loop playsinline autoplay preload="auto" poster="${DISH}${d.v}.webp" src="${DISH_VIDEO}${d.v}.mp4"></video><div class="shade"></div></div>`;
+		feed.innerHTML = `<div class="slide"><video muted loop playsinline autoplay preload="auto" poster="${DISH}${d.v}.webp" src="${DISH}${d.v}.mp4"></video><div class="shade"></div></div>`;
 		$("#segs").innerHTML = '<div class="seg done"><i></i></div>';
 		const heroVid = feed.querySelector("video")!;
 		heroVid.play().catch(() => {});
@@ -512,7 +508,7 @@ export function mountLanding(root: HTMLElement): LandingMotion {
 		const ttCard = ([v, name, k, , isVid]: TtItem, useVideo: boolean) =>
 			`<div class="tt-card">${
 				useVideo && isVid
-					? `<video src="${DISH_VIDEO}${v}.mp4" poster="${DISH}${v}.webp" muted loop playsinline autoplay preload="metadata"></video>`
+					? `<video src="${DISH}${v}.mp4" poster="${DISH}${v}.webp" muted loop playsinline autoplay preload="metadata"></video>`
 					: `<img src="${DISH}${v}.webp" alt="" loading="lazy">`
 			}<div class="tt-heart"><b>♥</b></div><div class="tt-meta">${name}<small>${k}</small></div></div>`;
 		const cols = mobile() ? 4 : 6;
@@ -542,7 +538,7 @@ export function mountLanding(root: HTMLElement): LandingMotion {
 			CREATORS.map(
 				(c, i) => `
     <div class="cr-card">
-      <video src="${PEXELS_VIDEO}video-files/${c.v}.mp4" poster="${PEXELS}videos/${c.p}.jpeg" muted loop playsinline autoplay preload="metadata"></video>
+      <video src="${PEXELS}video-files/${c.v}.mp4" poster="${PEXELS}videos/${c.p}.jpeg" muted loop playsinline autoplay preload="metadata"></video>
       <div class="shade"></div>
       <div class="cr-top"><span class="cr-live"><i></i>REC</span><span>0:${15 + i * 7}</span></div>
       <div class="cr-rail"><span>❤️</span><span>💬</span><span>🔖</span><span>↗️</span></div>
@@ -592,7 +588,7 @@ export function mountLanding(root: HTMLElement): LandingMotion {
 		const csTag = $("#csTag");
 		csTrack.innerHTML = CHEFS.map(
 			(c, i) =>
-				`<div class="cs-slide" role="group" aria-label="${i + 1} of ${CHEFS.length}"><video muted loop playsinline preload="${i ? "none" : "metadata"}" poster="${PEXELS}videos/${c.p}.jpeg" src="${PEXELS_VIDEO}video-files/${c.v}.mp4"></video></div>`,
+				`<div class="cs-slide" role="group" aria-label="${i + 1} of ${CHEFS.length}"><video muted loop playsinline preload="${i ? "none" : "metadata"}" poster="${PEXELS}videos/${c.p}.jpeg" src="${PEXELS}video-files/${c.v}.mp4"></video></div>`,
 		).join("");
 		csDots.innerHTML = CHEFS.map((_c, i) => `<button aria-label="Show chef ${i + 1}"></button>`).join("");
 		const csSlides = Array.from(csTrack.querySelectorAll<HTMLElement>(".cs-slide"));
