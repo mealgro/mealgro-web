@@ -121,69 +121,28 @@ export function mountLanding(root: HTMLElement): LandingMotion {
 			});
 		});
 
-		/* ---------- hero feed ---------- */
-		const dishes = [
-			{ v: "beef-suya", name: "Beef Suya", desc: "Grilled beef in yaji spice, with fresh tomato and onion.", k: "Mallam Sule Suya", area: "Wuse", t: "15–25 mins", r: "4.7", n: "400+", p: "₦3,500", likes: 954, saves: 211, reviews: 96 },
-			{ v: "jollof-chicken", name: "Jollof Rice And Chicken", desc: "Smoky party jollof with peppered chicken and fried plantain.", k: "Mama Ronke's Kitchen", area: "Yaba", t: "25–35 mins", r: "4.6", n: "300+", p: "₦4,300", likes: 412, saves: 128, reviews: 128 },
-			{ v: "shrimp-boil", name: "Shrimp Boil Tray", desc: "Prawns, sweetcorn and lemon in spicy garlic butter.", k: "Bayside Boil", area: "Lekki", t: "35–50 mins", r: "4.8", n: "200+", p: "₦14,500", likes: 688, saves: 96, reviews: 74 },
-		];
+		/* ---------- hero phone: one dish, on loop ---------- */
+		// The phone holds one dish (owner): its clip loops and the scroll below
+		// zooms that same clip to full screen. A tap only throws hearts.
+		const d = { v: "beef-suya", name: "Beef Suya", desc: "Grilled beef in yaji spice, with fresh tomato and onion.", k: "Mallam Sule Suya", area: "Wuse", t: "15–25 mins", r: "4.7", n: "400+", p: "₦3,500", saves: 211, reviews: 96 };
 		const feed = $("#feed");
-		const segs = $("#segs");
-		const info = $("#info");
-		feed.innerHTML = dishes
-			.map((d) => `<div class="slide"><video muted loop playsinline preload="auto" poster="${DISH}${d.v}.webp" src="${DISH}${d.v}.mp4"></video><div class="shade"></div></div>`)
-			.join("");
-		segs.innerHTML = dishes.map(() => '<div class="seg"><i></i></div>').join("");
-		const vids = Array.from(feed.querySelectorAll("video"));
-		const segEls = Array.from(segs.querySelectorAll<HTMLElement>(".seg"));
-		let idx = -1;
-		let timer: number | undefined;
-		let first = true;
-		let feedPaused = false;
-		const show = (i: number) => {
-			idx = (i + dishes.length) % dishes.length;
-			const d = dishes[idx];
-			feed.style.transform = `translateY(-${idx * 100}%)`;
-			vids.forEach((v, j) => {
-				if (j === idx) {
-					v.currentTime = 0;
-					v.play().catch(() => {});
-				} else v.pause();
-			});
-			segEls.forEach((s, j) => {
-				s.classList.remove("active");
-				s.classList.toggle("done", j < idx);
-				void s.offsetWidth;
-				if (j === idx) s.classList.add("active");
-			});
-			const apply = () => {
-				// The app's info block: dish, description, store and delivery time,
-				// area, then the badge and rating chips.
-				info.innerHTML =
-					`<p class="ac-title">${d.name}</p><p class="ac-desc">${d.desc}</p>` +
-					`<div class="ac-store"><img src="/media/app-icons/shop_icon.svg" alt=""><b>${d.k}</b><span class="ac-time"><img src="/media/app-icons/scooter_icon.svg" alt="">${d.t}</span></div>` +
-					`<div class="ac-city"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>${d.area}</div>` +
-					`<div class="ac-badges"><span class="ac-badge">🔥 POPULAR</span><span class="ac-rating"><img src="/media/app-icons/mealgro_icon.svg" alt="">${d.r}<svg viewBox="0 0 24 24" fill="#FEA000"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9Z"/></svg>(${d.n})</span></div>`;
-				$("#price").textContent = d.p;
-				$("#reviews").textContent = String(d.reviews);
-				$("#saves").textContent = String(d.saves);
-				info.classList.remove("swap");
-			};
-			if (first) {
-				apply();
-				first = false;
-			} else {
-				info.classList.add("swap");
-				after(apply, 380);
-			}
-			cancel(timer);
-			if (!feedPaused) timer = after(() => show(idx + 1), 5200);
-		};
-		show(0);
+		feed.innerHTML = `<div class="slide"><video muted loop playsinline autoplay preload="auto" poster="${DISH}${d.v}.webp" src="${DISH}${d.v}.mp4"></video><div class="shade"></div></div>`;
+		$("#segs").innerHTML = '<div class="seg done"><i></i></div>';
+		const heroVid = feed.querySelector("video")!;
+		heroVid.play().catch(() => {});
+		// The app's info block: dish, description, store and delivery time, area,
+		// then the badge and rating chips.
+		$("#info").innerHTML =
+			`<p class="ac-title">${d.name}</p><p class="ac-desc">${d.desc}</p>` +
+			`<div class="ac-store"><img src="/media/app-icons/shop_icon.svg" alt=""><b>${d.k}</b><span class="ac-time"><img src="/media/app-icons/scooter_icon.svg" alt="">${d.t}</span></div>` +
+			`<div class="ac-city"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>${d.area}</div>` +
+			`<div class="ac-badges"><span class="ac-badge">🔥 POPULAR</span><span class="ac-rating"><img src="/media/app-icons/mealgro_icon.svg" alt="">${d.r}<svg viewBox="0 0 24 24" fill="#FEA000"><path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9Z"/></svg>(${d.n})</span></div>`;
+		$("#price").textContent = d.p;
+		$("#reviews").textContent = String(d.reviews);
+		$("#saves").textContent = String(d.saves);
 		const heroScreen = $("#heroScreen");
 		on(heroScreen, "click", (ev) => {
 			const e = ev as MouseEvent;
-			show(idx + 1);
 			const rect = heroScreen.getBoundingClientRect();
 			["❤️", "😋", "🔥", "🧡"].forEach((em, k) => {
 				const h = document.createElement("span");
@@ -245,22 +204,15 @@ export function mountLanding(root: HTMLElement): LandingMotion {
 				onUpdate: (self) => {
 					if (self.progress > 0.12 && !synced) {
 						synced = true;
-						feedPaused = true;
-						cancel(timer);
-						const d = dishes[idx];
-						const v = vids[idx];
-						zVid.src = v.currentSrc || v.src;
-						zVid.currentTime = v.currentTime || 0;
+						zVid.src = heroVid.currentSrc || heroVid.src;
+						zVid.currentTime = heroVid.currentTime || 0;
 						zVid.play().catch(() => {});
-						$("#zTitle").textContent = `${d.name.split(" And ")[0]}.`;
+						$("#zTitle").textContent = `${d.name}.`;
 						$("#zTag").textContent = `🔥 Popular in ${d.area}`;
 						$("#zSub").textContent = `You watched it. Now it's cooking at ${d.k}. At your door in ${d.t}.`;
 					} else if (self.progress < 0.08 && synced) {
 						synced = false;
-						feedPaused = false;
 						zVid.pause();
-						cancel(timer);
-						timer = after(() => show(idx + 1), 3000);
 					}
 				},
 			},
