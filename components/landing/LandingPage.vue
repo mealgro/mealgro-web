@@ -5,7 +5,7 @@
 // so the next page starts clean. Dish media is the site's own (/media/dish);
 // the stock clips and photos are in /media/landing (Pexels and Unsplash
 // licences: free to use, no attribution required).
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import "@fontsource-variable/fredoka";
 import "@fontsource-variable/nunito";
 import "./landing.css";
@@ -14,11 +14,48 @@ import { CUSTOMER_APP } from "../../lib/site/links";
 import { FAQS } from "./faqs";
 
 const root = ref<HTMLElement | null>(null);
+
+// The visitor's device, for the download buttons. Unknown until mounted (the
+// page is prerendered), so the server HTML shows every store.
+type Platform = "ios" | "android" | "mac" | "other";
+const platform = ref<Platform>("other");
+function detectPlatform(): Platform {
+	const ua = navigator.userAgent;
+	if (/android/i.test(ua)) return "android";
+	// iPadOS asks for the desktop site and says "Macintosh"; touch gives it away.
+	if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return "ios";
+	if (/Macintosh|Mac OS X/.test(ua)) return "mac";
+	return "other";
+}
+
+type Store = { key: "ios" | "android"; href: string };
+const allStores = (): Store[] => [
+	...(CUSTOMER_APP.ios ? [{ key: "ios" as const, href: CUSTOMER_APP.ios }] : []),
+	...(CUSTOMER_APP.android ? [{ key: "android" as const, href: CUSTOMER_APP.android }] : []),
+];
+/** On a phone, its own store when there is one; on a computer, every store, the Mac's first on a Mac. */
+const stores = computed<Store[]>(() => {
+	const list = allStores();
+	const p = platform.value;
+	if (p === "ios" || p === "android") {
+		const own = list.filter((s) => s.key === p);
+		if (own.length) return own;
+	}
+	const first = p === "ios" || p === "mac" ? "ios" : "android";
+	return [...list].sort((a, b) => Number(b.key === first) - Number(a.key === first));
+});
+/** A phone's "Download now" goes straight to its store; elsewhere it scrolls to the buttons. */
+const directStore = computed(() => {
+	const p = platform.value;
+	if (p !== "ios" && p !== "android") return null;
+	return allStores().find((s) => s.key === p)?.href ?? null;
+});
 const faqs = FAQS;
 const year = new Date().getFullYear();
 let stop: (() => void) | null = null;
 
 onMounted(async () => {
+	platform.value = detectPlatform();
 	const { mountLanding } = await import("./landing");
 	if (root.value) stop = mountLanding(root.value);
 });
@@ -41,7 +78,7 @@ onBeforeUnmount(() => {
         <li><a href="/affiliate">Affiliates</a></li>
         <li><a href="/about">About</a></li>
       </ul>
-      <a class="btn" href="#get-app">Get the app</a>
+      <a class="btn" :href="directStore ?? '#get-app'" :target="directStore ? '_blank' : undefined" :rel="directStore ? 'noopener' : undefined">Get the app</a>
       <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><i></i><i></i></button>
     </nav>
 
@@ -55,7 +92,7 @@ onBeforeUnmount(() => {
       </ul>
       <div class="burst spin" data-burst="16">HUNGRY?</div>
       <div class="mnav-foot">
-        <a class="btn yellow" href="#get-app" data-close>Get the app →</a>
+        <a class="btn yellow" :href="directStore ?? '#get-app'" :target="directStore ? '_blank' : undefined" :rel="directStore ? 'noopener' : undefined" data-close>Get the app →</a>
         <div class="mnav-social"><a href="https://www.instagram.com/trymealgro">Instagram</a><a href="https://x.com/mealgro">X</a><a href="https://www.facebook.com/share/14VPaxDJVbY/">Facebook</a><a href="https://www.linkedin.com/company/mealgro/">LinkedIn</a></div>
       </div>
     </div>
@@ -71,7 +108,7 @@ onBeforeUnmount(() => {
       <div class="hero-ctas">
         <div>
           <p>Short videos from kitchens near you. Swipe, tap, and it's on its way.</p>
-          <a class="btn yellow" href="#get-app">Download now</a>
+          <a class="btn yellow" :href="directStore ?? '#get-app'" :target="directStore ? '_blank' : undefined" :rel="directStore ? 'noopener' : undefined">Download now</a>
         </div>
         <div class="scroll-cue"><i></i>Scroll to watch it happen</div>
       </div>
@@ -452,12 +489,16 @@ onBeforeUnmount(() => {
         <h2 class="huge chunk"><span class="lw" data-chars>Swipe.</span><span class="lw" data-chars>Tap. Eat.</span></h2>
         <p>Get Mealgro and see what the kitchens near you are cooking right now.</p>
         <div class="stores">
-          <a v-if="CUSTOMER_APP.android" class="btn light" :href="CUSTOMER_APP.android" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2.5v19l10-9.5L4 2.5Zm11.4 8.2L6.7 2.2l10.6 6.1-1.9 2.4Zm0 2.6 1.9 2.4-10.6 6.1 8.7-8.5Zm2.9-4.3 2.9 1.7c.7.4.7 1.4 0 1.8l-2.9 1.7-2.1-2.6 2.1-2.6Z" /></svg>
-            Get it on Google Play</a>
-          <a v-if="CUSTOMER_APP.ios" class="btn ink" :href="CUSTOMER_APP.ios" target="_blank" rel="noopener">
-            <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1ZM15 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5Z" /></svg>
-            Download on the App Store</a>
+          <a v-for="(s, i) in stores" :key="s.key" class="btn" :class="i === 0 ? 'light' : 'ink'" :href="s.href" target="_blank" rel="noopener">
+            <template v-if="s.key === 'android'">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2.5v19l10-9.5L4 2.5Zm11.4 8.2L6.7 2.2l10.6 6.1-1.9 2.4Zm0 2.6 1.9 2.4-10.6 6.1 8.7-8.5Zm2.9-4.3 2.9 1.7c.7.4.7 1.4 0 1.8l-2.9 1.7-2.1-2.6 2.1-2.6Z" /></svg>
+              Get it on Google Play
+            </template>
+            <template v-else>
+              <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4.1ZM15 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5Z" /></svg>
+              Download on the App Store
+            </template>
+          </a>
         </div>
       </div>
     </section>
