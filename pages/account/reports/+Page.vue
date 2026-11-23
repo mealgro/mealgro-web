@@ -84,7 +84,11 @@ async function download(format: "csv" | "xlsx") {
 }
 
 const money = (n: number) => formatMoney(n, report.value?.symbol ?? "");
-const peak = computed(() => Math.max(1, ...(report.value?.series ?? []).map((p) => p.gross_sales)));
+const peak = computed(() => Math.max(1, ...(report.value?.series ?? []).map((p) => p.earnings)));
+const completedShare = computed(() => {
+	const t = report.value?.totals;
+	return t && t.orders ? `${Math.round((t.completed / t.orders) * 100)}% of orders` : "";
+});
 const periodLabel = (iso: string) =>
 	new Date(iso).toLocaleDateString("en-NG", {
 		day: q.value.group === "month" ? undefined : "numeric",
@@ -124,16 +128,16 @@ const periodLabel = (iso: string) =>
 				<HeroPanel
 					class="stats-hero"
 					numeric
-					eyebrow="Gross sales"
+					eyebrow="Your earnings"
 					shape="ci"
 					color="var(--cat-2)"
-					:title="money(report.totals.gross_sales)"
+					:title="money(report.totals.earnings)"
 					:lead="rangeText"
 				/>
 				<div class="stats-tiles">
-					<StatTile :order="1" :tone="1" shape="sq" label="Your earnings" :value="money(report.totals.earnings)" />
-					<StatTile :order="2" :tone="4" shape="di" label="Completed" :value="report.totals.completed.toLocaleString()" :sub="`of ${report.totals.orders.toLocaleString()} orders`" />
-					<StatTile :order="3" :tone="3" shape="cd" label="Average order" :value="money(report.totals.average_order)" />
+					<StatTile :order="1" :tone="1" shape="sq" label="Orders" :value="report.totals.orders.toLocaleString()" />
+					<StatTile :order="2" :tone="4" shape="di" label="Completed" :value="report.totals.completed.toLocaleString()" :sub="completedShare" />
+					<StatTile :order="3" :tone="3" shape="cd" label="Average earning" :value="money(report.totals.average_earning)" sub="per completed order" />
 					<StatTile :order="4" :tone="5" shape="tr" label="Cancelled or rejected" :value="report.totals.cancelled.toLocaleString()" />
 				</div>
 			</div>
@@ -142,14 +146,13 @@ const periodLabel = (iso: string) =>
 				<div class="card-h pad"><h3 id="rp-branch">By branch</h3></div>
 				<div class="p-scroll">
 					<table class="p-table">
-						<thead><tr><th>Branch</th><th class="num">Orders</th><th class="num">Completed</th><th class="num">Cancelled</th><th class="num">Gross sales</th><th class="num">Earnings</th></tr></thead>
+						<thead><tr><th>Branch</th><th class="num">Orders</th><th class="num">Completed</th><th class="num">Cancelled</th><th class="num">Earnings</th></tr></thead>
 						<tbody>
 							<tr v-for="b in report.branches" :key="b.store">
 								<td data-primary><strong>{{ b.display_name }}</strong></td>
 								<td class="num" data-label="Orders">{{ b.totals.orders }}</td>
 								<td class="num" data-label="Completed">{{ b.totals.completed }}</td>
 								<td class="num" data-label="Cancelled">{{ b.totals.cancelled }}</td>
-								<td class="num" data-label="Gross sales">{{ money(b.totals.gross_sales) }}</td>
 								<td class="num" data-label="Earnings">{{ money(b.totals.earnings) }}</td>
 							</tr>
 						</tbody>
@@ -159,13 +162,13 @@ const periodLabel = (iso: string) =>
 
 			<div class="two-col">
 				<section class="card-box arrive" style="--i: 6" aria-labelledby="rp-sales">
-					<h3 id="rp-sales" class="chart-h"><span class="sh sh-ci" style="--c: var(--cat-2)" />Gross sales over time</h3>
-					<StateBlock :empty="!report.series.length" empty-text="No sales in this period.">
+					<h3 id="rp-sales" class="chart-h"><span class="sh sh-ci" style="--c: var(--cat-2)" />Earnings over time</h3>
+					<StateBlock :empty="!report.series.length" empty-text="No earnings in this period.">
 						<ul class="bars" role="list">
 							<li v-for="p in report.series" :key="p.period">
 								<span class="when">{{ periodLabel(p.period) }}</span>
-								<span class="bar" :aria-label="money(p.gross_sales)"><span class="grow-x" :style="{ width: `${(p.gross_sales / peak) * 100}%` }" /></span>
-								<span class="amt">{{ money(p.gross_sales) }}</span>
+								<span class="bar" :aria-label="money(p.earnings)"><span class="grow-x" :style="{ width: `${(p.earnings / peak) * 100}%` }" /></span>
+								<span class="amt">{{ money(p.earnings) }}</span>
 							</li>
 						</ul>
 					</StateBlock>
@@ -174,12 +177,11 @@ const periodLabel = (iso: string) =>
 					<div class="card-h pad"><h3 id="rp-items">Top items</h3></div>
 					<StateBlock :empty="!report.top_items.length" empty-text="Nothing sold in this period.">
 						<table class="p-table">
-							<thead><tr><th>Item</th><th class="num">Sold</th><th class="num">Sales</th></tr></thead>
+							<thead><tr><th>Item</th><th class="num">Sold</th></tr></thead>
 							<tbody>
 								<tr v-for="i in report.top_items" :key="i.name">
 									<td data-primary>{{ i.name }}</td>
 									<td class="num" data-label="Sold">{{ i.quantity }}</td>
-									<td class="num" data-label="Sales">{{ money(i.sales) }}</td>
 								</tr>
 							</tbody>
 						</table>

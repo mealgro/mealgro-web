@@ -206,15 +206,15 @@ export type Branch = {
 
 export type BrandBranches = { id: string; name: string; branches: Branch[] };
 
+/** Order counts and earnings only: the API never sends what customers paid. */
 export type Totals = {
 	orders: number;
 	completed: number;
 	cancelled: number;
-	gross_sales: number;
-	delivery_fees: number;
-	service_charges: number;
+	/** What the branch's wallet was paid in the period. */
 	earnings: number;
-	average_order: number;
+	/** Earnings per completed order. */
+	average_earning: number;
 };
 
 export type Report = {
@@ -225,8 +225,9 @@ export type Report = {
 	symbol: string;
 	totals: Totals;
 	branches: { store: string; display_name: string; branch_label: string; totals: Totals }[];
-	series: { period: string; orders: number; gross_sales: number; earnings: number }[];
-	top_items: { name: string; quantity: number; sales: number }[];
+	series: { period: string; orders: number; earnings: number }[];
+	/** By quantity sold. */
+	top_items: { name: string; quantity: number }[];
 };
 
 /** `code` is the ISO country code on a country, lower or upper case. */
