@@ -1,0 +1,4 @@
+<template>
+	<meta name="robots" content="noindex, nofollow" />
+	<meta name="referrer" content="no-referrer" />
+</template>
